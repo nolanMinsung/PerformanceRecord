@@ -32,13 +32,13 @@ struct FacilityResponse: Codable, Hashable {
     /// 공연장 수
     let mt13cnt: String
     
-    /// 시설 특성
+    /// 시설 특성 - 해외 지역인 경우 응답값은 "기타(해외 등)"
     let fcltychartr: String
     
-    /// 시도명
+    /// 시도명 - 해외 지역인 경우 응답값은 빈 문자열
     let sidonm: String
     
-    /// 구군명
+    /// 구군명 - 해외 지역인 경우 응답값은 빈 문자열
     let gugunnm: String
     
     /// 개관연도
