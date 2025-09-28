@@ -44,7 +44,7 @@
 		4E52FAB22E890BF100EB3EBB /* Exceptions for "Muyeon" folder in "Muyeon" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				"Source/Global/Supporting FIles/Info.plist",
+				"Source/Global/Supporting FIles/InfoPlist/Info.plist",
 				Source/Test/MuyeonTests/MuyeonTests.swift,
 				Source/Test/MuyeonUITests/MuyeonUITests.swift,
 				Source/Test/MuyeonUITests/MuyeonUITestsLaunchTests.swift,
@@ -325,7 +325,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 548W892M42;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/Info.plist";
+				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/InfoPlist/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Muyeon;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -355,7 +355,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 548W892M42;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/Info.plist";
+				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/InfoPlist/Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Muyeon;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
