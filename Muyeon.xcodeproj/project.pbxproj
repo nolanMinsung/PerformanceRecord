@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		4E52FABF2E890C2C00EB3EBB /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 4E52FABE2E890C2C00EB3EBB /* .gitignore */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		4E52FAA12E890BF100EB3EBB /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -27,15 +31,34 @@
 		4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muyeon.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E52FAA02E890BF100EB3EBB /* MuyeonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuyeonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E52FAAA2E890BF100EB3EBB /* MuyeonUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuyeonUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E52FABE2E890C2C00EB3EBB /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
 		4E52FAB22E890BF100EB3EBB /* Exceptions for "Muyeon" folder in "Muyeon" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				"Source/Global/Supporting FIles/Info.plist",
+				Source/Test/MuyeonTests/MuyeonTests.swift,
+				Source/Test/MuyeonUITests/MuyeonUITests.swift,
+				Source/Test/MuyeonUITests/MuyeonUITestsLaunchTests.swift,
 			);
 			target = 4E52FA892E890BEF00EB3EBB /* Muyeon */;
+		};
+		4E52FAD02E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonTests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Source/Test/MuyeonTests/MuyeonTests.swift,
+			);
+			target = 4E52FA9F2E890BF100EB3EBB /* MuyeonTests */;
+		};
+		4E52FAD12E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonUITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Source/Test/MuyeonUITests/MuyeonUITests.swift,
+				Source/Test/MuyeonUITests/MuyeonUITestsLaunchTests.swift,
+			);
+			target = 4E52FAA92E890BF100EB3EBB /* MuyeonUITests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
@@ -44,18 +67,10 @@
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
 				4E52FAB22E890BF100EB3EBB /* Exceptions for "Muyeon" folder in "Muyeon" target */,
+				4E52FAD02E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonTests" target */,
+				4E52FAD12E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonUITests" target */,
 			);
 			path = Muyeon;
-			sourceTree = "<group>";
-		};
-		4E52FAA32E890BF100EB3EBB /* MuyeonTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MuyeonTests;
-			sourceTree = "<group>";
-		};
-		4E52FAAD2E890BF100EB3EBB /* MuyeonUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MuyeonUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -88,9 +103,8 @@
 		4E52FA812E890BEF00EB3EBB = {
 			isa = PBXGroup;
 			children = (
+				4E52FABE2E890C2C00EB3EBB /* .gitignore */,
 				4E52FA8C2E890BEF00EB3EBB /* Muyeon */,
-				4E52FAA32E890BF100EB3EBB /* MuyeonTests */,
-				4E52FAAD2E890BF100EB3EBB /* MuyeonUITests */,
 				4E52FA8B2E890BEF00EB3EBB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -143,9 +157,6 @@
 			dependencies = (
 				4E52FAA22E890BF100EB3EBB /* PBXTargetDependency */,
 			);
-			fileSystemSynchronizedGroups = (
-				4E52FAA32E890BF100EB3EBB /* MuyeonTests */,
-			);
 			name = MuyeonTests;
 			packageProductDependencies = (
 			);
@@ -165,9 +176,6 @@
 			);
 			dependencies = (
 				4E52FAAC2E890BF100EB3EBB /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				4E52FAAD2E890BF100EB3EBB /* MuyeonUITests */,
 			);
 			name = MuyeonUITests;
 			packageProductDependencies = (
@@ -225,6 +233,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4E52FABF2E890C2C00EB3EBB /* .gitignore in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,12 +300,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 548W892M42;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Muyeon/Info.plist;
+				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Muyeon;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -319,12 +330,14 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 548W892M42;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = Muyeon/Info.plist;
+				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = Muyeon;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
-				INFOPLIST_KEY_UIMainStoryboardFile = Main;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
