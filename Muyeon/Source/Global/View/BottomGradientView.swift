@@ -7,22 +7,23 @@
 
 import UIKit
 
+// traitChange 관련 버전별 분기처리는 더 간단하게 할 수 있으나,(traitCollectionDidChange override만)
+// 공부 목적으로 registerForTraitChanges 메서드도 구현하였음.
+
 class BottomGradientView: UIView {
     
-    override class var layerClass: AnyClass {
-        return CAGradientLayer.self
-    }
-    
-    private var gradientLayer: CAGradientLayer {
-        return layer as! CAGradientLayer
-    }
+    private let gradientLayer = CAGradientLayer()
     
     private let color: UIColor
     
     init(color: UIColor) {
         self.color = color
         super.init(frame: .zero)
-        setupGradient()
+        layer.addSublayer(gradientLayer)
+        updateGradientColors()
+        if #available(iOS 17.0, *) {
+            registerForTraitChanges()
+        }
     }
     
     required init?(coder: NSCoder) {
@@ -34,9 +35,26 @@ class BottomGradientView: UIView {
         gradientLayer.frame = bounds
     }
     
-    private func setupGradient() {
+    @available(iOS 17.0, *)
+    private func registerForTraitChanges() {
+        registerForTraitChanges([UITraitUserInterfaceStyle.self]) { [weak self] (view: Self, previousTraitCollection) in
+            self?.updateGradientColors()
+        }
+    }
+    
+    override func traitCollectionDidChange(_ previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+        
+        if #available(iOS 17.0, *) { return }
+        if traitCollection.hasDifferentColorAppearance(comparedTo: previousTraitCollection) {
+            updateGradientColors()
+        }
+    }
+    
+    private func updateGradientColors() {
         let topColor = color.withAlphaComponent(0.0).cgColor
         let bottomColor = color.cgColor
+        
         gradientLayer.colors = [topColor, bottomColor, bottomColor]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         gradientLayer.locations = [0.0, 0.5, 1.0]

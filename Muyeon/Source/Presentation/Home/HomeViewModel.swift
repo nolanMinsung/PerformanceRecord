@@ -24,16 +24,12 @@ final class HomeViewModel {
     }
     
     struct Output {
-        let topTenContents: PublishRelay<[BoxOfficeItem]>
+        let topTenContents: BehaviorRelay<[BoxOfficeItem]>
         let boxOfficeGenres: BehaviorRelay<[Constant.BoxOfficeGenre]>
-        let trendingContents: PublishRelay<[BoxOfficeItem]>
+        let trendingContents: BehaviorRelay<[BoxOfficeItem]>
+        let presentDetail: PublishRelay<Void>
         let errorRelay: PublishRelay<any Error>
     }
-    
-    private var boxOfficeGenres = Constant.BoxOfficeGenre.allCases.map { HomeUIModel.genre(model: $0) }
-    private var topTenContents: [HomeUIModel] = []
-    private var trendingContents: [HomeUIModel] = []
-    
     
     init(
         fetchBoxOfficeUseCase: some FetchBoxOfficeUseCase,
@@ -44,9 +40,10 @@ final class HomeViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let topTenContents = PublishRelay<[BoxOfficeItem]>()
+        let topTenContents = BehaviorRelay<[BoxOfficeItem]>(value: [])
         let boxOfficeGenres = BehaviorRelay<[Constant.BoxOfficeGenre]>(value: Constant.BoxOfficeGenre.allCases)
-        let trendingBoxOffice = PublishRelay<[BoxOfficeItem]>()
+        let trendingBoxOffice = BehaviorRelay<[BoxOfficeItem]>(value: [])
+        let pushPerformanceDetail = PublishRelay<Void>()
         let errorRelay = PublishRelay<any Error>()
         
         input.topTenLoadingTrigger
@@ -112,10 +109,22 @@ final class HomeViewModel {
             .disposed(by: disposeBag)
         
         
+        let trendingItemSelected = input.itemSelected
+            .filter { $0.section == 2 }
+        
+        trendingItemSelected
+            .map {
+                trendingBoxOffice.value[$0.item]
+                return 
+            }
+            .bind(to: pushPerformanceDetail)
+            .disposed(by: disposeBag)
+        
         return .init(
             topTenContents: topTenContents,
             boxOfficeGenres: boxOfficeGenres,
             trendingContents: trendingBoxOffice,
+            presentDetail: pushPerformanceDetail,
             errorRelay: errorRelay
         )
     }

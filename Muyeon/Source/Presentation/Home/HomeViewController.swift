@@ -42,6 +42,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        navigationController?.navigationBar.isHidden = true
         setupCollectionView()
         bind()
         
@@ -68,6 +69,7 @@ private extension HomeViewController {
         let trendingContents = output.trendingContents
         
         Observable.combineLatest(topTenContents, boxOfficeGenres, trendingContents)
+            .observe(on: MainScheduler.instance)
             .bind(
                 with: self,
                 onNext: { owner, values in
@@ -77,6 +79,16 @@ private extension HomeViewController {
                     snapshot.appendItems(values.1.map { HomeUIModel.genre(model: $0) }, toSection: .genre)
                     snapshot.appendItems(values.2.map { HomeUIModel.trending(model: $0) }, toSection: .trending)
                     owner.dataSource.apply(snapshot)
+                }
+            )
+            .disposed(by: disposeBag)
+        
+        output.presentDetail
+            .bind(
+                with: self,
+                onNext: { owner, _ in
+                    let naviCon = UINavigationController(rootViewController: PerformanceDetailViewController())
+                    owner.present(naviCon, animated: true)
                 }
             )
             .disposed(by: disposeBag)
