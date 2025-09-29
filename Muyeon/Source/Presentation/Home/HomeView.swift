@@ -142,6 +142,7 @@ private extension HomeView {
             elementKind: UICollectionView.elementKindSectionHeader,
             alignment: .topLeading
         )
+        sectionHeader.contentInsets = .init(top: 0, leading: 20, bottom: 0, trailing: 20)
         section.boundarySupplementaryItems = [sectionHeader]
         
         return section
@@ -156,7 +157,7 @@ private extension HomeView {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalWidth(0.45)
+            heightDimension: .fractionalWidth(0.6)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,

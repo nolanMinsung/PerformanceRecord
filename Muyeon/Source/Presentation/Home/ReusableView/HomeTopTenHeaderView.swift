@@ -6,13 +6,34 @@
 //
 
 import UIKit
+import SnapKit
 
 class HomeTopTenHeaderView: UICollectionReusableView {
+    
+    let titleLabel = UILabel()
+    let dateLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .systemGray5
+        backgroundColor = .systemGray6
+        
+        titleLabel.font = .systemFont(ofSize: 32, weight: .bold)
+        titleLabel.text = "TOP 10"
+        dateLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        dateLabel.text = "9월 22일"
+        
+        addSubview(titleLabel)
+        addSubview(dateLabel)
+        
+        titleLabel.snp.makeConstraints { make in
+            make.top.leading.equalToSuperview()
+        }
+        
+        dateLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom)
+            make.leading.bottom.equalToSuperview()
+        }
     }
     
     required init?(coder: NSCoder) {

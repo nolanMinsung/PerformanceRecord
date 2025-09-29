@@ -9,4 +9,15 @@ import Foundation
 
 final class HomeViewModel {
     
+    let fetchBoxOfficeUseCase: FetchBoxOfficeUseCase
+    let fetchPerformanceListUseCase: FetchPerformanceListUseCase
+    
+    init(
+        fetchBoxOfficeUseCase: some FetchBoxOfficeUseCase,
+        fetchPerformanceListUseCase: some FetchPerformanceListUseCase
+    ) {
+        self.fetchBoxOfficeUseCase = fetchBoxOfficeUseCase
+        self.fetchPerformanceListUseCase = fetchPerformanceListUseCase
+    }
+    
 }
