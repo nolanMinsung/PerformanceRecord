@@ -14,6 +14,7 @@
 		4E52FB722E89124F00EB3EBB /* XMLCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FB712E89124F00EB3EBB /* XMLCoder */; };
 		4E52FB752E89126700EB3EBB /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FB742E89126700EB3EBB /* SnapKit */; };
 		4E52FB782E8912CA00EB3EBB /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FB772E8912CA00EB3EBB /* Kingfisher */; };
+		4E52FE542E8ADC7800EB3EBB /* Wisp in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FE532E8ADC7800EB3EBB /* Wisp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -91,6 +92,7 @@
 				4E52FB6C2E8911C000EB3EBB /* RxSwift in Frameworks */,
 				4E52FB722E89124F00EB3EBB /* XMLCoder in Frameworks */,
 				4E52FB6A2E8911C000EB3EBB /* RxCocoa in Frameworks */,
+				4E52FE542E8ADC7800EB3EBB /* Wisp in Frameworks */,
 				4E52FB752E89126700EB3EBB /* SnapKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -157,6 +159,7 @@
 				4E52FB712E89124F00EB3EBB /* XMLCoder */,
 				4E52FB742E89126700EB3EBB /* SnapKit */,
 				4E52FB772E8912CA00EB3EBB /* Kingfisher */,
+				4E52FE532E8ADC7800EB3EBB /* Wisp */,
 			);
 			productName = Muyeon;
 			productReference = 4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */;
@@ -241,6 +244,7 @@
 				4E52FB702E89124F00EB3EBB /* XCRemoteSwiftPackageReference "XMLCoder" */,
 				4E52FB732E89126700EB3EBB /* XCRemoteSwiftPackageReference "SnapKit" */,
 				4E52FB762E8912CA00EB3EBB /* XCRemoteSwiftPackageReference "Kingfisher" */,
+				4E52FE522E8ADC7800EB3EBB /* XCLocalSwiftPackageReference "../../../../../Library/Wisp" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4E52FA8B2E890BEF00EB3EBB /* Products */;
@@ -617,6 +621,13 @@
 		};
 /* End XCConfigurationList section */
 
+/* Begin XCLocalSwiftPackageReference section */
+		4E52FE522E8ADC7800EB3EBB /* XCLocalSwiftPackageReference "../../../../../Library/Wisp" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../../../../Library/Wisp;
+		};
+/* End XCLocalSwiftPackageReference section */
+
 /* Begin XCRemoteSwiftPackageReference section */
 		4E52FB682E8911C000EB3EBB /* XCRemoteSwiftPackageReference "RxSwift" */ = {
 			isa = XCRemoteSwiftPackageReference;
@@ -690,6 +701,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 4E52FB762E8912CA00EB3EBB /* XCRemoteSwiftPackageReference "Kingfisher" */;
 			productName = Kingfisher;
+		};
+		4E52FE532E8ADC7800EB3EBB /* Wisp */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = Wisp;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
