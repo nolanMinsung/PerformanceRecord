@@ -8,15 +8,15 @@
 import Foundation
 
 protocol FetchBoxOfficeUseCase {
-    func execute(requestInfo: BoxOfficeRequestParameter) async throws -> BoxOfficeResponse
+    func execute(requestInfo: BoxOfficeRequestParameter) async throws -> [BoxOfficeItem]
 }
 
 
 final class DefaultFetchBoxOfficeUseCase: FetchBoxOfficeUseCase {
-    func execute(requestInfo parameter: BoxOfficeRequestParameter) async throws -> BoxOfficeResponse {
+    func execute(requestInfo parameter: BoxOfficeRequestParameter) async throws -> [BoxOfficeItem] {
         try await NetworkManager.requestValue(
             router: .getBoxOffice(param: parameter),
             decodingType: BoxOfficeResponse.self
-        )
+        ).toDomain()
     }
 }

@@ -18,14 +18,15 @@ class HomeTrendingCell: UICollectionViewCell {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        contentView.backgroundColor = .systemGray6
-        contentView.layer.cornerRadius = 5
+        contentView.backgroundColor = .systemGray6.withAlphaComponent(0.3)
         contentView.clipsToBounds = true
         
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
+        imageView.layer.cornerRadius = 5
+        imageView.clipsToBounds = true
+        
         titleLabel.numberOfLines = 2
-        titleLabel.textAlignment = .center
         titleLabel.font = .systemFont(ofSize: 13, weight: .bold)
         
         placeNameLabel.font = .systemFont(ofSize: 11)
@@ -56,7 +57,7 @@ class HomeTrendingCell: UICollectionViewCell {
         guard case .trending(let model) = uiModel else { return }
         imageView.kf.setImage(with: URL(string: model.posterURL))
         titleLabel.text = model.name
-        placeNameLabel.text = model.facilityFullName
+        placeNameLabel.text = model.performingPlaceName
     }
     
 }

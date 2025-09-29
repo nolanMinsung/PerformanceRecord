@@ -7,9 +7,13 @@
 
 import UIKit
 
+import RxSwift
+import RxCocoa
+
 class HomeViewController: UIViewController {
     
     typealias DiffableDataSource = UICollectionViewDiffableDataSource<HomeView.Section, HomeUIModel>
+    typealias DiffableSnapshot = NSDiffableDataSourceSnapshot<HomeView.Section, HomeUIModel>
     typealias CellProvider = DiffableDataSource.CellProvider
     typealias SupplementaryViewProvider = DiffableDataSource.SupplementaryViewProvider
     typealias TopTenCellRegistration = UICollectionView.CellRegistration<HomeTopTenCell, HomeUIModel>
@@ -18,14 +22,14 @@ class HomeViewController: UIViewController {
     typealias TrendingCellRegistration = UICollectionView.CellRegistration<HomeTrendingCell, HomeUIModel>
     typealias TrendingHeaderRegistration = UICollectionView.SupplementaryRegistration<HomeTrendingHeaderView>
     
+    private let topTenLoadingTrigger = PublishRelay<Void>()
+    private let trendingLoadingTrigger = PublishRelay<Void>()
+    private let disposeBag = DisposeBag()
+    
     private let viewModel = HomeViewModel(
         fetchBoxOfficeUseCase: DefaultFetchBoxOfficeUseCase(),
         fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase()
     )
-    
-    private var boxOfficeGenres = Constant.BoxOfficeGenre.allCases.map { HomeUIModel.genre(model: $0) }
-    private var topTenContents: [HomeUIModel] = []
-    private var trendingContents: [HomeUIModel] = []
     
     private var dataSource: DiffableDataSource!
     
@@ -39,37 +43,43 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         
         setupCollectionView()
-        applySnapshot()
+        bind()
         
-        // 박스오피스 정보 불러오기
-        let boxOfficeRequestParam = BoxOfficeRequestParameter(
-            service: InfoPlist.apiKey,
-            stdate: .now.addingDay(-2),
-            eddate: .now.addingDay(-2)
+        topTenLoadingTrigger.accept(())
+        trendingLoadingTrigger.accept(())
+    }
+    
+}
+
+
+private extension HomeViewController {
+    
+    func bind() {
+        let input = HomeViewModel.Input(
+            topTenLoadingTrigger: topTenLoadingTrigger.asObservable(),
+            trendingLoadingTrigger: trendingLoadingTrigger.asObservable(),
+            itemSelected: rootView.homeCollectionView.rx.itemSelected
         )
-        let performanceListParam = PerformanceListRequestParameter(
-            stdate: .now.addingDay(-1),
-            eddate: .now.addingDay(+29),
-            cpage: 1,
-            rows: 100
-        )
-        Task {
-            do {
-                let boxOfficeListResult = try await viewModel.fetchBoxOfficeUseCase.execute(
-                    requestInfo: boxOfficeRequestParam
-                )
-                let performanceListResult = try await viewModel.fetchPerformanceListUseCase.execute(
-                    requestInfo: performanceListParam
-                )
-                dump(performanceListResult)
-                
-                topTenContents = boxOfficeListResult.toDomain().map { .topTen(model: $0) }
-                trendingContents = performanceListResult.map { .trending(model: $0) }
-                applySnapshot()
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
+        
+        let output = viewModel.transform(input: input)
+        
+        let topTenContents = output.topTenContents
+        let boxOfficeGenres = output.boxOfficeGenres
+        let trendingContents = output.trendingContents
+        
+        Observable.combineLatest(topTenContents, boxOfficeGenres, trendingContents)
+            .bind(
+                with: self,
+                onNext: { owner, values in
+                    var snapshot = DiffableSnapshot()
+                    snapshot.appendSections(HomeView.Section.allCases)
+                    snapshot.appendItems(values.0.map { HomeUIModel.topTen(model: $0) }, toSection: .topTen)
+                    snapshot.appendItems(values.1.map { HomeUIModel.genre(model: $0) }, toSection: .genre)
+                    snapshot.appendItems(values.2.map { HomeUIModel.trending(model: $0) }, toSection: .trending)
+                    owner.dataSource.apply(snapshot)
+                }
+            )
+            .disposed(by: disposeBag)
     }
     
 }
@@ -141,40 +151,5 @@ private extension HomeViewController {
             }
         }
     }
-    
-    func applySnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<HomeView.Section, HomeUIModel>()
-        snapshot.appendSections(HomeView.Section.allCases)
-        snapshot.appendItems(Array(topTenContents.prefix(10)), toSection: .topTen)
-        snapshot.appendItems(boxOfficeGenres, toSection: .genre)
-        snapshot.appendItems(trendingContents, toSection: .trending)
-        dataSource.apply(snapshot)
-    }
-    
-}
-
-
-extension HomeViewController: UICollectionViewDataSource {
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return boxOfficeGenres.count
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: HomeBoxOfficeGenreCell.reuseIdentifier,
-            for: indexPath
-        ) as? HomeBoxOfficeGenreCell
-        else {
-            fatalError()
-        }
-        cell.configure(with: boxOfficeGenres[indexPath.item])
-        return cell
-    }
-    
-}
-
-
-extension HomeViewController: UICollectionViewDelegate {
     
 }

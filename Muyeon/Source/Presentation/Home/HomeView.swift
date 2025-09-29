@@ -206,12 +206,12 @@ private extension HomeView {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalWidth(0.6)
+            heightDimension: .fractionalWidth(0.9)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
             subitem: item,
-            count: 3
+            count: 2
         )
         
         let spacing: CGFloat = 10

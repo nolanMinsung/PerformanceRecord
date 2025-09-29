@@ -10,5 +10,5 @@ import Foundation
 enum HomeUIModel: Hashable {
     case topTen(model: BoxOfficeItem)
     case genre(model: Constant.BoxOfficeGenre)
-    case trending(model: Performance)
+    case trending(model: BoxOfficeItem)
 }

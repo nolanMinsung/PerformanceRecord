@@ -11,6 +11,10 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell {
     
     private let genreNameLabel = UILabel()
     
+    override var isSelected: Bool {
+        didSet { setSelected(isSelected) }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -23,10 +27,16 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell {
             make.verticalEdges.equalToSuperview().inset(10)
             make.horizontalEdges.equalToSuperview().inset(10)
         }
+        self.setSelected(false)
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    func setSelected(_ isSelected: Bool) {
+        genreNameLabel.textColor = isSelected ? .label : .systemGray4
+        contentView.backgroundColor = isSelected ? .systemOrange : .systemGray6
     }
     
     func configure(with model: HomeUIModel) {

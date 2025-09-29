@@ -17,7 +17,8 @@ class HomeTopTenCell: UICollectionViewCell {
     private let rankNumLabel = UILabel()
     private let titleLabel = UILabel()
     private let datePeriodLabel = UILabel()
-    private lazy var infoStackView = UIStackView(arrangedSubviews: [titleLabel, datePeriodLabel])
+    private let placeNameLabel = UILabel()
+    private lazy var infoStackView = UIStackView(arrangedSubviews: [titleLabel, datePeriodLabel, placeNameLabel])
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -34,7 +35,7 @@ class HomeTopTenCell: UICollectionViewCell {
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
         
-        rankNumLabel.font = .systemFont(ofSize: 60, weight: .heavy)
+        rankNumLabel.font = .systemFont(ofSize: 70, weight: .heavy)
         rankNumLabel.textColor = .systemBackground
         
         titleLabel.numberOfLines = 3
@@ -44,6 +45,10 @@ class HomeTopTenCell: UICollectionViewCell {
         datePeriodLabel.numberOfLines = 2
         datePeriodLabel.textColor = .systemBackground
         datePeriodLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        
+        placeNameLabel.numberOfLines = 1
+        placeNameLabel.textColor = .systemBackground
+        placeNameLabel.font = .systemFont(ofSize: 14, weight: .bold)
         
         infoStackView.axis = .vertical
         infoStackView.spacing = 5
@@ -56,7 +61,7 @@ class HomeTopTenCell: UICollectionViewCell {
         contentView.addSubview(infoStackView)
         
         backGradientView.snp.makeConstraints { make in
-            make.top.equalTo(rankNumLabel.snp.top).offset(-20)
+            make.top.equalTo(rankNumLabel.snp.top).offset(-40)
             make.horizontalEdges.bottom.equalToSuperview()
         }
         rankNumLabel.snp.makeConstraints { make in
@@ -84,6 +89,7 @@ class HomeTopTenCell: UICollectionViewCell {
         rankNumLabel.text = "\(model.rank)"
         titleLabel.text = model.name
         datePeriodLabel.text = model.performPeriod
+        placeNameLabel.text = model.performingPlaceName
     }
     
 }
