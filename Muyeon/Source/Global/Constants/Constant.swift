@@ -27,6 +27,8 @@ enum Constant {
         case ongoing = "02"
         /// 공연 완료 (Code: 03)
         case completed = "03"
+        /// 기타 (파싱에 실패했을 경우)
+        case unknown = "00"
         
         /// 코드 설명
         var description: String {
@@ -34,8 +36,19 @@ enum Constant {
             case .scheduled: return "공연예정"
             case .ongoing: return "공연중"
             case .completed: return "공연완료"
+            case .unknown: return "알 수 없음"
             }
         }
+        
+        static func findBy(name: String) -> Self {
+            switch name {
+            case "공연예정": return .scheduled
+            case "공연중": return .ongoing
+            case "공연완료": return .completed
+            default: return .unknown
+            }
+        }
+        
     }
     
     // MARK: - 장르 코드 (Genre Code)
@@ -60,6 +73,8 @@ enum Constant {
         case circusMagic = "EEEB"
         /// 뮤지컬 (Code: GGGA)
         case musical = "GGGA"
+        /// 기타 (파싱에 실패했을 경우)
+        case unknown = "0000"
         
         /// 코드 설명 (장르명)
         var description: String {
@@ -73,8 +88,25 @@ enum Constant {
             case .composite: return "복합"
             case .circusMagic: return "서커스/마술"
             case .musical: return "뮤지컬"
+            case .unknown: return "기타"
             }
         }
+        
+        static func findBy(name: String) -> Self {
+            switch name {
+            case "연극": return .play
+            case "무용(서양/한국무용)": return .danceWesternKorean
+            case "대중무용": return .popularDance
+            case "서양음악(클래식)": return .classicalMusic
+            case "한국음악(국악)": return .koreanTraditionalMusic
+            case "대중음악": return .popularMusic
+            case "복합": return .composite
+            case "서커스/마술": return .circusMagic
+            case "뮤지컬": return .musical
+            default: return .unknown
+            }
+        }
+        
     }
     
     // MARK: - 공연시설특성 코드 (Facility Characteristic Code)
@@ -157,6 +189,8 @@ enum Constant {
         case children = "KID"
         /// 오픈런 (Code: OPEN)
         case openRun = "OPEN"
+        /// 기타 (파싱에 실패했을 경우)
+        case unknown = "0000"
         
         /// 코드 설명 (장르명/구분명)
         var description: String {
@@ -172,6 +206,36 @@ enum Constant {
             case .composite: return "복합"
             case .children: return "아동"
             case .openRun: return "오픈런"
+            case .unknown: return "기타"
+            }
+        }
+        
+        static func findBy(name: String) -> Self {
+            switch name {
+            case "연극":
+                return .play
+            case "뮤지컬":
+                return .musical
+            case "서양음악(클래식)":
+                return .classicalMusic
+            case "한국음악(국악)":
+                return .koreanTraditionalMusic
+            case "대중음악":
+                return .popularMusic
+            case "무용(서양/한국무용)":
+                return .danceWesternKorean
+            case "대중무용":
+                return .popularDance
+            case "서커스/마술":
+                return .circusMagic
+            case "복합":
+                return .composite
+            case "아동":
+                return .children
+            case "오픈런":
+                return .openRun
+            default:
+                return .unknown
             }
         }
     }
@@ -249,6 +313,8 @@ enum Constant {
         case jeju = "50"
         /// 대학로 (Code: UNI)
         case daehakro = "UNI"
+        /// 기타 (파싱에 실패했을 경우)
+        case unknown = "기타"
         
         /// 코드 설명 (지역명)
         var description: String {
@@ -262,15 +328,40 @@ enum Constant {
             case .ulsan: return "울산"
             case .sejong: return "세종"
             case .gyeonggi: return "경기"
-            case .chungcheongbuk: return "충청북도"
-            case .chungcheongnam: return "충청남도"
-            case .jeollabuk: return "전라북도"
-            case .jeollanam: return "전라남도"
-            case .gyeongsangbuk: return "경상북도"
-            case .gyeongsangnam: return "경상남도"
+            case .chungcheongbuk: return "충북"
+            case .chungcheongnam: return "충남"
+            case .jeollabuk: return "전북"
+            case .jeollanam: return "전남"
+            case .gyeongsangbuk: return "경북"
+            case .gyeongsangnam: return "경남"
             case .gangwon: return "강원"
             case .jeju: return "제주"
             case .daehakro: return "대학로"
+            case .unknown: return "기타"
+            }
+        }
+        
+        static func findBy(name: String) -> Self {
+            switch name {
+            case "서울": return .seoul
+            case "인천": return .incheon
+            case "대전": return .daejeon
+            case "대구": return .daegu
+            case "광주": return .gwangju
+            case "부산": return .busan
+            case "울산": return .ulsan
+            case "세종": return .sejong
+            case "경기": return .gyeonggi
+            case "충북": return .chungcheongbuk
+            case "충남": return .chungcheongnam
+            case "전북": return .jeollabuk
+            case "전남": return .jeollanam
+            case "경북": return .gyeongsangbuk
+            case "경남": return .gyeongsangnam
+            case "강원": return .gangwon
+            case "제주": return .jeju
+            case "대학로": return .daehakro
+            default: return .unknown
             }
         }
     }
@@ -279,7 +370,6 @@ enum Constant {
     
     /// 행정 표준 코드 앞 2자리를 사용하는 시/도 지역 코드
     enum AdminAreaCode: String, CaseIterable, Codable {
-        // 시도 코드 및 설명은 제공해주신 PDF의 내용에 따라 정의되었습니다.
         case seoul = "11" // 서울특별시
         case busan = "26" // 부산광역시
         case daegu = "27" // 대구광역시
@@ -297,6 +387,7 @@ enum Constant {
         case gyeongsangbuk = "47" // 경상북도
         case gyeongsangnam = "48" // 경상남도
         case jejuSpecialSelfGoverning = "50" // 제주특별자치도
+        case unknown = "기타" // 기타 (파싱에 실패했을 경우)
         
         /// 코드 설명 (시/도명)
         var description: String {
@@ -318,6 +409,30 @@ enum Constant {
             case .gyeongsangbuk: return "경상북도"
             case .gyeongsangnam: return "경상남도"
             case .jejuSpecialSelfGoverning: return "제주특별자치도"
+            case .unknown: return "기타"
+            }
+        }
+        
+        static func findBy(name: String) -> Self {
+            switch name {
+            case "서울특별시": return .seoul
+            case "부산광역시": return .busan
+            case "대구광역시": return .daegu
+            case "인천광역시": return .incheon
+            case "광주광역시": return .gwangju
+            case "대전광역시": return .daejeon
+            case "울산광역시": return .ulsan
+            case "세종특별자치시": return .sejong
+            case "경기도": return .gyeonggi
+            case "강원특별자치도": return .gangwonSpecialSelfGoverning
+            case "충청북도": return .chungcheongbuk
+            case "충청남도": return .chungcheongnam
+            case "전라북도": return .jeollabuk
+            case "전라남도": return .jeollanam
+            case "경상북도": return .gyeongsangbuk
+            case "경상남도": return .gyeongsangnam
+            case "제주특별자치도": return .jejuSpecialSelfGoverning
+            default: return .unknown
             }
         }
     }

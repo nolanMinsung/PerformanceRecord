@@ -52,3 +52,28 @@ struct PerformanceResponse: Codable, Hashable {
     /// 공연 상태
     let prfstate: String
 }
+
+
+extension PerformanceListResponse {
+    
+    func toDomain() -> [Performance] {
+        let dateFormmater = DateFormatter()
+        dateFormmater.dateFormat = "yyyy.MM.dd"
+        return db.map {
+            return Performance(
+                id: $0.mt20id,
+                name: $0.prfnm,
+                startDate: dateFormmater.date(from: $0.prfpdfrom)!,
+                endDate: dateFormmater.date(from: $0.prfpdto)!,
+                facilityFullName: $0.fcltynm,
+                posterURL: $0.poster.convertURLToHTTPS(),
+                area: Constant.AdminAreaCode.findBy(name: $0.area),
+                genre: Constant.Genre.findBy(name: $0.genrenm),
+                openRun: ($0.openrun == "Y"),
+                state: Constant.PerformanceState.findBy(name: $0.prfstate),
+                detail: nil
+            )
+        }
+    }
+    
+}

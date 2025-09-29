@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct BoxOfficeItem: Identifiable {
+struct BoxOfficeItem: Identifiable, Hashable {
     let id: String // ID(mt20id)
     let category: Constant.BoxOfficeGenre // 장르
     let rank: Int // rnum (순위)
@@ -17,5 +17,5 @@ struct BoxOfficeItem: Identifiable {
     let area: Constant.BoxOfficeArea // area(지역)
     let seatCount: Int // seatcnt(좌석수)
     let performingPlaceName: String // prfplcnm(공연장)
-    let poster: URL? // poster(포스터이미지)
+    let posterURL: String // poster(포스터이미지)
 }
