@@ -27,7 +27,7 @@ final class HomeViewModel {
         let topTenContents: BehaviorRelay<[BoxOfficeItem]>
         let boxOfficeGenres: BehaviorRelay<[Constant.BoxOfficeGenre]>
         let trendingContents: BehaviorRelay<[BoxOfficeItem]>
-        let presentDetail: PublishRelay<Void>
+        let presentDetail: PublishRelay<IndexPath>
         let errorRelay: PublishRelay<any Error>
     }
     
@@ -43,7 +43,7 @@ final class HomeViewModel {
         let topTenContents = BehaviorRelay<[BoxOfficeItem]>(value: [])
         let boxOfficeGenres = BehaviorRelay<[Constant.BoxOfficeGenre]>(value: Constant.BoxOfficeGenre.allCases)
         let trendingBoxOffice = BehaviorRelay<[BoxOfficeItem]>(value: [])
-        let pushPerformanceDetail = PublishRelay<Void>()
+        let presentDetail = PublishRelay<IndexPath>()
         let errorRelay = PublishRelay<any Error>()
         
         input.topTenLoadingTrigger
@@ -113,18 +113,18 @@ final class HomeViewModel {
             .filter { $0.section == 2 }
         
         trendingItemSelected
-            .map {
-                trendingBoxOffice.value[$0.item]
-                return 
-            }
-            .bind(to: pushPerformanceDetail)
+//            .map {
+//                trendingBoxOffice.value[$0.item]
+//                return 
+//            }
+            .bind(to: presentDetail)
             .disposed(by: disposeBag)
         
         return .init(
             topTenContents: topTenContents,
             boxOfficeGenres: boxOfficeGenres,
             trendingContents: trendingBoxOffice,
-            presentDetail: pushPerformanceDetail,
+            presentDetail: presentDetail,
             errorRelay: errorRelay
         )
     }

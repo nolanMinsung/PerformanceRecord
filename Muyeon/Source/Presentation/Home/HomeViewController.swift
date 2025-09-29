@@ -9,6 +9,7 @@ import UIKit
 
 import RxSwift
 import RxCocoa
+import Wisp
 
 class HomeViewController: UIViewController {
     
@@ -86,9 +87,23 @@ private extension HomeViewController {
         output.presentDetail
             .bind(
                 with: self,
-                onNext: { owner, _ in
+                onNext: { owner, indexPath in
                     let naviCon = UINavigationController(rootViewController: PerformanceDetailViewController())
-                    owner.present(naviCon, animated: true)
+                    let wispConfig = WispConfiguration { config in
+                        config.setGesture { gesture in
+                            gesture.allowedDirections = [.right, .down]
+                        }
+                        config.setLayout { layout in
+                            layout.initialCornerRadius = 5
+                        }
+                    }
+                    
+                    owner.wisp.present(
+                        naviCon,
+                        collectionView: owner.rootView.homeCollectionView,
+                        at: indexPath,
+                        configuration: wispConfig
+                    )
                 }
             )
             .disposed(by: disposeBag)

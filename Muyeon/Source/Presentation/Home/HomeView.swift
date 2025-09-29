@@ -8,6 +8,7 @@
 import UIKit
 
 import SnapKit
+import Wisp
 
 final class HomeView: UIView {
     
@@ -19,8 +20,7 @@ final class HomeView: UIView {
     
     private let top10TitleLabel = UILabel()
     private let trendingPerformanceTitleLabel = UILabel()
-//    private(set) var genreCollectionView: UICollectionView!
-    private(set) var homeCollectionView: UICollectionView!
+    private(set) var homeCollectionView: WispableCollectionView!
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -44,7 +44,7 @@ extension HomeView: BaseViewSettings {
         top10TitleLabel.text = "오늘 TOP 10"
         top10TitleLabel.font = .systemFont(ofSize: 32, weight: .bold)
         
-        homeCollectionView = UICollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
+        homeCollectionView = WispableCollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
         
         trendingPerformanceTitleLabel.text = "지금 뜨는 공연"
         trendingPerformanceTitleLabel.font = .systemFont(ofSize: 25, weight: .bold)
@@ -73,10 +73,10 @@ private extension HomeView {
         return layout
     }
     
-    func createCompositionalLayout() -> UICollectionViewLayout {
+    func createCompositionalLayout() -> WispCompositionalLayout {
         let sections: [Section] = [.topTen, .genre, .trending]
         
-        let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
+        let layout = UICollectionViewCompositionalLayout.wisp.make { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             let section = sections[sectionIndex]
             switch section {
             case .topTen:
@@ -206,12 +206,12 @@ private extension HomeView {
         
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .fractionalWidth(0.9)
+            heightDimension: .fractionalWidth(0.7)
         )
         let group = NSCollectionLayoutGroup.horizontal(
             layoutSize: groupSize,
             subitem: item,
-            count: 2
+            count: 3
         )
         
         let spacing: CGFloat = 10
