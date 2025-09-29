@@ -13,7 +13,11 @@ import SnapKit
 class HomeTopTenCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
+    private let backGradientView = BottomGradientView(color: .label)
+    private let rankNumLabel = UILabel()
     private let titleLabel = UILabel()
+    private let datePeriodLabel = UILabel()
+    private lazy var infoStackView = UIStackView(arrangedSubviews: [titleLabel, datePeriodLabel])
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -22,19 +26,49 @@ class HomeTopTenCell: UICollectionViewCell {
         contentView.layer.cornerRadius = 23
         contentView.clipsToBounds = true
         
+        let gradientLayer = CAGradientLayer()
+        gradientLayer.colors = [UIColor.label.cgColor, UIColor.clear.cgColor]
+        gradientLayer.startPoint = .init(x: 0.5, y: 1)
+        gradientLayer.endPoint = .init(x: 0.5, y: 0)
+        
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
-        titleLabel.numberOfLines = 0
-        titleLabel.textAlignment = .center
-        titleLabel.font = .systemFont(ofSize: 13, weight: .bold)
-        titleLabel.backgroundColor = .systemBackground.withAlphaComponent(0.7)
+        
+        rankNumLabel.font = .systemFont(ofSize: 60, weight: .heavy)
+        rankNumLabel.textColor = .systemBackground
+        
+        titleLabel.numberOfLines = 3
+        titleLabel.textColor = .systemBackground
+        titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
+        
+        datePeriodLabel.numberOfLines = 2
+        datePeriodLabel.textColor = .systemBackground
+        datePeriodLabel.font = .systemFont(ofSize: 14, weight: .regular)
+        
+        infoStackView.axis = .vertical
+        infoStackView.spacing = 5
+        infoStackView.alignment = .leading
+        infoStackView.distribution = .fill
+        
         contentView.addSubview(imageView)
-        contentView.addSubview(titleLabel)
+        contentView.addSubview(backGradientView)
+        contentView.addSubview(rankNumLabel)
+        contentView.addSubview(infoStackView)
+        
+        backGradientView.snp.makeConstraints { make in
+            make.top.equalTo(rankNumLabel.snp.top).offset(-20)
+            make.horizontalEdges.bottom.equalToSuperview()
+        }
+        rankNumLabel.snp.makeConstraints { make in
+            make.leading.bottom.equalToSuperview().inset(10)
+        }
         imageView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
-        titleLabel.snp.makeConstraints { make in
-            make.horizontalEdges.bottom.equalToSuperview()
+        infoStackView.snp.makeConstraints { make in
+            make.centerY.equalTo(rankNumLabel)
+            make.leading.equalTo(rankNumLabel.snp.trailing).offset(5)
+            make.trailing.equalToSuperview().inset(10)
         }
     }
     
@@ -43,14 +77,13 @@ class HomeTopTenCell: UICollectionViewCell {
     }
     
     func configure(with uiModel: HomeUIModel) {
-        switch uiModel {
-        case .topTen(let model):
-            imageView.kf.setImage(with: URL(string: model.posterURL))
-            titleLabel.text = model.name
-        case .trending(let model):
-            imageView.kf.setImage(with: URL(string: model.posterURL))
-            titleLabel.text = model.name
+        guard case .topTen(let model) = uiModel else {
+            return
         }
+        imageView.kf.setImage(with: URL(string: model.posterURL))
+        rankNumLabel.text = "\(model.rank)"
+        titleLabel.text = model.name
+        datePeriodLabel.text = model.performPeriod
     }
     
 }

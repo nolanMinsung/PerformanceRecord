@@ -14,6 +14,7 @@ class HomeViewController: UIViewController {
     typealias SupplementaryViewProvider = DiffableDataSource.SupplementaryViewProvider
     typealias TopTenCellRegistration = UICollectionView.CellRegistration<HomeTopTenCell, HomeUIModel>
     typealias TopTenHeaderRegistration = UICollectionView.SupplementaryRegistration<HomeTopTenHeaderView>
+    typealias GenreCellRegistration = UICollectionView.CellRegistration<HomeBoxOfficeGenreCell, HomeUIModel>
     typealias TrendingCellRegistration = UICollectionView.CellRegistration<HomeTrendingCell, HomeUIModel>
     typealias TrendingHeaderRegistration = UICollectionView.SupplementaryRegistration<HomeTrendingHeaderView>
     
@@ -22,11 +23,7 @@ class HomeViewController: UIViewController {
         fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase()
     )
     
-//    private var topTenContents: [String] = ["0-0", "0-1", "0-2", "0-3", "0-4", "0-5", "0-6", "0-7", "0-8", "0-9"]
-//    private var trendingContents: [String] = [
-//        "1-0", "1-1", "1-2", "1-3", "1-4", "1-5", "1-6", "1-7", "1-8", "1-9",
-//        "1-10", "1-11", "1-12", "1-13", "1-14", "1-15", "1-16", "1-17", "1-18", "1-19"
-//    ]
+    private var boxOfficeGenres = Constant.BoxOfficeGenre.allCases.map { HomeUIModel.genre(model: $0) }
     private var topTenContents: [HomeUIModel] = []
     private var trendingContents: [HomeUIModel] = []
     
@@ -64,11 +61,10 @@ class HomeViewController: UIViewController {
                 let performanceListResult = try await viewModel.fetchPerformanceListUseCase.execute(
                     requestInfo: performanceListParam
                 )
-//                dump(boxOfficeListResult)
                 dump(performanceListResult)
                 
                 topTenContents = boxOfficeListResult.toDomain().map { .topTen(model: $0) }
-                trendingContents = performanceListResult.toDomain().map { .trending(model: $0) }
+                trendingContents = performanceListResult.map { .trending(model: $0) }
                 applySnapshot()
             } catch {
                 print(error.localizedDescription)
@@ -82,9 +78,12 @@ class HomeViewController: UIViewController {
 private extension HomeViewController {
     
     func setupCollectionView() {
-        
         let topTenCellRegistration = TopTenCellRegistration { cell, indexPath, itemIdentifier in
             // configuring Cell...
+            cell.configure(with: itemIdentifier)
+        }
+        
+        let genreCellRegistration = GenreCellRegistration { cell, indexPath, itemIdentifier in
             cell.configure(with: itemIdentifier)
         }
         
@@ -98,6 +97,12 @@ private extension HomeViewController {
             case 0:
                 return collectionView.dequeueConfiguredReusableCell(
                     using: topTenCellRegistration,
+                    for: indexPath,
+                    item: itemIdentifier
+                )
+            case 1:
+                return collectionView.dequeueConfiguredReusableCell(
+                    using: genreCellRegistration,
                     for: indexPath,
                     item: itemIdentifier
                 )
@@ -129,8 +134,10 @@ private extension HomeViewController {
             switch indexPath.section {
             case 0:
                 return collectionView.dequeueConfiguredReusableSupplementary(using: topTenHeaderRegistration, for: indexPath)
-            default:
+            case 1:
                 return collectionView.dequeueConfiguredReusableSupplementary(using: trendingHeaderRegistration, for: indexPath)
+            default:
+                return nil
             }
         }
     }
@@ -139,8 +146,35 @@ private extension HomeViewController {
         var snapshot = NSDiffableDataSourceSnapshot<HomeView.Section, HomeUIModel>()
         snapshot.appendSections(HomeView.Section.allCases)
         snapshot.appendItems(Array(topTenContents.prefix(10)), toSection: .topTen)
+        snapshot.appendItems(boxOfficeGenres, toSection: .genre)
         snapshot.appendItems(trendingContents, toSection: .trending)
         dataSource.apply(snapshot)
     }
+    
+}
+
+
+extension HomeViewController: UICollectionViewDataSource {
+    
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return boxOfficeGenres.count
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: HomeBoxOfficeGenreCell.reuseIdentifier,
+            for: indexPath
+        ) as? HomeBoxOfficeGenreCell
+        else {
+            fatalError()
+        }
+        cell.configure(with: boxOfficeGenres[indexPath.item])
+        return cell
+    }
+    
+}
+
+
+extension HomeViewController: UICollectionViewDelegate {
     
 }

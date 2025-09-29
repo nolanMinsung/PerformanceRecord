@@ -13,30 +13,36 @@ class HomeTrendingCell: UICollectionViewCell {
     
     private let imageView = UIImageView()
     private let titleLabel = UILabel()
+    private let placeNameLabel = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
         contentView.backgroundColor = .systemGray6
-//        contentView.layer.cornerRadius = 10
-//        contentView.clipsToBounds = true
+        contentView.layer.cornerRadius = 5
+        contentView.clipsToBounds = true
         
         imageView.contentMode = .scaleAspectFill
         imageView.backgroundColor = .clear
-        imageView.layer.cornerRadius = 5
-        imageView.clipsToBounds = true
-        titleLabel.numberOfLines = 0
+        titleLabel.numberOfLines = 2
         titleLabel.textAlignment = .center
         titleLabel.font = .systemFont(ofSize: 13, weight: .bold)
-        titleLabel.backgroundColor = .systemBackground.withAlphaComponent(0.7)
+        
+        placeNameLabel.font = .systemFont(ofSize: 11)
+        
         contentView.addSubview(imageView)
         contentView.addSubview(titleLabel)
+        contentView.addSubview(placeNameLabel)
         imageView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
             make.height.equalTo(imageView.snp.width).multipliedBy(1.333)
         }
         titleLabel.snp.makeConstraints { make in
-            make.top.equalTo(imageView.snp.bottom).offset(10)
+            make.top.equalTo(imageView.snp.bottom).offset(5)
+            make.horizontalEdges.equalToSuperview()
+        }
+        placeNameLabel.snp.makeConstraints { make in
+            make.top.equalTo(titleLabel.snp.bottom).offset(4)
             make.horizontalEdges.equalToSuperview()
             make.bottom.lessThanOrEqualToSuperview()
         }
@@ -47,14 +53,10 @@ class HomeTrendingCell: UICollectionViewCell {
     }
     
     func configure(with uiModel: HomeUIModel) {
-        switch uiModel {
-        case .topTen(let model):
-            imageView.kf.setImage(with: URL(string: model.posterURL))
-            titleLabel.text = model.name
-        case .trending(let model):
-            imageView.kf.setImage(with: URL(string: model.posterURL))
-            titleLabel.text = model.name
-        }
+        guard case .trending(let model) = uiModel else { return }
+        imageView.kf.setImage(with: URL(string: model.posterURL))
+        titleLabel.text = model.name
+        placeNameLabel.text = model.facilityFullName
     }
     
 }

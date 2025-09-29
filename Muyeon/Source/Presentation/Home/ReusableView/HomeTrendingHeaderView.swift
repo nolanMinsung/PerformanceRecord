@@ -14,7 +14,7 @@ class HomeTrendingHeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .systemGray5
+        backgroundColor = .systemGray6
         titleLabel.font = .systemFont(ofSize: 25, weight: .bold)
         titleLabel.text = "지금 뜨는 공연"
         addSubview(titleLabel)

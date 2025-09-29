@@ -8,15 +8,16 @@
 import Foundation
 
 protocol FetchPerformanceListUseCase {
-    func execute(requestInfo: PerformanceListRequestParameter) async throws -> PerformanceListResponse
+    func execute(requestInfo: PerformanceListRequestParameter) async throws -> [Performance]
 }
 
 
 final class DefaultFetchPerformanceListUseCase: FetchPerformanceListUseCase {
-    func execute(requestInfo parameter: PerformanceListRequestParameter) async throws -> PerformanceListResponse {
-        return try await NetworkManager.requestValue(
+    func execute(requestInfo parameter: PerformanceListRequestParameter) async throws -> [Performance] {
+        let performanceListResponse = try await NetworkManager.requestValue(
             router: .getPerformanceList(param: parameter),
             decodingType: PerformanceListResponse.self
         )
+        return performanceListResponse.toDomain()
     }
 }

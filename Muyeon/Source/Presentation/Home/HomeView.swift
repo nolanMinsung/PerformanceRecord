@@ -13,11 +13,13 @@ final class HomeView: UIView {
     
     enum Section: Hashable, CaseIterable {
         case topTen // 오늘 TOP 10
+        case genre // 장르 필터링 버튼
         case trending // 지금 뜨는 공연
     }
     
     private let top10TitleLabel = UILabel()
     private let trendingPerformanceTitleLabel = UILabel()
+//    private(set) var genreCollectionView: UICollectionView!
     private(set) var homeCollectionView: UICollectionView!
     
     override init(frame: CGRect) {
@@ -63,14 +65,24 @@ extension HomeView: BaseViewSettings {
 
 private extension HomeView {
     
+    func createFlowLayout() -> UICollectionViewFlowLayout {
+        let layout = UICollectionViewFlowLayout()
+        layout.scrollDirection = .horizontal
+        layout.minimumInteritemSpacing = 10
+        layout.estimatedItemSize = .init(width: 100, height: 50)
+        return layout
+    }
+    
     func createCompositionalLayout() -> UICollectionViewLayout {
-        let sections: [Section] = [.topTen, .trending]
+        let sections: [Section] = [.topTen, .genre, .trending]
         
         let layout = UICollectionViewCompositionalLayout { (sectionIndex, layoutEnvironment) -> NSCollectionLayoutSection? in
             let section = sections[sectionIndex]
             switch section {
             case .topTen:
                 return self.createTopTenSection()
+            case .genre:
+                return self.createGenreListSection()
             case .trending:
                 return self.createTrendingSection()
             }
@@ -83,6 +95,7 @@ private extension HomeView {
         return layout
     }
     
+    // MARK: - TopTenSection
     func createTopTenSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -91,7 +104,7 @@ private extension HomeView {
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         item.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 10, bottom: 0, trailing: 10)
         
-        let groupWidthRatio: CGFloat = 0.7
+        let groupWidthRatio: CGFloat = 0.8
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(groupWidthRatio),
             heightDimension: .fractionalWidth(groupWidthRatio * 1.3)
@@ -101,37 +114,38 @@ private extension HomeView {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPagingCentered
         section.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0)
-        section.visibleItemsInvalidationHandler = {
-            visibleItems,
-            scrollOffset,
-            layoutEnvironment in
-            // 컬렉션뷰의 centerX 좌표 계산
-            let collectionViewCenterX = scrollOffset.x + layoutEnvironment.container.contentSize.width / 2
-            
-            let scalingFactor: CGFloat = 0.0007
-            let maxScale: CGFloat = 1.0
-            let minScale: CGFloat = 0.8
-            
-            for item in visibleItems {
-                // 헤더는 제외
-                guard (item.representedElementCategory == .cell) else { continue }
-                // 아이템의 centerX 좌표
-                let itemCenterX = item.center.x
-                
-                // 중앙으로부터의 거리
-                let distance = itemCenterX - collectionViewCenterX
-                
-                // 거리에 비례하여 scale 계산 및 적용
-                let normalizedDistance = abs(distance) * scalingFactor
-                let scale = max(minScale, maxScale - normalizedDistance)
-                let xPositionDiff = -distance * 0.1
-                
-                let scaleTransform = CGAffineTransform(scaleX: scale, y: scale)
-                let positionTransform = CGAffineTransform(translationX: xPositionDiff, y: 0)
-                item.transform = positionTransform.concatenating(scaleTransform)
-                item.zIndex = Int(scale * 10)
-            }
-        }
+//        section.visibleItemsInvalidationHandler = {
+//            visibleItems,
+//            scrollOffset,
+//            layoutEnvironment in
+//            print(scrollOffset)
+//            // 컬렉션뷰의 centerX 좌표 계산
+//            let collectionViewCenterX = scrollOffset.x + layoutEnvironment.container.contentSize.width / 2
+//            
+//            let scalingFactor: CGFloat = 0.0007
+//            let maxScale: CGFloat = 1.0
+//            let minScale: CGFloat = 0.8
+//            
+//            for item in visibleItems {
+//                // 헤더는 제외
+//                guard (item.representedElementCategory == .cell) else { continue }
+//                // 아이템의 centerX 좌표
+//                let itemCenterX = item.center.x
+//                
+//                // 중앙으로부터의 거리
+//                let distance = itemCenterX - collectionViewCenterX
+//                
+//                // 거리에 비례하여 scale 계산 및 적용
+//                let normalizedDistance = abs(distance) * scalingFactor
+//                let scale = max(minScale, maxScale - normalizedDistance)
+//                let xPositionDiff = -distance * 0.1
+//                
+//                let scaleTransform = CGAffineTransform(scaleX: scale, y: scale)
+//                let positionTransform = CGAffineTransform(translationX: xPositionDiff, y: 0)
+//                item.transform = positionTransform.concatenating(scaleTransform)
+//                item.zIndex = Int(scale * 10)
+//            }
+//        }
         
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -147,7 +161,42 @@ private extension HomeView {
         
         return section
     }
-
+    
+    // MARK: - GenreListSection
+    func createGenreListSection() -> NSCollectionLayoutSection {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .estimated(100),
+            heightDimension: .fractionalHeight(1.0)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .estimated(100),
+            heightDimension: .absolute(35)
+        )
+        let group = NSCollectionLayoutGroup.vertical(
+            layoutSize: groupSize,
+            subitems: [item]
+        )
+        let section = NSCollectionLayoutSection(group: group)
+        section.interGroupSpacing = 10
+        section.orthogonalScrollingBehavior = .continuous
+        
+        let headerSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .absolute(44)
+        )
+        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
+            layoutSize: headerSize,
+            elementKind: UICollectionView.elementKindSectionHeader,
+            alignment: .topLeading
+        )
+        section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15)
+        section.boundarySupplementaryItems = [sectionHeader]
+        
+        return section
+    }
+    
+    // MARK: - TrendingSection
     func createTrendingSection() -> NSCollectionLayoutSection {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -171,17 +220,6 @@ private extension HomeView {
         let section = NSCollectionLayoutSection(group: group)
         section.contentInsets = NSDirectionalEdgeInsets(top: 10, leading: 15, bottom: 10, trailing: 15)
         section.interGroupSpacing = spacing
-        
-        let headerSize = NSCollectionLayoutSize(
-            widthDimension: .fractionalWidth(1.0),
-            heightDimension: .absolute(44)
-        )
-        let sectionHeader = NSCollectionLayoutBoundarySupplementaryItem(
-            layoutSize: headerSize,
-            elementKind: UICollectionView.elementKindSectionHeader,
-            alignment: .topLeading
-        )
-        section.boundarySupplementaryItems = [sectionHeader]
         
         return section
     }

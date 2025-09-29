@@ -18,7 +18,19 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
-        window?.rootViewController = HomeViewController()
+        
+        let homeNaviCon = UINavigationController(rootViewController: HomeViewController())
+        homeNaviCon.tabBarItem = UITabBarItem(title: "홈", image: .init(systemName: "house"), tag: 0)
+        let mainTabBarCon = UITabBarController()
+        
+        let defaultTabBarAppearance = UITabBarAppearance()
+        defaultTabBarAppearance.configureWithDefaultBackground()
+        mainTabBarCon.tabBar.standardAppearance = defaultTabBarAppearance
+        mainTabBarCon.tabBar.scrollEdgeAppearance = defaultTabBarAppearance
+        
+        mainTabBarCon.tabBar.tintColor = .label
+        mainTabBarCon.viewControllers = [homeNaviCon, ViewController()]
+        window?.rootViewController = mainTabBarCon
         window?.makeKeyAndVisible()
     }
 
