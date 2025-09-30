@@ -63,10 +63,10 @@ struct PerformancePlaceResponse: Codable, Hashable {
     let prfplcnm: String
     let mt13id: String
     let seatscale: String
-    let stageorchat: String?
-    let stagepracat: String?
-    let stagedresat: String?
-    let stageoutdrat: String?
+    let stageorchat: String
+    let stagepracat: String
+    let stagedresat: String
+    let stageoutdrat: String
     let disabledseatscale: String?
     let stagearea: String?
 }

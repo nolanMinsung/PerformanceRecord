@@ -1,0 +1,129 @@
+//
+//  FacilityDetailViewController.swift
+//  Muyeon
+//
+//  Created by 김민성 on 9/30/25.
+//
+
+import UIKit
+
+class FacilityDetailViewController: UIViewController {
+
+    private let detailView = FacilityDetailView()
+
+    override func loadView() {
+        // 뷰 컨트롤러의 기본 뷰를 커스텀 뷰로 설정
+        self.view = detailView
+    }
+
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.title = "공연장 정보"
+        
+        // 네비게이션 바 스타일 설정
+        navigationController?.navigationBar.prefersLargeTitles = false
+
+        // --- 테스트용 데이터 ---
+        // 실제 앱에서는 네트워크 요청을 통해 이 데이터를 받아옵니다.
+        let concertHall = SubVenue(
+            id: "sub1",
+            name: "콘서트홀",
+            seatScale: 2600,
+            hasOrchestraPit: true,
+            hasPracticeRoom: true,
+            hasDressingRoom: true,
+            hasOutdoorStage: false,
+            disabledSeatScale: 24,
+            stageArea: "18m x 12m"
+        )
+        
+        let cjTowallTheater = SubVenue(
+            id: "FC000001-01",
+            name: "CJ 토월극장",
+            seatScale: 1004,
+            hasOrchestraPit: true,
+            hasPracticeRoom: false,
+            hasDressingRoom: true,
+            hasOutdoorStage: false,
+            disabledSeatScale: 10,
+            stageArea: nil
+        )
+        
+        
+        let childrenLounge = SubVenue(
+            id: "FC000001-14",
+            name: "1101어린이라운지",
+            seatScale: 0,
+            hasOrchestraPit: false,
+            hasPracticeRoom: false,
+            hasDressingRoom: false,
+            hasOutdoorStage: false,
+            disabledSeatScale: nil,
+            stageArea: nil
+        )
+        
+        let olympicHall = SubVenue(
+            id: "FC001247-03",
+            name: "올림픽홀",
+            seatScale: 2452,
+            hasOrchestraPit: false,
+            hasPracticeRoom: true,
+            hasDressingRoom: true,
+            hasOutdoorStage: false,
+            disabledSeatScale: 22,
+            stageArea: "23.1X18.5X8.5"
+        )
+        
+        let subyun = SubVenue(
+            id: "FC001247-08",
+            name: "야외(수변무대)",
+            seatScale: 1000,
+            hasOrchestraPit: false,
+            hasPracticeRoom: true,
+            hasDressingRoom: true,
+            hasOutdoorStage: true,
+            disabledSeatScale: nil,
+            stageArea: nil
+        )
+        
+        let sampleDetail = FacilityDetail(
+            totalSeatScale: 2600,
+            telNumber: "02-580-1300",
+            relatedURL: URL(string: "https://www.sac.or.kr"),
+            address: "서울특별시 서초구 남부순환로 2406",
+            latitude: 37.4786,
+            longitude: 127.0114,
+            hasRestaurant: true,
+            hasCafe: true,
+            hasStore: true,
+            hasNolibang: true,
+            hasSuyusil: false,
+            hasParkingBarrier: true,
+            hasRestroomBarrier: true,
+            hasRunwayBarrier: true,
+            hasElevatorBarrier: true,
+            hasParkingLot: false,
+            subVenues: [
+                concertHall,
+                cjTowallTheater,
+                childrenLounge,
+                olympicHall,
+                subyun
+            ]
+        )
+        
+        let sampleFacility = Facility(
+            id: "FC000001",
+            name: "예술의전당",
+            performanceCount: 3,
+            character: .cultureArtCenter,
+            sidoName: .seoul,
+            gugunName: nil,
+            openYear: 1988,
+            detail: sampleDetail
+        )
+
+        // 뷰에 데이터 전달
+        detailView.configure(with: sampleFacility)
+    }
+}

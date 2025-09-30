@@ -68,7 +68,7 @@ private extension PerformanceDetailViewController {
             .bind(
                 with: self,
                 onNext: { owner, performanceID in
-                    owner.navigationController?.pushViewController(ViewController(), animated: true)
+                    owner.navigationController?.pushViewController(FacilityDetailViewController(), animated: true)
                 }
             )
             .disposed(by: disposeBag)

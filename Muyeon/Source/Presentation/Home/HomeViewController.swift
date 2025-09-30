@@ -76,7 +76,7 @@ private extension HomeViewController {
                 onNext: { owner, values in
                     var snapshot = DiffableSnapshot()
                     snapshot.appendSections(HomeView.Section.allCases)
-                    snapshot.appendItems(values.0.map { HomeUIModel.topTen(model: $0) }, toSection: .topTen)
+                    snapshot.appendItems(Array(values.0.map { HomeUIModel.topTen(model: $0) }.prefix(10)), toSection: .topTen)
                     snapshot.appendItems(values.1.map { HomeUIModel.genre(model: $0) }, toSection: .genre)
                     snapshot.appendItems(values.2.map { HomeUIModel.trending(model: $0) }, toSection: .trending)
                     owner.dataSource.apply(snapshot)

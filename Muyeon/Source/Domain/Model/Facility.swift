@@ -62,6 +62,6 @@ struct SubVenue: Identifiable {
     let hasPracticeRoom: Bool      // stagepracat
     let hasDressingRoom: Bool      // stagedresat
     let hasOutdoorStage: Bool      // stageoutdrat
-    let disabledSeatScale: Int    // disabledseatscale (장애인 좌석 수)
-    let stageArea: String         // stagearea (무대 면적)
+    let disabledSeatScale: Int?    // disabledseatscale (장애인 좌석 수)
+    let stageArea: String?         // stagearea (무대 면적)
 }
