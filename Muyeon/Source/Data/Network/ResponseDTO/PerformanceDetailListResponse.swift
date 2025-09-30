@@ -86,3 +86,62 @@ struct RelateResponse: Codable, Hashable {
     /// 관련 사이트 URL
     let relateurl: String
 }
+
+
+extension PerformanceDetailListResponse {
+    
+    func toDomain() -> Performance {
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy.MM.dd"
+        
+        let updateDateFormatter = DateFormatter()
+        updateDateFormatter.dateFormat = "yyyy-MM-dd HH:mm:ss"
+        
+        let updateDateFormatter2 = DateFormatter()
+        updateDateFormatter2.dateFormat = "yyyy-MM-dd HH:mm:ss.SSSSSS"
+        
+        let detailPerformance = db.first!
+        let updatedate = updateDateFormatter.date(from: detailPerformance.updatedate!) ?? updateDateFormatter2.date(from: detailPerformance.updatedate!)
+        
+        return Performance(
+            id: detailPerformance.mt20id,
+            name: detailPerformance.prfnm,
+            startDate: dateFormatter.date(from: detailPerformance.prfpdfrom)!,
+            endDate: dateFormatter.date(from: detailPerformance.prfpdto)!,
+            facilityFullName: detailPerformance.fcltynm,
+            posterURL: detailPerformance.poster.convertURLToHTTPS(),
+            area: Constant.AdminAreaCode.findBy(name: detailPerformance.area),
+            genre: Constant.Genre.findBy(name: detailPerformance.genrenm),
+            openRun: (detailPerformance.openrun == "Y"),
+            state: Constant.PerformanceState.findBy(name: detailPerformance.prfstate),
+            detail: .init(
+                cast: detailPerformance.prfcast,
+                crew: detailPerformance.prfcrew,
+                runtime: detailPerformance.prfruntime,
+                ageLimit: detailPerformance.prfage,
+                enterpriseName: detailPerformance.entrpsnm,
+                enterpriseNameP: detailPerformance.entrpsnmP ?? "",
+                enterpriseNameA: detailPerformance.entrpsnmA ?? "",
+                enterpriseNameH: detailPerformance.entrpsnmH ?? "",
+                enterpriseNameS: detailPerformance.entrpsnmS ?? "",
+                priceGuidance: detailPerformance.pcseguidance,
+                story: detailPerformance.sty ?? "",
+                visitingKorea: (detailPerformance.visit == "Y"),
+                child: (detailPerformance.child == "Y"),
+                daehakro: (detailPerformance.daehakro == "Y"),
+                isFestival: (detailPerformance.festival == "Y"),
+                musicalLicense: (detailPerformance.musicallicense == "Y"),
+                musicalCreate: (detailPerformance.musicalcreate == "Y"),
+                updateDate: .now,
+                facilityID: detailPerformance.mt10id,
+                detailDateGuidance: detailPerformance.dtguidance,
+                detailImageURLs: detailPerformance.styurls.styurl.map { $0.convertURLToHTTPS() },
+                relatedLinks: detailPerformance.relates.relate.map {
+                    RelatedLink(name: $0.relatenm, url: $0.relateurl)
+                }
+            )
+        )
+        
+    }
+    
+}

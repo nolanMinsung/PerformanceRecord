@@ -35,7 +35,7 @@ struct PerformanceDetail: Hashable {
     let enterpriseNameH: String // entrpsnmH(주최)
     let enterpriseNameS: String // entrpsnmS(주관)
     let priceGuidance: String // pcseguidance (가격 정보)
-    let story: Bool // sty (줄거리)
+    let story: String // sty (줄거리)
     let visitingKorea: Bool // visit(내한)    N
     let child: Bool // child(아동)    N
     let daehakro: Bool // daehakro(대학로)    Y

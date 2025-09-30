@@ -8,15 +8,16 @@
 import Foundation
 
 protocol FetchPerformanceDetailUseCase {
-    func execute(performanceID: String) async throws -> PerformanceDetailListResponse
+    func execute(performanceID: String) async throws -> Performance
 }
 
 
 final class DefaultFetchPerformanceDetailUseCase: FetchPerformanceDetailUseCase {
-    func execute(performanceID: String) async throws -> PerformanceDetailListResponse {
+    func execute(performanceID: String) async throws -> Performance {
         return try await NetworkManager.requestValue(
             router: .getPerformanceDetail(apiKey: InfoPlist.apiKey, performanceID: performanceID),
             decodingType: PerformanceDetailListResponse.self
         )
+        .toDomain()
     }
 }
