@@ -87,13 +87,17 @@ private extension HomeViewController {
         output.presentDetail
             .bind(
                 with: self,
-                onNext: { owner, indexPath in
-                    let naviCon = UINavigationController(rootViewController: PerformanceDetailViewController())
+                onNext: { owner, values in
+                    let (indexPath, performanceID) = values
+                    let performanceDetailVC = PerformanceDetailViewController(performanceID: performanceID)
+                    let naviCon = UINavigationController(rootViewController: performanceDetailVC)
                     let wispConfig = WispConfiguration { config in
                         config.setGesture { gesture in
                             gesture.allowedDirections = [.right, .down]
                         }
                         config.setLayout { layout in
+                            let topInset = self.view.safeAreaInsets.top
+                            layout.presentedAreaInset = .init(top: topInset, left: 0, bottom: 0, right: 0)
                             layout.initialCornerRadius = 5
                         }
                     }

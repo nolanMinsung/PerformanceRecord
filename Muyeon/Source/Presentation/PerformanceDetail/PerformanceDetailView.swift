@@ -7,7 +7,7 @@
 
 import UIKit
 
-import UIKit
+import Kingfisher
 import SnapKit
 
 final class PerformanceDetailView: UIView {
@@ -23,7 +23,7 @@ final class PerformanceDetailView: UIView {
         // 실제 앱에서는 URL로부터 이미지를 비동기적으로 로드해야 합니다.
         // 여기서는 임시로 시스템 이미지를 사용합니다.
         imageView.image = UIImage(systemName: "photo.artframe")
-        imageView.contentMode = .scaleToFill
+        imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
         imageView.backgroundColor = .lightGray // 이미지 로딩 전 배경색
         return imageView
@@ -33,7 +33,8 @@ final class PerformanceDetailView: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.text = "2025 최현우 아판타시아 - 서울: 이 문자열이 길다면? 세 줄까지도 가능해질까?"
+//        label.text = "2025 최현우 아판타시아 - 서울: 이 문자열이 길다면? 세 줄까지도 가능해질까?"
+        label.text = ""
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.textColor = .label
         label.numberOfLines = 3
@@ -81,7 +82,8 @@ final class PerformanceDetailView: UIView {
     
     private let genreLabel: UILabel = {
         let label = UILabel()
-        label.text = "뮤지컬"
+//        label.text = "뮤지컬"
+        label.text = ""
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
         return label
@@ -89,7 +91,8 @@ final class PerformanceDetailView: UIView {
 
     private let durationLabel: UILabel = {
         let label = UILabel()
-        label.text = "2시간"
+//        label.text = "2시간"
+        label.text = ""
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
         return label
@@ -97,7 +100,8 @@ final class PerformanceDetailView: UIView {
 
     private let ageRatingLabel: UILabel = {
         let label = UILabel()
-        label.text = "만 13세 이상"
+//        label.text = "만 13세 이상"
+        label.text = ""
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
         return label
@@ -113,17 +117,19 @@ final class PerformanceDetailView: UIView {
         return label
     }()
     
-    private let venueButton: UIButton = {
+    let venueButton: UIButton = {
         var config = UIButton.Configuration.plain()
         config.image = .init(systemName: "chevron.forward")
         config.baseForegroundColor = .label
-        config.title = "한전아트센터"
+//        config.title = "한전아트센터"
+        config.title = ""
         config.imagePlacement = .trailing
         config.imagePadding = 4
         config.contentInsets = .zero
+        config.titleAlignment = .leading
         config.titleTextAttributesTransformer = .init { incoming in
             var outgoing = incoming
-            outgoing.font = .systemFont(ofSize: 16)
+            outgoing.font = .systemFont(ofSize: 16, weight: .semibold)
             return outgoing
         }
         let button = UIButton(configuration: config)
@@ -142,9 +148,11 @@ final class PerformanceDetailView: UIView {
     
     private let periodLabel: UILabel = {
         let label = UILabel()
-        label.text = "2025.10.25 - 2025.11.09"
-        label.font = .systemFont(ofSize: 15, weight: .regular)
+//        label.text = "2025.10.25 - 2025.11.09"
+        label.text = ""
+        label.font = .systemFont(ofSize: 15, weight: .semibold)
         label.textColor = .label
+        label.numberOfLines = 0
         return label
     }()
     
@@ -159,9 +167,9 @@ final class PerformanceDetailView: UIView {
     
     private let storyBodyLabel: UILabel = {
         let label = UILabel()
-        label.text = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis vehicula risus eleifend laoreet et scelerisque leo. Fusce et quam quis turpis semper sagittis nec eu neque. Nullam imperdiet, mi facilisis lacinia pretium, lectus sapien efficitur massa, ut pretium ipsum lorem sed magna. Vivamus tincidunt aliquam. Pellentesque et hendrerit."
+        label.text = "" /*"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris facilisis vehicula risus eleifend laoreet et scelerisque leo. Fusce et quam quis turpis semper sagittis nec eu neque. Nullam imperdiet, mi facilisis lacinia pretium, lectus sapien efficitur massa, ut pretium ipsum lorem sed magna. Vivamus tincidunt aliquam. Pellentesque et hendrerit."*/
         label.font = .systemFont(ofSize: 15, weight: .regular)
-        label.textColor = .darkGray
+        label.textColor = .label
         label.numberOfLines = 0
         return label
     }()
@@ -171,26 +179,8 @@ final class PerformanceDetailView: UIView {
         stackView.axis = .vertical
         stackView.spacing = 0
         stackView.alignment = .fill
-        stackView.distribution = .fillProportionally
+        stackView.distribution = .fill
         return stackView
-    }()
-    
-    private let additionalImageView1: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = .init(systemName: "photo.artframe")
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .lightGray // 이미지 로딩 전 배경색
-        return imageView
-    }()
-    
-    private let additionalImageView2: UIImageView = {
-        let imageView = UIImageView()
-        imageView.image = .init(systemName: "photo.artframe")
-        imageView.contentMode = .scaleAspectFill
-        imageView.clipsToBounds = true
-        imageView.backgroundColor = .lightGray // 이미지 로딩 전 배경색
-        return imageView
     }()
 
     // MARK: - Initializer
@@ -229,7 +219,6 @@ final class PerformanceDetailView: UIView {
         infoStackView.addArrangedSubview(periodContainerView)
         
         // 가로 상세 정보 스택 뷰
-        // 가변적인 데이터에 대응하기 위해 dot label을 별도로 추가합니다.
         let dotLabel1 = createDotLabel()
         let dotLabel2 = createDotLabel()
         [genreLabel, dotLabel1, durationLabel, dotLabel2, ageRatingLabel].forEach {
@@ -242,13 +231,8 @@ final class PerformanceDetailView: UIView {
         
         periodContainerView.addSubview(periodTitleLabel)
         periodContainerView.addSubview(periodLabel)
-        
-        // 추가 줄거리 이미지
-        additionalImageStackView.addArrangedSubview(additionalImageView1)
-        additionalImageStackView.addArrangedSubview(additionalImageView2)
     }
-
-    /// 오토레이아웃 제약조건을 설정합니다.
+    
     private func setupLayoutConstraints() {
         scrollView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
@@ -256,7 +240,7 @@ final class PerformanceDetailView: UIView {
         
         // 포스터 이미지
         posterImageView.snp.makeConstraints { make in
-            make.top.equalTo(scrollView.contentLayoutGuide).inset(-2) // UIKit 버그인 듯. 1~2포인트 정도 여백이 생김.
+            make.top.equalTo(scrollView.contentLayoutGuide)//.inset(-2) // UIKit 버그인 듯. 1~2포인트 정도 여백이 생김.
             make.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
             make.height.equalTo(posterImageView.snp.width).multipliedBy(1.2) // 이미지 비율을 대략 1:1.2로 설정
         }
@@ -268,6 +252,7 @@ final class PerformanceDetailView: UIView {
         }
         
         // 타이틀
+        titleLabel.snp.contentHuggingHorizontalPriority = 249
         titleLabel.snp.makeConstraints { make in
             make.leading.equalTo(scrollView.frameLayoutGuide).inset(20)
             make.bottom.equalTo(posterImageView.snp.bottom)
@@ -292,6 +277,8 @@ final class PerformanceDetailView: UIView {
             make.leading.centerY.equalToSuperview()
             make.width.equalTo(35) // "장소", "기간" 너비 고정
         }
+        
+        // 장소 버튼
         venueButton.snp.makeConstraints { make in
             make.leading.equalTo(venueTitleLabel.snp.trailing).offset(8)
             make.verticalEdges.trailing.equalToSuperview()
@@ -302,6 +289,8 @@ final class PerformanceDetailView: UIView {
             make.leading.centerY.equalToSuperview()
             make.width.equalTo(35) // "장소", "기간" 너비 고정
         }
+        
+        // 상연 기간
         periodLabel.snp.makeConstraints { make in
             make.leading.equalTo(periodTitleLabel.snp.trailing).offset(8)
             make.verticalEdges.trailing.equalToSuperview()
@@ -319,17 +308,6 @@ final class PerformanceDetailView: UIView {
             make.horizontalEdges.equalTo(storyTitleLabel)
         }
         
-        additionalImageView1.snp.makeConstraints { make in
-            guard let image = additionalImageView1.image else { return }
-            let aspectRatio = image.size.height / image.size.width
-            make.height.equalTo(additionalImageView1.snp.width).multipliedBy(aspectRatio)
-        }
-        additionalImageView2.snp.makeConstraints { make in
-            guard let image = additionalImageView2.image else { return }
-            let aspectRatio = image.size.height / image.size.width
-            make.height.equalTo(additionalImageView2.snp.width).multipliedBy(aspectRatio)
-        }
-        
         additionalImageStackView.snp.makeConstraints { make in
             make.top.equalTo(storyBodyLabel.snp.bottom).offset(30)
             make.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
@@ -337,9 +315,6 @@ final class PerformanceDetailView: UIView {
         }
     }
     
-    // MARK: - Helper Methods
-    
-    /// 상세 정보 스택뷰에 사용될 구분자(dot) 라벨을 생성합니다.
     private func createDotLabel() -> UILabel {
         let label = UILabel()
         label.text = "•"
@@ -347,4 +322,62 @@ final class PerformanceDetailView: UIView {
         label.textColor = .label
         return label
     }
+}
+
+
+extension PerformanceDetailView {
+    
+    @MainActor
+    func update(with performance: Performance) {
+        let posterURL = URL(string: performance.posterURL)
+        
+        posterImageView.kf.setImage(with: posterURL) { [weak self] _ in
+            self?.updatePosterImageSize()
+        }
+        titleLabel.text = performance.name
+        genreLabel.text = performance.genre.description
+        durationLabel.text = performance.detail?.runtime ?? "-시간"
+        ageRatingLabel.text = performance.detail?.ageLimit
+        storyBodyLabel.text = performance.detail?.story
+        if #available(iOS 16.0, *) {
+            let (placeName, placeDetail) = performance.facilityFullName.parsePlaceAndDetail()!
+            venueButton.configuration?.title = placeName
+            venueButton.configuration?.subtitle = placeDetail
+        } else {
+            venueButton.configuration?.title = performance.facilityFullName
+        }
+        periodLabel.text = performance.detail?.detailDateGuidance.replacingOccurrences(of: ", ", with: "\n")
+        
+        updateAdditionalImages(urls: performance.detail?.detailImageURLs ?? [])
+    }
+    
+    private func updatePosterImageSize() {
+        guard let posterImageSize = posterImageView.image?.size else { return }
+        let imageRatio = posterImageSize.height / posterImageSize.width
+        
+        posterImageView.snp.remakeConstraints { make in
+            make.top.equalTo(scrollView.contentLayoutGuide)//.inset(-2) // UIKit 버그인 듯. 1~2포인트 정도 여백이 생김.
+            make.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
+            make.height.equalTo(posterImageView.snp.width).multipliedBy(imageRatio) // 이미지 비율을 대략 1:1.2로 설정
+        }
+        layoutIfNeeded()
+    }
+    
+    private func updateAdditionalImages(urls: [String]) {
+        let urls = urls.map { URL(string: $0) }
+        for url in urls {
+            Task {
+                guard let url else { return }
+                let imageResult = try await KingfisherManager.shared.retrieveImage(with: url)
+                let imageView = UIImageView(image: imageResult.image)
+                additionalImageStackView.addArrangedSubview(imageView)
+                guard let image = imageView.image else { return }
+                imageView.snp.makeConstraints { make in
+                    let aspectRatio = image.size.height / image.size.width
+                    make.height.equalTo(imageView.snp.width).multipliedBy(aspectRatio)
+                }
+            }
+        }
+    }
+    
 }

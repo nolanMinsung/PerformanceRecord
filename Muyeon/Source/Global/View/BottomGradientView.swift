@@ -55,10 +55,9 @@ class BottomGradientView: UIView {
         let topColor = color.withAlphaComponent(0.0).cgColor
         let bottomColor = color.cgColor
         
-        gradientLayer.colors = [topColor, bottomColor, bottomColor]
+        gradientLayer.colors = [topColor, bottomColor]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
-        gradientLayer.locations = [0.0, 0.5, 1.0]
-        gradientLayer.endPoint = CGPoint(x: 0.5, y: 1.0)
+        gradientLayer.endPoint = CGPoint(x: 0.5, y: 0.8)
     }
     
 }

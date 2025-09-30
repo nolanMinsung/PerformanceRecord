@@ -7,12 +7,46 @@
 
 import Foundation
 
+import RxSwift
+import RxCocoa
+
 final class PerformanceDetailViewModel {
     
-    let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
+    struct Input {
+        let facilityButtonTapped: Observable<String>
+    }
     
-    init(fetchPerformanceDetailUseCase: some FetchPerformanceDetailUseCase) {
+    struct Output {
+        let performanceDetail: Observable<Performance>
+        let showFacilityDetail: Observable<String>
+    }
+    
+    let performanceID: String
+    let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
+    private let disposeBag = DisposeBag()
+    
+    init(performanceID: String, fetchPerformanceDetailUseCase: some FetchPerformanceDetailUseCase) {
+        self.performanceID = performanceID
         self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
+    }
+    
+    func transform(input: Input) -> Output {
+        let performanceDetail = PublishRelay<Performance>()
+        let showFacilityDetail = PublishRelay<String>()
+        
+        input.facilityButtonTapped
+            .bind(to: showFacilityDetail)
+            .disposed(by: disposeBag)
+        
+        Task {
+            let performanceDetailInfo = try await fetchPerformanceDetailUseCase.execute(performanceID: performanceID)
+            performanceDetail.accept(performanceDetailInfo)
+        }
+        
+        return .init(
+            performanceDetail: performanceDetail.asObservable(),
+            showFacilityDetail: showFacilityDetail.asObservable()
+        )
     }
     
 }
