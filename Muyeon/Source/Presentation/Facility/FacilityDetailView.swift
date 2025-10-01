@@ -116,12 +116,12 @@ class FacilityDetailView: UIView {
         nameLabel.text = facility.name
         
         if let detail = facility.detail {
-            totalSeatsLabel.text = "총 \(detail.totalSeatScale ?? 0)석"
+            totalSeatsLabel.text = "총 \(detail.totalSeatScale)석"
             addressLabel.text = detail.address
             
             // 지도 위치 설정
-            if let lat = detail.latitude, let lon = detail.longitude {
-                let coordinate = CLLocationCoordinate2D(latitude: lat, longitude: lon)
+            if let latitude = detail.latitude, let longitude = detail.longitude {
+                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
                 let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
                 mapView.setRegion(region, animated: false)
                 

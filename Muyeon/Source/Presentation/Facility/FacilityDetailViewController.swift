@@ -26,8 +26,8 @@ class FacilityDetailViewController: UIViewController {
         // --- 테스트용 데이터 ---
         // 실제 앱에서는 네트워크 요청을 통해 이 데이터를 받아옵니다.
         let concertHall = SubVenue(
-            id: "sub1",
             name: "콘서트홀",
+            id: "sub1",
             seatScale: 2600,
             hasOrchestraPit: true,
             hasPracticeRoom: true,
@@ -38,8 +38,8 @@ class FacilityDetailViewController: UIViewController {
         )
         
         let cjTowallTheater = SubVenue(
-            id: "FC000001-01",
             name: "CJ 토월극장",
+            id: "FC000001-01",
             seatScale: 1004,
             hasOrchestraPit: true,
             hasPracticeRoom: false,
@@ -51,8 +51,8 @@ class FacilityDetailViewController: UIViewController {
         
         
         let childrenLounge = SubVenue(
-            id: "FC000001-14",
             name: "1101어린이라운지",
+            id: "FC000001-14",
             seatScale: 0,
             hasOrchestraPit: false,
             hasPracticeRoom: false,
@@ -63,8 +63,8 @@ class FacilityDetailViewController: UIViewController {
         )
         
         let olympicHall = SubVenue(
-            id: "FC001247-03",
             name: "올림픽홀",
+            id: "FC001247-03",
             seatScale: 2452,
             hasOrchestraPit: false,
             hasPracticeRoom: true,
@@ -75,8 +75,8 @@ class FacilityDetailViewController: UIViewController {
         )
         
         let subyun = SubVenue(
-            id: "FC001247-08",
             name: "야외(수변무대)",
+            id: "FC001247-08",
             seatScale: 1000,
             hasOrchestraPit: false,
             hasPracticeRoom: true,
@@ -89,7 +89,7 @@ class FacilityDetailViewController: UIViewController {
         let sampleDetail = FacilityDetail(
             totalSeatScale: 2600,
             telNumber: "02-580-1300",
-            relatedURL: URL(string: "https://www.sac.or.kr"),
+            relatedURL: "https://www.sac.or.kr",
             address: "서울특별시 서초구 남부순환로 2406",
             latitude: 37.4786,
             longitude: 127.0114,

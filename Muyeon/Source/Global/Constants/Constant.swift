@@ -127,6 +127,8 @@ enum Constant {
         case otherOverseasEtc = "6"
         /// 기타(비공연장) (Code: 7)
         case otherNonPerformanceVenue = "7"
+        /// 기타(파싱에 실패했을 경우) (임시 Code: 0)
+        case unknown = "0"
         
         /// 코드 설명
         var description: String {
@@ -138,6 +140,20 @@ enum Constant {
             case .privateNonDaehakro: return "민간(대학로 외)"
             case .otherOverseasEtc: return "기타(해외등)"
             case .otherNonPerformanceVenue: return "기타(비공연장)"
+            case .unknown: return "기타"
+            }
+        }
+        
+        static func findBy(name: String) -> Self {
+            switch name {
+            case "중앙정부": return .centralGovernment
+            case "문예회관": return .cultureArtCenter
+            case "기타(공공)": return .otherPublic
+            case "대학로": return .daehakro
+            case "민간(대학로 외)": return .privateNonDaehakro
+            case "기타(해외등)": return .otherOverseasEtc
+            case "기타(비공연장)": return .otherNonPerformanceVenue
+            default: return .unknown
             }
         }
     }

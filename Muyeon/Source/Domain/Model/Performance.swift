@@ -29,11 +29,11 @@ struct PerformanceDetail: Hashable {
     let crew: String // prfcrew (제작진)
     let runtime: String // prfruntime
     let ageLimit: String // prfage (관람 연령)
-    let enterpriseName: String // entrpsnm(기획제작사)
-    let enterpriseNameP: String // entrpsnmP(제작사)
-    let enterpriseNameA: String // entrpsnmA(기획사)
-    let enterpriseNameH: String // entrpsnmH(주최)
-    let enterpriseNameS: String // entrpsnmS(주관)
+    let enterpriseName: String? // entrpsnm(기획제작사)
+    let enterpriseNameP: String? // entrpsnmP(제작사)
+    let enterpriseNameA: String? // entrpsnmA(기획사)
+    let enterpriseNameH: String? // entrpsnmH(주최)
+    let enterpriseNameS: String? // entrpsnmS(주관)
     let priceGuidance: String // pcseguidance (가격 정보)
     let story: String // sty (줄거리)
     let visitingKorea: Bool // visit(내한)    N

@@ -13,9 +13,9 @@ struct Facility: Identifiable {
     let name: String         // fcltynm
     let performanceCount: Int // mt13cnt (공연장 개수)
     let character: Constant.FacilityCharacteristic    // fcltychartr (시설 특성)
-    let sidoName: Constant.AdminAreaCode?    // sidonm (시도명) - 해외인 경우 nil
-    let gugunName: Constant.AdminDistrictCode?   // gugunnm (구군명) - 해외인 경우 nil
-    let openYear: Int?       // opende (개관연도, String을 Int로 변환) - 해외인 경우 nil
+    let sidoName: Constant.AdminAreaCode?    // sidonm (시도명) 시설목록에만 포함되는 항목. - 해외인 경우 nil
+    let gugunName: Constant.AdminDistrictCode?   // gugunnm (구군명) 시설목록에만 포함되는 항목.  - 해외인 경우 nil
+    let openYear: Int?       // opende (개관연도, String을 Int로 변환) - 해외인 경우 nil.
     
     // 상세 정보는 옵셔널 속성으로 포함
     let detail: FacilityDetail?
@@ -24,14 +24,14 @@ struct Facility: Identifiable {
 
 struct FacilityDetail {
     // 시설 상세 정보 (시설 상세 조회 응답값 기준)
-    let totalSeatScale: Int? // seatscale (총 좌석수) - 해외인 경우 0
+    let totalSeatScale: Int  // seatscale (총 좌석수) - 해외인 경우 0일 수 있음.
     let telNumber: String?   // telno (전화번호) - 해외인 경우 nil
-    let relatedURL: URL?     // relateurl
+    let relatedURL: String?     // relateurl
     let address: String?     // adres (주소) - 해외인 경우 nil
     
     // 위치 정보
-    let latitude: Double?    // la (위도, String을 Double로 변환) - 해외인 경우 nil
-    let longitude: Double?   // lo (경도, String을 Double로 변환) - 해외인 경우 nil
+    let latitude: Double?     // la (위도, String을 Double로 변환) - 해외인 경우 0
+    let longitude: Double?    // lo (경도, String을 Double로 변환) - 해외인 경우 0
     
     // 편의 시설 정보 (XML의 Y/N 값을 Bool로 변환)
     let hasRestaurant: Bool  // restaurant
@@ -53,8 +53,8 @@ struct FacilityDetail {
 
 
 struct SubVenue: Identifiable {
-    let id: String           // mt13id
     let name: String         // prfplcnm (공연장 이름)
+    let id: String           // mt13id
     let seatScale: Int      // seatscale (좌석 수, String을 Int로 변환)
     
     // 기타 상세 정보 필드 (예: stageorchat, stagepracat 등)
