@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: - SubVenueInfoTagView (재사용 가능한 태그 뷰)
-/// 아이콘, 텍스트, 배경색을 가지는 재사용 가능한 태그 컴포넌트입니다.
+/// 아이콘, 텍스트, 배경색을 가지는 재사용 가능한 태그 컴포넌트.
 class SubVenueInfoTagView: UIView {
     
     private let iconImageView: UIImageView = {

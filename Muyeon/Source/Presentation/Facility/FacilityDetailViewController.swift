@@ -9,11 +9,24 @@ import UIKit
 
 class FacilityDetailViewController: UIViewController {
 
-    private let detailView = FacilityDetailView()
-
+    private let rootView = FacilityDetailView()
+    private let viewModel: FacilityDetailViewModel
+    
+    init(facilityID: String) {
+        self.viewModel = FacilityDetailViewModel(
+            facilityID: facilityID,
+            fetchFacilityDetailUseCase: DefaultFetchFacilityDetailUseCase()
+        )
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func loadView() {
         // 뷰 컨트롤러의 기본 뷰를 커스텀 뷰로 설정
-        self.view = detailView
+        self.view = rootView
     }
 
     override func viewDidLoad() {
@@ -22,7 +35,18 @@ class FacilityDetailViewController: UIViewController {
         
         // 네비게이션 바 스타일 설정
         navigationController?.navigationBar.prefersLargeTitles = false
-
+        
+        Task {
+            let facility = try await viewModel.fetchFacilityDetailUseCase.execute(facilityID: viewModel.facilityID)
+            rootView.configure(with: facility)
+        }
+        
+//        rootView.configure(with: createDummyFacility())
+    }
+    
+    
+    func createDummyFacility() -> Facility {
+        
         // --- 테스트용 데이터 ---
         // 실제 앱에서는 네트워크 요청을 통해 이 데이터를 받아옵니다.
         let concertHall = SubVenue(
@@ -122,8 +146,7 @@ class FacilityDetailViewController: UIViewController {
             openYear: 1988,
             detail: sampleDetail
         )
-
-        // 뷰에 데이터 전달
-        detailView.configure(with: sampleFacility)
+        
+        return sampleFacility
     }
 }

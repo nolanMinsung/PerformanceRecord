@@ -121,7 +121,6 @@ final class PerformanceDetailView: UIView {
         var config = UIButton.Configuration.plain()
         config.image = .init(systemName: "chevron.forward")
         config.baseForegroundColor = .label
-//        config.title = "한전아트센터"
         config.title = ""
         config.imagePlacement = .trailing
         config.imagePadding = 4
@@ -133,6 +132,7 @@ final class PerformanceDetailView: UIView {
             return outgoing
         }
         let button = UIButton(configuration: config)
+        button.isEnabled = false
         return button
     }()
     

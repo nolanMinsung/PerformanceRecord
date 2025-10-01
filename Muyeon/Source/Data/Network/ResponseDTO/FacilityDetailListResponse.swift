@@ -136,7 +136,7 @@ struct PerformancePlaceResponse: Codable, Hashable {
         return SubVenue(
             name: prfplcnm,
             id: mt13id,
-            seatScale: Int(seatscale) ?? 0,
+            seatScale: (try? Int(seatscale, format: .number)) ?? 0,
             hasOrchestraPit: (stageorchat == "Y"),
             hasPracticeRoom: (stagepracat == "Y"),
             hasDressingRoom: (stagedresat == "Y"),

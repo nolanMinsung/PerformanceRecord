@@ -60,15 +60,20 @@ private extension PerformanceDetailViewController {
                 with: self,
                 onNext: { owner, performance in
                     owner.rootView.update(with: performance)
+                    owner.rootView.venueButton.isEnabled = (performance.detail != nil)
                 }
             )
             .disposed(by: disposeBag)
         
         output.showFacilityDetail
+//            .withLatestFrom(output.facilityID)
             .bind(
                 with: self,
-                onNext: { owner, performanceID in
-                    owner.navigationController?.pushViewController(FacilityDetailViewController(), animated: true)
+                onNext: { owner, facilityID in
+                    owner.navigationController?.pushViewController(
+                        FacilityDetailViewController(facilityID: facilityID),
+                        animated: true
+                    )
                 }
             )
             .disposed(by: disposeBag)

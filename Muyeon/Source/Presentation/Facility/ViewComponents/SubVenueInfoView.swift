@@ -8,7 +8,7 @@
 import UIKit
 
 // MARK: - SubVenueInfoView (메인 뷰)
-/// SubVenue 정보를 받아 화면을 구성하는 메인 뷰입니다.
+/// SubVenue 정보를 받아 화면을 구성하는 메인 뷰
 class SubVenueInfoView: UIView {
     
     // MARK: - UI Components
@@ -27,6 +27,7 @@ class SubVenueInfoView: UIView {
     private let nameLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 22, weight: .bold)
+        label.numberOfLines = 0
         return label
     }()
     
@@ -49,7 +50,7 @@ class SubVenueInfoView: UIView {
         view.layer.cornerRadius = 10
         view.clipsToBounds = true
         seatScaleLabel.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(2)
+            make.verticalEdges.equalToSuperview().inset(5)
             make.horizontalEdges.equalToSuperview().inset(12)
         }
         return view
@@ -82,7 +83,7 @@ class SubVenueInfoView: UIView {
     private let headerStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .horizontal
-        stackView.alignment = .fill
+        stackView.alignment = .top
         stackView.spacing = 8
         return stackView
     }()
@@ -225,23 +226,21 @@ class SubVenueInfoView: UIView {
         
         disabledTags.forEach(disabledFacilitiesStackView.addArrangedSubview)
         
-        // 7. 장애인시설 섹션 전체의 표시 여부 결정
+        // 장애인시설 섹션 전체의 표시 여부 결정
         let hasDisabledFacilities = !disabledTags.isEmpty
         disabledFacilitiesLabel.isHidden = !hasDisabledFacilities
         disabledFacilitiesStackView.isHidden = !hasDisabledFacilities
         
-        // 8. 기타 섹션 태그 구성
+        // 기타 섹션 태그 구성
         var otherTags: [UIView] = []
         if let stageArea = venue.stageArea {
-             // SubVenue 구조체에는 '무대넓이'가 아닌 'stageArea'로 정의되어 있습니다.
-             // 실제 데이터가 있다면 `venue.stageArea!`를 사용하세요. 여기서는 이미지와 같이 임의의 값을 넣습니다.
             let tag = SubVenueInfoTagView(icon: UIImage(systemName: "ruler.fill"), text: "무대넓이: \(stageArea)", color: .systemBlue)
             otherTags.append(tag)
         }
         
         otherTags.forEach(otherFacilitiesStackView.addArrangedSubview)
         
-        // 9. 기타 섹션 전체의 표시 여부 결정
+        // 기타 섹션 전체의 표시 여부 결정
         let hasOtherFacilities = !otherTags.isEmpty
         otherFacilitiesLabel.isHidden = !hasOtherFacilities
         otherFacilitiesStackView.isHidden = !hasOtherFacilities

@@ -129,7 +129,6 @@ class FacilityDetailView: UIView {
                 annotation.coordinate = coordinate
                 annotation.title = facility.name
                 mapView.addAnnotation(annotation)
-                mapView.isScrollEnabled = false
             }
             
             // 편의시설

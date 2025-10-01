@@ -35,6 +35,8 @@ final class PerformanceDetailViewModel {
         let showFacilityDetail = PublishRelay<String>()
         
         input.facilityButtonTapped
+            .withLatestFrom(performanceDetail)
+            .compactMap(\.detail?.facilityID)
             .bind(to: showFacilityDetail)
             .disposed(by: disposeBag)
         
