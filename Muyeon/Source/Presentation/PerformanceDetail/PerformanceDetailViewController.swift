@@ -66,7 +66,6 @@ private extension PerformanceDetailViewController {
             .disposed(by: disposeBag)
         
         output.showFacilityDetail
-//            .withLatestFrom(output.facilityID)
             .bind(
                 with: self,
                 onNext: { owner, facilityID in

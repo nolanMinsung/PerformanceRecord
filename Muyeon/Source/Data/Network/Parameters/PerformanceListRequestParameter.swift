@@ -15,8 +15,11 @@ struct PerformanceListRequestParameter: ParameterConvertible {
     let cpage: Int
     var rows: Int
     
+    /// 공연명
     let shprfnm: String?
+    /// 공연시설명
     let shprfnmfct: String?
+    /// 장르 코드
     let shcate: String?
     let prfplccd: String?
     let signgucode: String?

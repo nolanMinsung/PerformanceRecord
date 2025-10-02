@@ -13,8 +13,6 @@ struct Performance: Identifiable, Hashable {
     let startDate: Date // prfpdfrom(공연시작일)
     let endDate: Date // prfpdto(공연종료일)
     let facilityFullName: String // fcltynm(공연시설명(공연장명))
-    var facilityName: String { "" } // TODO: facilityFullName에서 정보 파싱 구현
-    var venueName: String { "" } // TODO: facilityFullName에서 정보 파싱 구현
     let posterURL: String // poster(포스터이미지경로)
     let area: Constant.AdminAreaCode // area(공연지역)
     let genre: Constant.Genre // genrenm(공연)
