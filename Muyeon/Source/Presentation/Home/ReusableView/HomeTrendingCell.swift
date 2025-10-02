@@ -7,6 +7,7 @@
 
 import UIKit
 
+import Kingfisher
 import SnapKit
 
 class HomeTrendingCell: UICollectionViewCell {
@@ -53,9 +54,20 @@ class HomeTrendingCell: UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        imageView.image = nil
+    }
+    
     func configure(with uiModel: HomeUIModel) {
         guard case .trending(let model) = uiModel else { return }
-        imageView.kf.setImage(with: URL(string: model.posterURL))
+        let targetSize = imageView.bounds.size.applying(.init(scaleX: 0.8, y: 0.8))
+        let processor = DownsamplingImageProcessor(size: targetSize)
+        imageView.kf.setImage(
+            with: URL(string: model.posterURL),
+            options: [.processor(processor), .scaleFactor(UIScreen.main.scale),]
+        )
         titleLabel.text = model.name
         placeNameLabel.text = model.performingPlaceName
     }

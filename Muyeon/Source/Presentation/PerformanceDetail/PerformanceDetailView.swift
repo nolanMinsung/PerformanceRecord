@@ -20,12 +20,9 @@ final class PerformanceDetailView: UIView {
     // --- 포스터 및 정보 섹션 ---
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
-        // 실제 앱에서는 URL로부터 이미지를 비동기적으로 로드해야 합니다.
-        // 여기서는 임시로 시스템 이미지를 사용합니다.
-        imageView.image = UIImage(systemName: "photo.artframe")
         imageView.contentMode = .scaleAspectFit
         imageView.clipsToBounds = true
-        imageView.backgroundColor = .lightGray // 이미지 로딩 전 배경색
+        imageView.backgroundColor = .systemGray6
         return imageView
     }()
     
@@ -33,7 +30,6 @@ final class PerformanceDetailView: UIView {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-//        label.text = "2025 최현우 아판타시아 - 서울: 이 문자열이 길다면? 세 줄까지도 가능해질까?"
         label.text = ""
         label.font = .systemFont(ofSize: 24, weight: .bold)
         label.textColor = .label
@@ -82,7 +78,6 @@ final class PerformanceDetailView: UIView {
     
     private let genreLabel: UILabel = {
         let label = UILabel()
-//        label.text = "뮤지컬"
         label.text = ""
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
@@ -91,7 +86,6 @@ final class PerformanceDetailView: UIView {
 
     private let durationLabel: UILabel = {
         let label = UILabel()
-//        label.text = "2시간"
         label.text = ""
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
@@ -100,7 +94,6 @@ final class PerformanceDetailView: UIView {
 
     private let ageRatingLabel: UILabel = {
         let label = UILabel()
-//        label.text = "만 13세 이상"
         label.text = ""
         label.font = .systemFont(ofSize: 14, weight: .regular)
         label.textColor = .label
@@ -329,10 +322,8 @@ extension PerformanceDetailView {
     
     @MainActor
     func update(with performance: Performance) {
-        let posterURL = URL(string: performance.posterURL)
-        
-        posterImageView.kf.setImage(with: posterURL) { [weak self] _ in
-            self?.updatePosterImageSize()
+        if posterImageView.image == nil {
+            updatePosterImageView(with: performance.posterURL)
         }
         titleLabel.text = performance.name
         genreLabel.text = performance.genre.description
@@ -349,6 +340,13 @@ extension PerformanceDetailView {
         periodLabel.text = performance.detail?.detailDateGuidance.replacingOccurrences(of: ", ", with: "\n")
         
         updateAdditionalImages(urls: performance.detail?.detailImageURLs ?? [])
+    }
+    
+    func updatePosterImageView(with urlString: String) {
+        let posterURL = URL(string: urlString)
+        posterImageView.kf.setImage(with: posterURL) { [weak self] _ in
+            self?.updatePosterImageSize()
+        }
     }
     
     private func updatePosterImageSize() {

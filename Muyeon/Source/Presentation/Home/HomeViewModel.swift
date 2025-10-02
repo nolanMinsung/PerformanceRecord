@@ -27,7 +27,8 @@ final class HomeViewModel {
         let topTenContents: BehaviorRelay<[BoxOfficeItem]>
         let boxOfficeGenres: BehaviorRelay<[Constant.BoxOfficeGenre]>
         let trendingContents: BehaviorRelay<[BoxOfficeItem]>
-        let presentDetail: PublishRelay<(IndexPath, String)>
+        /// (선택된 `IndexPath`, performance ID, posterURL) 을 전달
+        let presentDetail: PublishRelay<(IndexPath, String, String)>
         let errorRelay: PublishRelay<any Error>
     }
     
@@ -43,7 +44,8 @@ final class HomeViewModel {
         let topTenContents = BehaviorRelay<[BoxOfficeItem]>(value: [])
         let boxOfficeGenres = BehaviorRelay<[Constant.BoxOfficeGenre]>(value: Constant.BoxOfficeGenre.allCases)
         let trendingBoxOffice = BehaviorRelay<[BoxOfficeItem]>(value: [])
-        let presentDetail = PublishRelay<(IndexPath, String)>()
+        /// (선택된 `IndexPath`, performance ID, posterURL) 을 전달
+        let presentDetail = PublishRelay<(IndexPath, String, String)>()
         let errorRelay = PublishRelay<any Error>()
         
         input.topTenLoadingTrigger
@@ -114,8 +116,10 @@ final class HomeViewModel {
         
         trendingItemSelected
             .map {
-                let performanceID = trendingBoxOffice.value[$0.item].id
-                return ($0, performanceID)
+                let selectedItem = trendingBoxOffice.value[$0.item]
+                let performanceID = selectedItem.id
+                let posterURL = selectedItem.posterURL
+                return ($0, performanceID, posterURL)
             }
             .bind(to: presentDetail)
             .disposed(by: disposeBag)

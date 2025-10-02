@@ -171,14 +171,15 @@ final class SearchPerformanceCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with performance: Performance) {
-        // Kingfisher를 사용하여 이미지 로드
-        if let url = URL(string: performance.posterURL) {
-            posterImageView.kf.setImage(with: url)
-        }
-
+        let targetSize = posterImageView.bounds.size.applying(.init(scaleX: 0.8, y: 0.8))
+        let processor = DownsamplingImageProcessor(size: targetSize)
+        posterImageView.kf.setImage(
+            with: URL(string: performance.posterURL),
+            options: [.processor(processor), .scaleFactor(UIScreen.main.scale),]
+        )
+        
         titleLabel.text = performance.name
         
-        // Genre는 Enum의 rawValue를 사용한다고 가정
         genreLabel.text = "\(performance.genre.description)"
         
         facilityLabel.text = performance.facilityFullName

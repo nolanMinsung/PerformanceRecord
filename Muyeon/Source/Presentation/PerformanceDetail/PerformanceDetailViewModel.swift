@@ -17,16 +17,23 @@ final class PerformanceDetailViewModel {
     }
     
     struct Output {
+        let posterURL: Observable<String>
         let performanceDetail: Observable<Performance>
         let showFacilityDetail: Observable<String>
     }
     
     let performanceID: String
+    let posterURL: String
     let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
     private let disposeBag = DisposeBag()
     
-    init(performanceID: String, fetchPerformanceDetailUseCase: some FetchPerformanceDetailUseCase) {
+    init(
+        performanceID: String,
+        posterURL: String,
+        fetchPerformanceDetailUseCase: some FetchPerformanceDetailUseCase
+    ) {
         self.performanceID = performanceID
+        self.posterURL = posterURL
         self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
     }
     
@@ -46,6 +53,7 @@ final class PerformanceDetailViewModel {
         }
         
         return .init(
+            posterURL: Observable<String>.just(posterURL),
             performanceDetail: performanceDetail.asObservable(),
             showFacilityDetail: showFacilityDetail.asObservable()
         )

@@ -88,8 +88,11 @@ private extension HomeViewController {
             .bind(
                 with: self,
                 onNext: { owner, values in
-                    let (indexPath, performanceID) = values
-                    let performanceDetailVC = PerformanceDetailViewController(performanceID: performanceID)
+                    let (indexPath, performanceID, posterURL) = values
+                    let performanceDetailVC = PerformanceDetailViewController(
+                        performanceID: performanceID,
+                        posterURL: posterURL
+                    )
                     let naviCon = UINavigationController(rootViewController: performanceDetailVC)
                     let wispConfig = WispConfiguration { config in
                         config.setGesture { gesture in

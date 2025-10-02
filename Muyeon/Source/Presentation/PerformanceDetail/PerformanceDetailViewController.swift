@@ -14,9 +14,10 @@ class PerformanceDetailViewController: UIViewController {
     private let rootView = PerformanceDetailView()
     private let viewModel: PerformanceDetailViewModel
     
-    init(performanceID: String) {
+    init(performanceID: String, posterURL: String) {
         self.viewModel = PerformanceDetailViewModel(
             performanceID: performanceID,
+            posterURL: posterURL,
             fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase()
         )
         super.init(nibName: nil, bundle: nil)
@@ -53,6 +54,16 @@ private extension PerformanceDetailViewController {
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.posterURL
+            .observe(on: MainScheduler.instance)
+            .bind(
+                with: self,
+                onNext: { owner, posterURL in
+                    owner.rootView.updatePosterImageView(with: posterURL)
+                }
+            )
+            .disposed(by: disposeBag)
         
         output.performanceDetail
             .observe(on: MainScheduler.instance)
