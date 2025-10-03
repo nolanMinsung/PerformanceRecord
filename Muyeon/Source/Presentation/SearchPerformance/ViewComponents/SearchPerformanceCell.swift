@@ -15,6 +15,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
 
     private let containerView = UIView()
     private let posterImageView = UIImageView()
+    private let statusLabelContainer = UIView()
     private let statusLabel = UILabel()
 
     private let textStackView = UIStackView()
@@ -60,7 +61,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
 
     private func setupUIProperties() {
         // Container View
-        containerView.backgroundColor = .secondarySystemBackground
+        containerView.backgroundColor = .systemBackground
         containerView.layer.cornerRadius = 12
         containerView.clipsToBounds = true
         
@@ -70,13 +71,13 @@ final class SearchPerformanceCell: UICollectionViewCell {
         posterImageView.layer.cornerRadius = 8
 
         // Status Label
+        statusLabelContainer.backgroundColor = .Main.third
+        statusLabelContainer.layer.cornerRadius = 8
+        statusLabelContainer.clipsToBounds = true
         statusLabel.text = "진행중"
-        statusLabel.textColor = .white
+        statusLabel.textColor = .Main.primary
         statusLabel.font = .systemFont(ofSize: 12, weight: .bold)
-        statusLabel.backgroundColor = .systemPurple
         statusLabel.textAlignment = .center
-        statusLabel.layer.cornerRadius = 4
-        statusLabel.clipsToBounds = true
         
         // Title Label
         titleLabel.font = .systemFont(ofSize: 16, weight: .bold)
@@ -108,7 +109,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         
         // Main Text StackView
         textStackView.axis = .vertical
-        textStackView.spacing = 6
+        textStackView.spacing = 4
         textStackView.alignment = .leading
     }
 
@@ -117,7 +118,8 @@ final class SearchPerformanceCell: UICollectionViewCell {
         
         containerView.addSubview(posterImageView)
         containerView.addSubview(textStackView)
-        posterImageView.addSubview(statusLabel)
+        posterImageView.addSubview(statusLabelContainer)
+        statusLabelContainer.addSubview(statusLabel)
         genreLabelContainer.addSubview(genreLabel)
         
         textStackView.addArrangedSubview(titleLabel)
@@ -142,10 +144,12 @@ final class SearchPerformanceCell: UICollectionViewCell {
             make.width.equalTo(posterImageView.snp.height).multipliedBy(0.75)
         }
         
-        statusLabel.snp.makeConstraints { make in
+        statusLabelContainer.snp.makeConstraints { make in
             make.top.leading.equalToSuperview().inset(6)
-            make.width.equalTo(44)
-            make.height.equalTo(20)
+        }
+        statusLabel.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview().inset(3)
+            make.horizontalEdges.equalToSuperview().inset(5)
         }
 
         textStackView.snp.makeConstraints { make in

@@ -54,7 +54,7 @@ enum Constant {
     // MARK: - 장르 코드 (Genre Code)
     
     /// 공연 장르를 나타내는 코드
-    enum Genre: String, CaseIterable, Codable {
+    enum Genre: String, CaseIterable, Codable, Equatable {
         /// 연극 (Code: AAAA)
         case play = "AAAA"
         /// 무용(서양/한국무용) (Code: BBBC)

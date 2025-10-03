@@ -29,11 +29,13 @@ class SearchViewController: UIViewController {
         fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase()
     )
     
+    private let genreSelected = BehaviorRelay<Constant.Genre?>(value: nil)
     private let disposeBag = DisposeBag()
     
     override func loadView() {
         view = rootView
         
+        navigationController?.navigationBar.isHidden = true
         setupCollectionView()
         bind()
     }
@@ -58,22 +60,43 @@ class SearchViewController: UIViewController {
     }
     
     private func bind() {
-        let searchTried = rootView.searchTextField.rx.controlEvent(.editingDidEndOnExit)
+        rootView.genreSelectionButton.menu = UIMenu(children: makeGenreButtonActions())
+        
+        let textFieldEndOnExit = rootView.searchTextField.rx.controlEvent(.editingDidEndOnExit)
+        let searchButtonTapped = rootView.searchButton.rx.tap
+        let searchTried = Observable.merge([textFieldEndOnExit.asObservable(), searchButtonTapped.asObservable()])
             .withLatestFrom(rootView.searchTextField.rx.text.orEmpty)
             .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
+            .share(replay: 1)
         
         let input = SearchViewModel.Input(
-            searchButtonTapped: searchTried
+            searchTried: searchTried,
+            fromDate: rootView.fromDatePicker.rx.date.asObservable(),
+            toDate: rootView.toDatePicker.rx.date.asObservable(),
+            genreSelected: genreSelected.asObservable()
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.genreselected
+            .map { $0?.description ?? "전체" }
+            .bind(to: rootView.genreSelectionButton.rx.title())
+            .disposed(by: disposeBag)
+        
+        output.fromDate
+            .bind(to: rootView.fromDatePicker.rx.date)
+            .disposed(by: disposeBag)
         
         output.performanceSearchResult
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, searchedResult in
                 owner.applySnapshot(with: searchedResult)
             }
+            .disposed(by: disposeBag)
+        
+        output.error
+            .bind { print($0.localizedDescription) }
             .disposed(by: disposeBag)
     }
     
@@ -82,6 +105,26 @@ class SearchViewController: UIViewController {
         snapshot.appendSections([.main])
         snapshot.appendItems(searchResults, toSection: .main)
         diffableDataSource.apply(snapshot)
+    }
+    
+    private func makeGenreButtonActions() -> [UIAction] {
+        var menuElements = Constant.Genre.allCases.filter { $0 != .unknown }.map { genre in
+            return UIAction(title: genre.description) { [weak self] _ in
+                guard let self else { return }
+//                self.rootView.genreSelectionButton.configuration?.title = genre.description
+                self.genreSelected.accept(genre)
+            }
+        }
+        menuElements.insert(
+            .init(title: "전체", handler: { [weak self] _ in
+                guard let self else { return }
+//                self.rootView.genreSelectionButton.configuration?.title = "전체"
+                self.genreSelected.accept(nil)
+            }),
+            at: 0
+        )
+        
+        return menuElements
     }
     
 }

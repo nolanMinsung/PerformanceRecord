@@ -13,11 +13,17 @@ import RxCocoa
 final class SearchViewModel {
     
     struct Input {
-        let searchButtonTapped: Observable<String>
+        let searchTried: Observable<String>
+        let fromDate: Observable<Date>
+        let toDate: Observable<Date>
+        let genreSelected: Observable<Constant.Genre?>
     }
     
     struct Output {
+        let genreselected: Observable<Constant.Genre?>
+        let fromDate: Observable<Date>
         let performanceSearchResult: Observable<[Performance]>
+        let error: Observable<any Error>
     }
     
     let fetchPerformanceListUseCase: any FetchPerformanceListUseCase
@@ -29,18 +35,34 @@ final class SearchViewModel {
     }
     
     func transform(input: Input) -> Output {
+        let fromDate = PublishRelay<Date>()
         let searchResult = PublishRelay<[Performance]>()
         let errorRelay = PublishRelay<any Error>()
         
-        input.searchButtonTapped
-            .flatMap { searchText in
+        input.searchTried
+            .withLatestFrom(input.fromDate) { $1 }
+            .withLatestFrom(input.toDate) { ($0, $1) }
+            .map { values in
+                let (fromDate, toDate) = values
+                return fromDate < toDate ? fromDate : toDate
+            }
+            .bind(to: fromDate)
+            .disposed(by: disposeBag)
+        
+        input.searchTried
+            .withLatestFrom(input.genreSelected, resultSelector: { return ($0, $1) })
+            .withLatestFrom(input.fromDate, resultSelector: { return ($0.0, $0.1, $1) })
+            .withLatestFrom(input.toDate, resultSelector: { return ($0.0, $0.1, $0.2, $1) })
+            .flatMap { value in
+                let (searchText, genre, fromDate, toDate) = value
                 return Observable<[Performance]>.create { observer in
                     let requestParam = PerformanceListRequestParameter(
-                        stdate: .now.addingDay(-100),
-                        eddate: .now.addingDay(+100),
+                        stdate: (fromDate < toDate) ? fromDate : toDate,
+                        eddate: toDate,
                         cpage: 1,
                         rows: 50,
                         shprfnm: searchText,
+                        shcate: genre?.rawValue
                     )
                     
                     Task {
@@ -58,7 +80,10 @@ final class SearchViewModel {
             .disposed(by: disposeBag)
         
         return .init(
-            performanceSearchResult: searchResult.asObservable()
+            genreselected: input.genreSelected,
+            fromDate: fromDate.asObservable(),
+            performanceSearchResult: searchResult.asObservable(),
+            error: errorRelay.asObservable()
         )
     }
     

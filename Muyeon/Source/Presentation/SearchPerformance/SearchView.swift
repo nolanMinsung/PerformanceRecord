@@ -6,25 +6,35 @@
 //
 
 import UIKit
+
 import SnapKit
 
 final class SearchView: UIView {
     
     // MARK: - UI Components
     
-    let searchTextField = UITextField()
-    // 장르 버튼은 UI 배치를 위해 임시 할당한 것이고, 추후 collectionView 등으로 교체 예정.
-    let magicButton = UIButton(type: .system)
-    let classicButton = UIButton(type: .system)
-    let musicalButton = UIButton(type: .system)
-    private let filterStackView = UIStackView()
+    private let filteringOptionContainer = UIView()
+    private let separator = UIView()
+    private let mainTitleLabel = UILabel()
     
-    let dateSelectionButton = UIButton(type: .system)
+    let searchBarContainer = UIView()
+    let searchTextField = UITextField()
+    let searchButton = UIButton()
+    
+    let genreLabel = UILabel()
+    let genreSelectionButton = UIButton(configuration: .filled())
+    
+    let datePickingLabel = UILabel()
+    let fromDatePicker = UIDatePicker()
+    let tildeLabel = UILabel()
+    let toDatePicker = UIDatePicker()
+    
     let performanceCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
         layout.itemSize = CGSize(width: UIScreen.main.bounds.width - 40, height: 150)
         layout.minimumLineSpacing = 16
+        layout.sectionInset = .init(top: 16, left: 0, bottom: 16, right: 0)
         return UICollectionView(frame: .zero, collectionViewLayout: layout)
     }()
     
@@ -32,103 +42,150 @@ final class SearchView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        commonInit()
-    }
-    
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
-        commonInit()
-    }
-    
-    // MARK: - Setup Methods
-
-    private func commonInit() {
+        
         setupUIProperties()
         setupHierarchy()
         setupLayoutConstraints()
     }
     
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    // MARK: - Setup Methods
+    
     private func setupUIProperties() {
-        self.backgroundColor = .systemBackground
-
-        // Search TextField
-        searchTextField.placeholder = "어떤 공연을 찾으시나요?"
-
-        // Filter Buttons
-        configureFilterButton(magicButton, title: "마술")
-        configureFilterButton(classicButton, title: "클래식")
-        configureFilterButton(musicalButton, title: "뮤지컬")
+        self.backgroundColor = .systemGray6
         
-        // Filter StackView
-        filterStackView.axis = .horizontal
-        filterStackView.spacing = 8
-        filterStackView.distribution = .fillProportionally
-
-        // Date Selection Button
-        var dateConfig = UIButton.Configuration.plain()
-        dateConfig.title = "날짜 선택"
-        dateConfig.image = UIImage(systemName: "chevron.down")
-        dateConfig.imagePlacement = .trailing
-        dateConfig.imagePadding = 4
-        dateConfig.baseForegroundColor = .label
-        dateSelectionButton.configuration = dateConfig
-        dateSelectionButton.backgroundColor = .systemGray6
-        dateSelectionButton.layer.cornerRadius = 8
-        dateSelectionButton.contentHorizontalAlignment = .left
-        dateConfig.contentInsets = NSDirectionalEdgeInsets(top: 0, leading: 16, bottom: 0, trailing: 0)
-        dateSelectionButton.configuration = dateConfig
+        filteringOptionContainer.backgroundColor = .systemBackground
+        
+        separator.backgroundColor = .systemGray4
+        
+        mainTitleLabel.text = "공연 검색"
+        mainTitleLabel.font = .systemFont(ofSize: 25, weight: .bold)
+        
+        searchBarContainer.layer.borderColor = UIColor.Main.primary.withAlphaComponent(0.5).cgColor
+        searchBarContainer.layer.borderWidth = 1.5
+        searchBarContainer.layer.cornerRadius = 22
+        
+        searchTextField.placeholder = "어떤 공연을 찾으시나요?"
+        
+        searchButton.setImage(UIImage(systemName: "magnifyingglass"), for: .normal)
+        searchButton.tintColor = .Main.primary
+        
+        genreLabel.text = "장르"
+        genreLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        
+        genreSelectionButton.configuration?.title = "장르"
+        genreSelectionButton.configuration?.baseBackgroundColor = .Main.third
+        genreSelectionButton.configuration?.baseForegroundColor = .Main.primary
+        genreSelectionButton.configuration?.cornerStyle = .capsule
+        genreSelectionButton.showsMenuAsPrimaryAction = true
+        
+        datePickingLabel.text = "날짜 범위"
+        datePickingLabel.font = .systemFont(ofSize: 14, weight: .semibold)
+        
+        fromDatePicker.datePickerMode = .date
+        fromDatePicker.preferredDatePickerStyle = .compact
+        
+        tildeLabel.text = "~"
+        tildeLabel.font = .systemFont(ofSize: 17)
+        
+        toDatePicker.datePickerMode = .date
+        toDatePicker.preferredDatePickerStyle = .compact
         
         // CollectionView
         performanceCollectionView.backgroundColor = .clear
         performanceCollectionView.showsVerticalScrollIndicator = false
+        performanceCollectionView.keyboardDismissMode = .onDrag
     }
     
     private func setupHierarchy() {
-        addSubview(searchTextField)
-        
-        [magicButton, classicButton, musicalButton].forEach {
-            filterStackView.addArrangedSubview($0)
-        }
-        addSubview(filterStackView)
-        
-        addSubview(dateSelectionButton)
+        addSubview(filteringOptionContainer)
+        addSubview(separator)
+        addSubview(mainTitleLabel)
+        addSubview(searchBarContainer)
+        searchBarContainer.addSubview(searchTextField)
+        searchBarContainer.addSubview(searchButton)
+        addSubview(genreLabel)
+        addSubview(genreSelectionButton)
+        addSubview(datePickingLabel)
+        addSubview(tildeLabel)
+        addSubview(fromDatePicker)
+        addSubview(toDatePicker)
         addSubview(performanceCollectionView)
     }
     
     private func setupLayoutConstraints() {
-        searchTextField.snp.makeConstraints { make in
-            make.top.equalTo(self.safeAreaLayoutGuide).offset(10)
-            make.horizontalEdges.equalToSuperview().inset(20)
+        filteringOptionContainer.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+            make.bottom.equalTo(toDatePicker.snp.bottom).offset(15)
         }
         
-        filterStackView.snp.makeConstraints { make in
-            make.top.equalTo(searchTextField.snp.bottom).offset(16)
+        separator.snp.makeConstraints { make in
+            make.horizontalEdges.bottom.equalTo(filteringOptionContainer)
+            make.height.equalTo(1)
+        }
+        
+        mainTitleLabel.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).inset(25)
             make.leading.equalToSuperview().inset(20)
         }
         
-        dateSelectionButton.snp.makeConstraints { make in
-            make.top.equalTo(filterStackView.snp.bottom).offset(16)
+        searchBarContainer.snp.makeConstraints { make in
+            make.top.equalTo(mainTitleLabel.snp.bottom).offset(20)
             make.horizontalEdges.equalToSuperview().inset(20)
             make.height.equalTo(44)
         }
         
+        searchTextField.snp.contentHuggingHorizontalPriority = 230
+        searchTextField.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview()
+            make.leading.equalToSuperview().inset(20)
+        }
+        
+        searchButton.snp.makeConstraints { make in
+            make.centerY.equalTo(searchTextField)
+            make.leading.equalTo(searchTextField.snp.trailing).offset(10)
+            make.trailing.equalToSuperview().inset(12)
+            make.size.equalTo(44)
+        }
+        
+        genreLabel.snp.makeConstraints { make in
+            make.top.centerY.equalTo(genreSelectionButton)
+            make.leading.equalTo(searchBarContainer)
+        }
+        
+        genreSelectionButton.snp.makeConstraints { make in
+            make.top.equalTo(searchTextField.snp.bottom).offset(20)
+            make.leading.equalTo(genreLabel.snp.trailing).offset(20)
+        }
+        
+        datePickingLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(fromDatePicker)
+            make.leading.equalTo(searchBarContainer)
+        }
+        
+        fromDatePicker.snp.makeConstraints { make in
+            make.top.equalTo(genreLabel.snp.bottom).offset(10)
+            make.leading.equalTo(datePickingLabel.snp.trailing).offset(20)
+        }
+        
+        tildeLabel.snp.makeConstraints { make in
+            make.centerY.equalTo(fromDatePicker)
+            make.leading.equalTo(fromDatePicker.snp.trailing).offset(3)
+        }
+        
+        toDatePicker.snp.makeConstraints { make in
+            make.centerY.equalTo(fromDatePicker)
+            make.leading.equalTo(tildeLabel.snp.trailing).offset(3)
+        }
+        
         performanceCollectionView.snp.makeConstraints { make in
-            make.top.equalTo(dateSelectionButton.snp.bottom).offset(20)
+            make.top.equalTo(filteringOptionContainer.snp.bottom)
             make.horizontalEdges.equalToSuperview().inset(20)
             make.bottom.equalToSuperview()
         }
-    }
-    
-    // MARK: - Helper Methods
-    
-    private func configureFilterButton(_ button: UIButton, title: String) {
-        var config = UIButton.Configuration.filled()
-        config.title = title
-        config.baseBackgroundColor = .systemGray5
-        config.baseForegroundColor = .darkGray
-        config.cornerStyle = .capsule
-        config.contentInsets = NSDirectionalEdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16)
-        button.configuration = config
     }
     
 }
