@@ -38,7 +38,7 @@ class HomeTopTenCell: UICollectionViewCell {
         rankNumLabel.font = .systemFont(ofSize: 70, weight: .heavy)
         rankNumLabel.textColor = .systemBackground
         
-        titleLabel.numberOfLines = 3
+        titleLabel.numberOfLines = 2
         titleLabel.textColor = .systemBackground
         titleLabel.font = .systemFont(ofSize: 18, weight: .bold)
         
@@ -64,6 +64,7 @@ class HomeTopTenCell: UICollectionViewCell {
             make.top.equalTo(rankNumLabel.snp.top).offset(-40)
             make.horizontalEdges.bottom.equalToSuperview()
         }
+        rankNumLabel.snp.contentCompressionResistanceHorizontalPriority = 1000
         rankNumLabel.snp.makeConstraints { make in
             make.leading.bottom.equalToSuperview().inset(10)
         }

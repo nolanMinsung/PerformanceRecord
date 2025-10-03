@@ -358,7 +358,7 @@ extension PerformanceDetailView {
             make.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
             make.height.equalTo(posterImageView.snp.width).multipliedBy(imageRatio) // 이미지 비율을 대략 1:1.2로 설정
         }
-        layoutIfNeeded()
+        setNeedsLayout()
     }
     
     private func updateAdditionalImages(urls: [String]) {

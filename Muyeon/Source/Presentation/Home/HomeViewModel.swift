@@ -111,15 +111,21 @@ final class HomeViewModel {
             .disposed(by: disposeBag)
         
         
-        let trendingItemSelected = input.itemSelected
-            .filter { $0.section == 2 }
+        let boxOfficItemSelected = input.itemSelected
+            .filter { [0, 2].contains($0.section) }
         
-        trendingItemSelected
-            .map {
-                let selectedItem = trendingBoxOffice.value[$0.item]
+        boxOfficItemSelected
+            .map { indexPath in
+                let selectedItem: BoxOfficeItem
+                if indexPath.section == 0 {
+                    selectedItem = topTenContents.value[indexPath.item]
+                } else {
+                    selectedItem = trendingBoxOffice.value[indexPath.item]
+                }
+                
                 let performanceID = selectedItem.id
                 let posterURL = selectedItem.posterURL
-                return ($0, performanceID, posterURL)
+                return (indexPath, performanceID, posterURL)
             }
             .bind(to: presentDetail)
             .disposed(by: disposeBag)

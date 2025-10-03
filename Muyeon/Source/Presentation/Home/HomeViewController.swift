@@ -94,23 +94,30 @@ private extension HomeViewController {
                         posterURL: posterURL
                     )
                     let naviCon = UINavigationController(rootViewController: performanceDetailVC)
-                    let wispConfig = WispConfiguration { config in
-                        config.setGesture { gesture in
-                            gesture.allowedDirections = [.right, .down]
-                        }
-                        config.setLayout { layout in
-                            let topInset = self.view.safeAreaInsets.top
-                            layout.presentedAreaInset = .init(top: topInset, left: 0, bottom: 0, right: 0)
-                            layout.initialCornerRadius = 5
-                        }
-                    }
                     
-                    owner.wisp.present(
-                        naviCon,
-                        collectionView: owner.rootView.homeCollectionView,
-                        at: indexPath,
-                        configuration: wispConfig
-                    )
+                    if indexPath.section == 0 {
+                        naviCon.modalPresentationStyle = .formSheet
+                        owner.present(naviCon, animated: true)
+                        
+                    } else if indexPath.section == 2 {
+                        let wispConfig = WispConfiguration { config in
+                            config.setGesture { gesture in
+                                gesture.allowedDirections = [.right, .down]
+                            }
+                            config.setLayout { layout in
+                                let topInset = self.view.safeAreaInsets.top
+                                layout.presentedAreaInset = .init(top: topInset, left: 0, bottom: 0, right: 0)
+                                layout.initialCornerRadius = 5
+                            }
+                        }
+                        
+                        owner.wisp.present(
+                            naviCon,
+                            collectionView: owner.rootView.homeCollectionView,
+                            at: indexPath,
+                            configuration: wispConfig
+                        )
+                    }
                 }
             )
             .disposed(by: disposeBag)
