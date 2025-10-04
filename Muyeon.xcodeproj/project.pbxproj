@@ -15,6 +15,8 @@
 		4E52FB752E89126700EB3EBB /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FB742E89126700EB3EBB /* SnapKit */; };
 		4E52FB782E8912CA00EB3EBB /* Kingfisher in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FB772E8912CA00EB3EBB /* Kingfisher */; };
 		4E52FE542E8ADC7800EB3EBB /* Wisp in Frameworks */ = {isa = PBXBuildFile; productRef = 4E52FE532E8ADC7800EB3EBB /* Wisp */; };
+		4EF7EB5F2E913F2400B5E5B6 /* RealmSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 4EF7EB5E2E913F2400B5E5B6 /* RealmSwift */; };
+		4EF7EB602E913F7E00B5E5B6 /* RealmSwift in Embed Frameworks */ = {isa = PBXBuildFile; productRef = 4EF7EB5E2E913F2400B5E5B6 /* RealmSwift */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -33,6 +35,20 @@
 			remoteInfo = Muyeon;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		4EF7EB612E913F7E00B5E5B6 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				4EF7EB602E913F7E00B5E5B6 /* RealmSwift in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muyeon.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -87,6 +103,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				4EF7EB5F2E913F2400B5E5B6 /* RealmSwift in Frameworks */,
 				4E52FB782E8912CA00EB3EBB /* Kingfisher in Frameworks */,
 				4E52FB6F2E89123E00EB3EBB /* Alamofire in Frameworks */,
 				4E52FB6C2E8911C000EB3EBB /* RxSwift in Frameworks */,
@@ -143,6 +160,7 @@
 				4E52FA862E890BEF00EB3EBB /* Sources */,
 				4E52FA872E890BEF00EB3EBB /* Frameworks */,
 				4E52FA882E890BEF00EB3EBB /* Resources */,
+				4EF7EB612E913F7E00B5E5B6 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -160,6 +178,7 @@
 				4E52FB742E89126700EB3EBB /* SnapKit */,
 				4E52FB772E8912CA00EB3EBB /* Kingfisher */,
 				4E52FE532E8ADC7800EB3EBB /* Wisp */,
+				4EF7EB5E2E913F2400B5E5B6 /* RealmSwift */,
 			);
 			productName = Muyeon;
 			productReference = 4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */;
@@ -245,6 +264,7 @@
 				4E52FB732E89126700EB3EBB /* XCRemoteSwiftPackageReference "SnapKit" */,
 				4E52FB762E8912CA00EB3EBB /* XCRemoteSwiftPackageReference "Kingfisher" */,
 				4E52FE522E8ADC7800EB3EBB /* XCLocalSwiftPackageReference "../../../../../Library/Wisp" */,
+				4EF7EB5D2E913F2400B5E5B6 /* XCRemoteSwiftPackageReference "realm-swift" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4E52FA8B2E890BEF00EB3EBB /* Products */;
@@ -669,6 +689,14 @@
 				minimumVersion = 8.5.0;
 			};
 		};
+		4EF7EB5D2E913F2400B5E5B6 /* XCRemoteSwiftPackageReference "realm-swift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/realm/realm-swift.git";
+			requirement = {
+				kind = exactVersion;
+				version = 20.0.3;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -705,6 +733,11 @@
 		4E52FE532E8ADC7800EB3EBB /* Wisp */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = Wisp;
+		};
+		4EF7EB5E2E913F2400B5E5B6 /* RealmSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 4EF7EB5D2E913F2400B5E5B6 /* XCRemoteSwiftPackageReference "realm-swift" */;
+			productName = RealmSwift;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
