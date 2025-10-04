@@ -8,7 +8,7 @@
 import Foundation
 
 protocol TogglePerformanceLikeUseCase {
-    func execute(performanceID: String) throws
+    func execute(performanceID: String) -> Bool
 }
 
 
@@ -17,13 +17,18 @@ final class DefaultTogglePerformanceLikeUseCase: TogglePerformanceLikeUseCase {
     @UserDefault(key: .likePerformanceIDs, defaultValue: [])
     private var likePerformanceList: [String]
     
-    func execute(performanceID: String) throws {
+    func execute(performanceID: String) -> Bool {
         var newList = likePerformanceList
         if likePerformanceList.contains(performanceID) {
             newList.removeAll { $0 == performanceID }
+            likePerformanceList = newList
+            print("update됨: false")
+            return false
         } else {
             newList.append(performanceID)
+            likePerformanceList = newList
+            print("update됨: true")
+            return true
         }
-        likePerformanceList = newList
     }
 }

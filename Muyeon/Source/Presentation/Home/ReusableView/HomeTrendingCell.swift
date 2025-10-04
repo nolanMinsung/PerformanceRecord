@@ -15,11 +15,12 @@ class HomeTrendingCell: UICollectionViewCell {
     let imageView = UIImageView()
     private let titleLabel = UILabel()
     private let placeNameLabel = UILabel()
+    private let performingPeriodLabel = UILabel()
+    private let textStackView = UIStackView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        contentView.backgroundColor = .systemGray6.withAlphaComponent(0.3)
         contentView.clipsToBounds = true
         
         imageView.contentMode = .scaleAspectFill
@@ -32,19 +33,28 @@ class HomeTrendingCell: UICollectionViewCell {
         
         placeNameLabel.font = .systemFont(ofSize: 11)
         
+        performingPeriodLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        performingPeriodLabel.numberOfLines = 2
+        
+        textStackView.axis = .vertical
+        textStackView.spacing = 4
+        textStackView.alignment = .leading
+        textStackView.distribution = .fill
+        
+        textStackView.addArrangedSubview(titleLabel)
+        textStackView.addArrangedSubview(placeNameLabel)
+        textStackView.addArrangedSubview(performingPeriodLabel)
+        
         contentView.addSubview(imageView)
-        contentView.addSubview(titleLabel)
-        contentView.addSubview(placeNameLabel)
+        contentView.addSubview(textStackView)
+        
         imageView.snp.makeConstraints { make in
             make.top.horizontalEdges.equalToSuperview()
             make.height.equalTo(imageView.snp.width).multipliedBy(1.333)
         }
-        titleLabel.snp.makeConstraints { make in
+        
+        textStackView.snp.makeConstraints { make in
             make.top.equalTo(imageView.snp.bottom).offset(5)
-            make.horizontalEdges.equalToSuperview()
-        }
-        placeNameLabel.snp.makeConstraints { make in
-            make.top.equalTo(titleLabel.snp.bottom).offset(4)
             make.horizontalEdges.equalToSuperview()
             make.bottom.lessThanOrEqualToSuperview()
         }
@@ -61,15 +71,16 @@ class HomeTrendingCell: UICollectionViewCell {
     }
     
     func configure(with uiModel: HomeUIModel) {
-        guard case .trending(let model) = uiModel else { return }
+        guard case .trending(let boxOfficeItem) = uiModel else { return }
         let targetSize = imageView.bounds.size.applying(.init(scaleX: 0.8, y: 0.8))
         let processor = DownsamplingImageProcessor(size: targetSize)
         imageView.kf.setImage(
-            with: URL(string: model.posterURL),
+            with: URL(string: boxOfficeItem.posterURL),
             options: [.processor(processor), .scaleFactor(UIScreen.main.scale),]
         )
-        titleLabel.text = model.name
-        placeNameLabel.text = model.performingPlaceName
+        titleLabel.text = boxOfficeItem.name
+        placeNameLabel.text = boxOfficeItem.performingPlaceName
+        performingPeriodLabel.text = boxOfficeItem.performPeriod.replacingOccurrences(of: "~", with: "~\n")
     }
     
 }

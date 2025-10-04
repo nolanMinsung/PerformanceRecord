@@ -26,9 +26,11 @@ class SearchViewController: UIViewController {
     private var diffableDataSource: DiffableDataSource!
     private let rootView = SearchView()
     private let viewModel = SearchViewModel(
-        fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase()
+        fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase(),
+        togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase()
     )
     
+    private let likeButtonTapped = PublishRelay<(IndexPath,String)>()
     private let genreSelected = BehaviorRelay<Constant.Genre?>(value: nil)
     private let disposeBag = DisposeBag()
     
@@ -43,6 +45,18 @@ class SearchViewController: UIViewController {
         
         setupCollectionView()
         bind()
+        
+        applySnapshot(with: makeDummy())
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        let visibleIndexPaths = rootView.performanceCollectionView.indexPathsForVisibleItems
+        let visibleItemIdentifiers = visibleIndexPaths.compactMap(diffableDataSource.itemIdentifier)
+        var newSnapshot = diffableDataSource.snapshot()
+        newSnapshot.reloadItems(visibleItemIdentifiers)
+        diffableDataSource.apply(newSnapshot)
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -52,8 +66,13 @@ class SearchViewController: UIViewController {
     }
     
     private func setupCollectionView() {
-        let cellRegistration = CellRegistration { cell, indexPath, performance in
+        let cellRegistration = CellRegistration { [weak self] cell, indexPath, performance in
+            guard let self else { return }
             cell.configure(with: performance)
+            cell.likeButton.rx.tap
+                .map { (indexPath, performance.id) }
+                .bind(to: self.likeButtonTapped)
+                .disposed(by: cell.disposeBag)
         }
         
         let searchResultCellProvider: CellProvider = { collectionView, indexPath, itemIdentifier in
@@ -94,7 +113,8 @@ class SearchViewController: UIViewController {
             searchTried: searchTried,
             fromDate: rootView.fromDatePicker.rx.date.asObservable(),
             toDate: rootView.toDatePicker.rx.date.asObservable(),
-            genreSelected: genreSelected.asObservable()
+            genreSelected: genreSelected.asObservable(),
+            likeButtonTapped: likeButtonTapped.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -113,6 +133,17 @@ class SearchViewController: UIViewController {
             .bind(with: self) { owner, searchedResult in
                 owner.applySnapshot(with: searchedResult)
             }
+            .disposed(by: disposeBag)
+        
+        output.likeStatusUpdated
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, values in
+                let (indexPath, updatedValue) = values
+                guard let targetCell = owner.rootView.performanceCollectionView.cellForItem(at: indexPath) as? SearchPerformanceCell else {
+                    return
+                }
+                targetCell.setLikeButtonStatus(isSelected: updatedValue)
+            })
             .disposed(by: disposeBag)
         
         output.error

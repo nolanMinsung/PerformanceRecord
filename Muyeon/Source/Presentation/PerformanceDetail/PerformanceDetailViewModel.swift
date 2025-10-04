@@ -51,12 +51,8 @@ final class PerformanceDetailViewModel {
         
         input.likeButtonTapped
             .bind(with: self) { owner, currentSelectionState in
-                do {
-                    try owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
-                    likeButtonStatusRelay.accept(!currentSelectionState)
-                } catch {
-                    errorRelay.accept(error)
-                }
+                let newLikeStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
+                likeButtonStatusRelay.accept(newLikeStatus)
             }
             .disposed(by: disposeBag)
         

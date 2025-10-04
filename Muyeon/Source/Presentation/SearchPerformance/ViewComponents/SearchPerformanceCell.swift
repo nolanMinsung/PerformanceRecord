@@ -6,6 +6,9 @@
 //
 
 import UIKit
+
+import RxSwift
+import RxCocoa
 import SnapKit
 import Kingfisher
 
@@ -17,7 +20,8 @@ final class SearchPerformanceCell: UICollectionViewCell {
     private let posterImageView = UIImageView()
     private let statusLabelContainer = UIView()
     private let statusLabel = UILabel()
-
+    let likeButton = UIButton(configuration: .plain())
+    
     private let textStackView = UIStackView()
     private let titleLabel = UILabel()
     private let genreLabelContainer = UILabel()
@@ -30,6 +34,10 @@ final class SearchPerformanceCell: UICollectionViewCell {
     private let dateStackView = UIStackView()
     private let dateIconImageView = UIImageView()
     private let dateLabel = UILabel()
+    
+    // MARK: - Properties
+    
+    private(set) var disposeBag = DisposeBag()
     
     // MARK: - Initialization
 
@@ -49,6 +57,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        disposeBag = DisposeBag()
         posterImageView.kf.cancelDownloadTask()
         posterImageView.image = nil
         titleLabel.text = nil
@@ -78,6 +87,20 @@ final class SearchPerformanceCell: UICollectionViewCell {
         statusLabel.textColor = .Main.primary
         statusLabel.font = .systemFont(ofSize: 12, weight: .bold)
         statusLabel.textAlignment = .center
+        
+        // Like Button
+        var unselectedConfig = UIButton.Configuration.plain()
+        unselectedConfig.baseForegroundColor = .systemRed
+        unselectedConfig.baseBackgroundColor = .clear
+        unselectedConfig.contentInsets = .zero
+        unselectedConfig.image = UIImage(systemName: "heart")?.withRenderingMode(.alwaysTemplate)
+        
+        var selectedConfig = unselectedConfig
+        selectedConfig.image = UIImage(systemName: "heart.fill")?.withRenderingMode(.alwaysTemplate)
+        
+        likeButton.configurationUpdateHandler = { button in
+            button.configuration = button.isSelected ? selectedConfig : unselectedConfig
+        }
         
         // Title Label
         titleLabel.font = .systemFont(ofSize: 16, weight: .bold)
@@ -118,6 +141,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         
         containerView.addSubview(posterImageView)
         containerView.addSubview(textStackView)
+        containerView.addSubview(likeButton)
         posterImageView.addSubview(statusLabelContainer)
         statusLabelContainer.addSubview(statusLabel)
         genreLabelContainer.addSubview(genreLabel)
@@ -155,7 +179,13 @@ final class SearchPerformanceCell: UICollectionViewCell {
         textStackView.snp.makeConstraints { make in
             make.top.equalTo(posterImageView).offset(5)
             make.leading.equalTo(posterImageView.snp.trailing).offset(12)
-            make.trailing.equalToSuperview().inset(12)
+        }
+        
+        likeButton.snp.makeConstraints { make in
+            make.top.equalTo(textStackView)
+            make.leading.equalTo(textStackView.snp.trailing).offset(3)
+            make.trailing.equalToSuperview().inset(4)
+            make.width.equalTo(35)
         }
         
         genreLabel.snp.makeConstraints { make in
@@ -175,6 +205,9 @@ final class SearchPerformanceCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with performance: Performance) {
+        @UserDefault(key: .likePerformanceIDs, defaultValue: [])
+        var likePerformanceIDs: [String]
+        
         let targetSize = posterImageView.bounds.size.applying(.init(scaleX: 0.5, y: 0.5))
         let processor = DownsamplingImageProcessor(size: targetSize)
         posterImageView.kf.setImage(
@@ -182,10 +215,9 @@ final class SearchPerformanceCell: UICollectionViewCell {
             options: [.processor(processor), .scaleFactor(UIScreen.main.scale),]
         )
         
+        likeButton.isSelected = likePerformanceIDs.contains(performance.id)
         titleLabel.text = performance.name
-        
         genreLabel.text = "\(performance.genre.description)"
-        
         facilityLabel.text = performance.facilityFullName
         
         // 날짜 포맷팅
@@ -212,5 +244,9 @@ final class SearchPerformanceCell: UICollectionViewCell {
         
         label.font = .systemFont(ofSize: 13)
         label.textColor = .secondaryLabel
+    }
+    
+    func setLikeButtonStatus(isSelected: Bool) {
+        likeButton.isSelected = isSelected
     }
 }
