@@ -45,8 +45,6 @@ class SearchViewController: UIViewController {
         
         setupCollectionView()
         bind()
-        
-        applySnapshot(with: makeDummy())
     }
     
     override func viewWillAppear(_ animated: Bool) {

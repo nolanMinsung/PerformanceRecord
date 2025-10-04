@@ -403,7 +403,7 @@ enum Constant {
         case gyeongsangbuk = "47" // 경상북도
         case gyeongsangnam = "48" // 경상남도
         case jejuSpecialSelfGoverning = "50" // 제주특별자치도
-        case unknown = "기타" // 기타 (파싱에 실패했을 경우)
+        case unknown = "00" // 기타 (파싱에 실패했을 경우)
         
         /// 코드 설명 (시/도명)
         var description: String {
