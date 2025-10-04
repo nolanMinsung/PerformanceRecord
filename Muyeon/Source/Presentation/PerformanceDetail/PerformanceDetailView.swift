@@ -53,6 +53,7 @@ final class PerformanceDetailView: UIView {
         button.configurationUpdateHandler = { button in
             button.configuration = button.isSelected ? selectedConfig : unselectedConfig
         }
+        button.isEnabled = false
         return button
     }()
     
@@ -328,6 +329,7 @@ extension PerformanceDetailView {
             updatePosterImageView(with: performance.posterURL)
         }
         titleLabel.text = performance.name
+        likeButton.isEnabled = true
         likeButton.isSelected = likePerformanceIDs.contains(performance.id)
         genreLabel.text = performance.genre.description
         durationLabel.text = performance.detail?.runtime ?? "-시간"

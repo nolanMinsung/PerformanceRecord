@@ -13,6 +13,7 @@ import RealmSwift
 final class PerformanceObject: Object {
     // Primary Key
     @Persisted(primaryKey: true) var id: String // mt20id (공연ID)
+    @Persisted var createdDate: Date
     
     // 필수 공통 정보
     @Persisted var name: String = "" // prfnm (공연명)
@@ -131,5 +132,75 @@ extension PerformanceObject {
             state: Constant.PerformanceState(rawValue: self.state) ?? .unknown,
             detail: domainDetail
         )
+    }
+}
+
+
+extension PerformanceObject {
+
+    /// Performance 도메인 모델과 이미지 UUID를 사용하여 Realm 객체를 생성하는 타입 메서드
+    static func create(
+        from performance: Performance,
+        posterUUID: String?,
+        detailImageUUIDs: [String]
+    ) -> PerformanceObject {
+        
+        let object = PerformanceObject()
+        object.createdDate = .now
+        
+        // MARK: - 필수 공통 정보
+        object.id = performance.id
+        object.name = performance.name
+        object.startDate = performance.startDate
+        object.endDate = performance.endDate
+        object.facilityFullName = performance.facilityFullName
+        
+        // Constant 타입 (String 원시값 사용)
+        object.area = performance.area.rawValue
+        object.genre = performance.genre.rawValue
+        object.state = performance.state.rawValue
+        object.openRun = performance.openRun
+        
+        // 이미지 UUID 참조
+        object.posterImageUUID = posterUUID
+        
+        // MARK: - Detail 정보 통합
+        if let detail = performance.detail {
+            object.cast = detail.cast
+            object.crew = detail.crew
+            object.runtime = detail.runtime
+            object.ageLimit = detail.ageLimit
+            object.enterpriseName = detail.enterpriseName
+            object.enterpriseNameP = detail.enterpriseNameP
+            object.enterpriseNameA = detail.enterpriseNameA
+            object.enterpriseNameH = detail.enterpriseNameH
+            object.enterpriseNameS = detail.enterpriseNameS
+            object.priceGuidance = detail.priceGuidance
+            object.story = detail.story
+            object.visitingKorea = detail.visitingKorea
+            object.child = detail.child
+            object.daehakro = detail.daehakro
+            object.isFestival = detail.isFestival
+            object.musicalLicense = detail.musicalLicense
+            object.musicalCreate = detail.musicalCreate
+            object.updateDate = detail.updateDate
+            object.facilityID = detail.facilityID
+            object.detailDateGuidance = detail.detailDateGuidance
+            
+            // Detail Image UUIDs 목록 저장
+            object.detailImageUUIDs.append(objectsIn: detailImageUUIDs)
+            
+            // RelatedLink Object 생성 및 연결
+            let relatedLinkObjects = detail.relatedLinks.map { link -> RelatedLinkObject in
+                let linkObject = RelatedLinkObject()
+                linkObject.name = link.name
+                linkObject.url = link.url
+                // Inverse Relationship은 자동으로 설정됩니다.
+                return linkObject
+            }
+            object.relatedLinks.append(objectsIn: relatedLinkObjects)
+        }
+        
+        return object
     }
 }

@@ -21,7 +21,10 @@ class PerformanceDetailViewController: UIViewController {
             performanceID: performanceID,
             posterURL: posterURL,
             fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
-            togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase()
+            togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(),
+            storePerformanceUseCase: DefaultStorePerformanceUseCase(
+                repository: DefaultPerformanceRepository()
+            )
         )
         super.init(nibName: nil, bundle: nil)
         if let posterThumbnail {

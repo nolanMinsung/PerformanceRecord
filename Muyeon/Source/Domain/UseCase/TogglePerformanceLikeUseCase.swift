@@ -22,12 +22,10 @@ final class DefaultTogglePerformanceLikeUseCase: TogglePerformanceLikeUseCase {
         if likePerformanceList.contains(performanceID) {
             newList.removeAll { $0 == performanceID }
             likePerformanceList = newList
-            print("update됨: false")
             return false
         } else {
             newList.append(performanceID)
             likePerformanceList = newList
-            print("update됨: true")
             return true
         }
     }

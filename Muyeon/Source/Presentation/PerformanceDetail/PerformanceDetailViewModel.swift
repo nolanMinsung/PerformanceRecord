@@ -29,18 +29,21 @@ final class PerformanceDetailViewModel {
     let posterURL: String
     let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
     let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
+    let storePerformanceUseCase: any StorePerformanceUseCase
     private let disposeBag = DisposeBag()
     
     init(
         performanceID: String,
         posterURL: String,
         fetchPerformanceDetailUseCase: some FetchPerformanceDetailUseCase,
-        togglePerformanceLikeUseCase: some TogglePerformanceLikeUseCase
+        togglePerformanceLikeUseCase: some TogglePerformanceLikeUseCase,
+        storePerformanceUseCase: some StorePerformanceUseCase
     ) {
         self.performanceID = performanceID
         self.posterURL = posterURL
         self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
         self.togglePerformanceLikeUseCase = togglePerformanceLikeUseCase
+        self.storePerformanceUseCase = storePerformanceUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -49,10 +52,23 @@ final class PerformanceDetailViewModel {
         let likeButtonStatusRelay = PublishRelay<Bool>()
         let errorRelay = PublishRelay<any Error>()
         
+        Task {
+            let performanceDetailInfo = try await fetchPerformanceDetailUseCase.execute(performanceID: performanceID)
+            performanceDetail.accept(performanceDetailInfo)
+        }
+        
         input.likeButtonTapped
-            .bind(with: self) { owner, currentSelectionState in
-                let newLikeStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
-                likeButtonStatusRelay.accept(newLikeStatus)
+            .withLatestFrom(performanceDetail)
+            .bind(with: self) { owner, performance in
+                Task {
+                    do {
+                        try await self.storePerformanceUseCase.execute(performance: performance)
+                        let newLikeStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
+                        likeButtonStatusRelay.accept(newLikeStatus)
+                    } catch {
+                        errorRelay.accept(error)
+                    }
+                }
             }
             .disposed(by: disposeBag)
         
@@ -61,11 +77,6 @@ final class PerformanceDetailViewModel {
             .compactMap(\.detail?.facilityID)
             .bind(to: showFacilityDetail)
             .disposed(by: disposeBag)
-        
-        Task {
-            let performanceDetailInfo = try await fetchPerformanceDetailUseCase.execute(performanceID: performanceID)
-            performanceDetail.accept(performanceDetailInfo)
-        }
         
         return .init(
             posterURL: Observable<String>.just(posterURL),
