@@ -13,6 +13,7 @@ import SnapKit
 class AmenityIconView: UIView, BaseViewSettings {
     
     private let iconImageView =  UIImageView()
+    private let slashImageView = UIImageView(image: .init(systemName: "line.diagonal"))
     private let iconBackgroundView =  UIView()
     private let label =  UILabel()
     private let stackView =  UIStackView()
@@ -34,6 +35,8 @@ class AmenityIconView: UIView, BaseViewSettings {
         iconImageView.contentMode = .scaleAspectFit
         iconImageView.tintColor = .white
         
+        slashImageView.tintColor = .lightGray
+        
         iconBackgroundView.layer.cornerRadius = 8
         
         label.font = .systemFont(ofSize: 12, weight: .regular)
@@ -50,6 +53,7 @@ class AmenityIconView: UIView, BaseViewSettings {
     func setupHierarchy() {
         addSubview(stackView)
         iconBackgroundView.addSubview(iconImageView)
+        iconBackgroundView.addSubview(slashImageView)
     }
     
     func setupLayoutConstraints() {
@@ -60,8 +64,12 @@ class AmenityIconView: UIView, BaseViewSettings {
             make.size.equalTo(44)
         }
         iconImageView.snp.makeConstraints { make in
-            make.center.equalTo(iconBackgroundView)
+            make.center.equalToSuperview()
             make.size.equalTo(24)
+        }
+        slashImageView.snp.makeConstraints { make in
+            make.center.equalToSuperview()
+            make.size.equalTo(30)
         }
     }
     
@@ -72,10 +80,12 @@ class AmenityIconView: UIView, BaseViewSettings {
         if isAvailable {
             iconBackgroundView.backgroundColor = UIColor(red: 0.82, green: 0.97, blue: 0.85, alpha: 1.00) // light green
             iconImageView.tintColor = .systemGreen
+            slashImageView.isHidden = true
             label.textColor = .label
         } else {
             iconBackgroundView.backgroundColor = .systemGray5
             iconImageView.tintColor = .systemGray2
+            slashImageView.isHidden = false
             label.textColor = .secondaryLabel
         }
     }

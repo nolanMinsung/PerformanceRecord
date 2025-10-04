@@ -20,7 +20,8 @@ class PerformanceDetailViewController: UIViewController {
         self.viewModel = PerformanceDetailViewModel(
             performanceID: performanceID,
             posterURL: posterURL,
-            fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase()
+            fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
+            togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase()
         )
         super.init(nibName: nil, bundle: nil)
         if let posterThumbnail {
@@ -49,11 +50,17 @@ class PerformanceDetailViewController: UIViewController {
 private extension PerformanceDetailViewController {
     
     func bind() {
-        let buttonTapped = rootView.venueButton.rx.tap
+        let likeButtonTapped = rootView.likeButton.rx.tap.asObservable()
+            .withUnretained(rootView.likeButton) { button, _ in button }
+            .map(\.isSelected)
+            .share()
+            
+        let facilityButtonTapped = rootView.facilityButton.rx.tap
             .withLatestFrom(Observable.just(viewModel.performanceID))
         
         let input = PerformanceDetailViewModel.Input(
-            facilityButtonTapped: buttonTapped
+            likeButtonTapped: likeButtonTapped.asObservable(),
+            facilityButtonTapped: facilityButtonTapped
         )
         
         let output = viewModel.transform(input: input)
@@ -74,7 +81,7 @@ private extension PerformanceDetailViewController {
                 with: self,
                 onNext: { owner, performance in
                     owner.rootView.update(with: performance)
-                    owner.rootView.venueButton.isEnabled = (performance.detail != nil)
+                    owner.rootView.facilityButton.isEnabled = (performance.detail != nil)
                 }
             )
             .disposed(by: disposeBag)
@@ -89,6 +96,10 @@ private extension PerformanceDetailViewController {
                     )
                 }
             )
+            .disposed(by: disposeBag)
+        
+        output.likeButtonSelectionState
+            .bind(to: rootView.likeButton.rx.isSelected)
             .disposed(by: disposeBag)
     }
     

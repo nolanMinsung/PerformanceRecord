@@ -36,13 +36,19 @@ class SearchViewController: UIViewController {
         view = rootView
         
         navigationController?.navigationBar.isHidden = true
-        setupCollectionView()
-        bind()
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        setupCollectionView()
+        bind()
+    }
+    
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        
+        view.endEditing(true)
     }
     
     private func setupCollectionView() {

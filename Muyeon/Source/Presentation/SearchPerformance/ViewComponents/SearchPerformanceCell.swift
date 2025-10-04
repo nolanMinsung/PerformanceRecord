@@ -72,7 +72,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
 
         // Status Label
         statusLabelContainer.backgroundColor = .Main.third
-        statusLabelContainer.layer.cornerRadius = 8
+        statusLabelContainer.layer.cornerRadius = 4
         statusLabelContainer.clipsToBounds = true
         statusLabel.text = "진행중"
         statusLabel.textColor = .Main.primary
@@ -84,7 +84,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         titleLabel.numberOfLines = 2
         
         // Genre Label
-        genreLabelContainer.backgroundColor = .darkGray
+        genreLabelContainer.backgroundColor = .lightGray
         genreLabelContainer.layer.cornerRadius = 8
         genreLabelContainer.clipsToBounds = true
         genreLabel.textColor = .white
@@ -145,7 +145,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         }
         
         statusLabelContainer.snp.makeConstraints { make in
-            make.top.leading.equalToSuperview().inset(6)
+            make.top.leading.equalToSuperview().inset(4)
         }
         statusLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(3)
@@ -153,7 +153,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         }
 
         textStackView.snp.makeConstraints { make in
-            make.top.equalTo(posterImageView)
+            make.top.equalTo(posterImageView).offset(5)
             make.leading.equalTo(posterImageView.snp.trailing).offset(12)
             make.trailing.equalToSuperview().inset(12)
         }
@@ -175,7 +175,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
     // MARK: - Configuration
 
     func configure(with performance: Performance) {
-        let targetSize = posterImageView.bounds.size.applying(.init(scaleX: 0.8, y: 0.8))
+        let targetSize = posterImageView.bounds.size.applying(.init(scaleX: 0.5, y: 0.5))
         let processor = DownsamplingImageProcessor(size: targetSize)
         posterImageView.kf.setImage(
             with: URL(string: performance.posterURL),

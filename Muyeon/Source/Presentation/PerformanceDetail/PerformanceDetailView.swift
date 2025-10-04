@@ -39,17 +39,16 @@ final class PerformanceDetailView: UIView {
         return label
     }()
     
-    private let likeButton: UIButton = {
+    let likeButton: UIButton = {
         let button = UIButton(configuration: .plain())
         var unselectedConfig = UIButton.Configuration.plain()
-        unselectedConfig.image = UIImage(systemName: "heart")
         unselectedConfig.baseForegroundColor = .systemRed
+        unselectedConfig.baseBackgroundColor = .clear
         unselectedConfig.contentInsets = .zero
+        unselectedConfig.image = UIImage(systemName: "heart")?.resized(ratio: 1.5).withRenderingMode(.alwaysTemplate)
         
-        var selectedConfig = UIButton.Configuration.plain()
-        selectedConfig.image = UIImage(systemName: "heart.fill")
-        selectedConfig.baseForegroundColor = .systemRed
-        selectedConfig.contentInsets = .zero
+        var selectedConfig = unselectedConfig
+        selectedConfig.image = UIImage(systemName: "heart.fill")?.resized(ratio: 1.5).withRenderingMode(.alwaysTemplate)
         
         button.configurationUpdateHandler = { button in
             button.configuration = button.isSelected ? selectedConfig : unselectedConfig
@@ -110,7 +109,7 @@ final class PerformanceDetailView: UIView {
         return label
     }()
     
-    let venueButton: UIButton = {
+    let facilityButton: UIButton = {
         var config = UIButton.Configuration.plain()
         config.image = .init(systemName: "chevron.forward")
         config.baseForegroundColor = .label
@@ -220,7 +219,7 @@ final class PerformanceDetailView: UIView {
         
         // 장소/기간 컨테이너 뷰
         venueContainerView.addSubview(venueTitleLabel)
-        venueContainerView.addSubview(venueButton)
+        venueContainerView.addSubview(facilityButton)
         
         periodContainerView.addSubview(periodTitleLabel)
         periodContainerView.addSubview(periodLabel)
@@ -272,7 +271,7 @@ final class PerformanceDetailView: UIView {
         }
         
         // 장소 버튼
-        venueButton.snp.makeConstraints { make in
+        facilityButton.snp.makeConstraints { make in
             make.leading.equalTo(venueTitleLabel.snp.trailing).offset(8)
             make.verticalEdges.trailing.equalToSuperview()
         }
@@ -322,20 +321,24 @@ extension PerformanceDetailView {
     
     @MainActor
     func update(with performance: Performance) {
+        @UserDefault(key: .likePerformanceIDs, defaultValue: [])
+        var likePerformanceIDs: [String]
+        
         if posterImageView.image == nil {
             updatePosterImageView(with: performance.posterURL)
         }
         titleLabel.text = performance.name
+        likeButton.isSelected = likePerformanceIDs.contains(performance.id)
         genreLabel.text = performance.genre.description
         durationLabel.text = performance.detail?.runtime ?? "-시간"
         ageRatingLabel.text = performance.detail?.ageLimit
         storyBodyLabel.text = performance.detail?.story
         if #available(iOS 16.0, *) {
             let (placeName, placeDetail) = performance.facilityFullName.parsePlaceAndDetail()!
-            venueButton.configuration?.title = placeName
-            venueButton.configuration?.subtitle = placeDetail
+            facilityButton.configuration?.title = placeName
+            facilityButton.configuration?.subtitle = placeDetail
         } else {
-            venueButton.configuration?.title = performance.facilityFullName
+            facilityButton.configuration?.title = performance.facilityFullName
         }
         periodLabel.text = performance.detail?.detailDateGuidance.replacingOccurrences(of: ", ", with: "\n")
         
@@ -355,7 +358,6 @@ extension PerformanceDetailView {
     }
     
     private func updatePosterImageSize() {
-        print(#function)
         guard let posterImageSize = posterImageView.image?.size else { return }
         let imageRatio = posterImageSize.height / posterImageSize.width
         
