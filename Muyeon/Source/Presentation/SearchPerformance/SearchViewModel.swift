@@ -87,8 +87,4 @@ final class SearchViewModel {
         )
     }
     
-    
-    
-    
-    
 }

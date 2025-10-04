@@ -12,7 +12,7 @@ import SnapKit
 
 class HomeTopTenCell: UICollectionViewCell {
     
-    private let imageView = UIImageView()
+    let imageView = UIImageView()
     private let backGradientView = BottomGradientView(color: .label)
     private let rankNumLabel = UILabel()
     private let titleLabel = UILabel()

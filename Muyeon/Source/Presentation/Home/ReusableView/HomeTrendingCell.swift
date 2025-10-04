@@ -12,7 +12,7 @@ import SnapKit
 
 class HomeTrendingCell: UICollectionViewCell {
     
-    private let imageView = UIImageView()
+    let imageView = UIImageView()
     private let titleLabel = UILabel()
     private let placeNameLabel = UILabel()
     

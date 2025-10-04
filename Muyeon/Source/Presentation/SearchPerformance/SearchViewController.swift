@@ -60,6 +60,20 @@ class SearchViewController: UIViewController {
     }
     
     private func bind() {
+        rootView.performanceCollectionView.rx.itemSelected
+            .bind(with: self, onNext: { owner, indexPath in
+                guard let selectedPerformance = owner.diffableDataSource.itemIdentifier(for: indexPath) else {
+                    return
+                }
+                let detailVC = PerformanceDetailViewController(
+                    performanceID: selectedPerformance.id,
+                    posterURL: selectedPerformance.posterURL
+                )
+                detailVC.hidesBottomBarWhenPushed = true
+                owner.navigationController?.pushViewController(detailVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
         rootView.genreSelectionButton.menu = UIMenu(children: makeGenreButtonActions())
         
         let textFieldEndOnExit = rootView.searchTextField.rx.controlEvent(.editingDidEndOnExit)
@@ -111,14 +125,12 @@ class SearchViewController: UIViewController {
         var menuElements = Constant.Genre.allCases.filter { $0 != .unknown }.map { genre in
             return UIAction(title: genre.description) { [weak self] _ in
                 guard let self else { return }
-//                self.rootView.genreSelectionButton.configuration?.title = genre.description
                 self.genreSelected.accept(genre)
             }
         }
         menuElements.insert(
             .init(title: "전체", handler: { [weak self] _ in
                 guard let self else { return }
-//                self.rootView.genreSelectionButton.configuration?.title = "전체"
                 self.genreSelected.accept(nil)
             }),
             at: 0

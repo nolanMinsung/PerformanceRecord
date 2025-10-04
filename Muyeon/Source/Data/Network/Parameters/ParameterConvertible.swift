@@ -43,7 +43,6 @@ extension ParameterConvertible {
 
         // nil 제거 (Encodable에서는 nil이 빠지긴 하지만 안전하게 처리)
         dict = dict.filter { !($0.value is NSNull) }
-        print(dict)
         return dict
     }
 }

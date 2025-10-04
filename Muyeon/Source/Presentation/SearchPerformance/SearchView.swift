@@ -157,8 +157,8 @@ final class SearchView: UIView {
         }
         
         genreSelectionButton.snp.makeConstraints { make in
-            make.top.equalTo(searchTextField.snp.bottom).offset(20)
-            make.leading.equalTo(genreLabel.snp.trailing).offset(20)
+            make.top.equalTo(searchTextField.snp.bottom).offset(10)
+            make.leading.equalTo(genreLabel.snp.trailing).offset(10)
         }
         
         datePickingLabel.snp.makeConstraints { make in
@@ -168,7 +168,7 @@ final class SearchView: UIView {
         
         fromDatePicker.snp.makeConstraints { make in
             make.top.equalTo(genreLabel.snp.bottom).offset(10)
-            make.leading.equalTo(datePickingLabel.snp.trailing).offset(20)
+            make.leading.equalTo(datePickingLabel.snp.trailing).offset(10)
         }
         
         tildeLabel.snp.makeConstraints { make in

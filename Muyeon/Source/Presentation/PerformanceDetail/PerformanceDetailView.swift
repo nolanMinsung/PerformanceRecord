@@ -349,7 +349,13 @@ extension PerformanceDetailView {
         }
     }
     
+    func updatePosterImage(withThumbnail thumbnail: UIImage) {
+        posterImageView.image = thumbnail
+        updatePosterImageSize()
+    }
+    
     private func updatePosterImageSize() {
+        print(#function)
         guard let posterImageSize = posterImageView.image?.size else { return }
         let imageRatio = posterImageSize.height / posterImageSize.width
         

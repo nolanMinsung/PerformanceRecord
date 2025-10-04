@@ -47,6 +47,7 @@ class HomeViewController: UIViewController {
         setupCollectionView()
         bind()
         
+        rootView.homeCollectionView.selectItem(at: IndexPath(item: 0, section: 1), animated: false, scrollPosition: .init())
         topTenLoadingTrigger.accept(())
         trendingLoadingTrigger.accept(())
     }
@@ -84,42 +85,51 @@ private extension HomeViewController {
             )
             .disposed(by: disposeBag)
         
-        output.presentDetail
-            .bind(
-                with: self,
-                onNext: { owner, values in
-                    let (indexPath, performanceID, posterURL) = values
-                    let performanceDetailVC = PerformanceDetailViewController(
-                        performanceID: performanceID,
-                        posterURL: posterURL
-                    )
-                    let naviCon = UINavigationController(rootViewController: performanceDetailVC)
-                    
-                    if indexPath.section == 0 {
-                        naviCon.modalPresentationStyle = .formSheet
-                        owner.present(naviCon, animated: true)
-                        
-                    } else if indexPath.section == 2 {
-                        let wispConfig = WispConfiguration { config in
-                            config.setGesture { gesture in
-                                gesture.allowedDirections = [.right, .down]
-                            }
-                            config.setLayout { layout in
-                                let topInset = self.view.safeAreaInsets.top
-                                layout.presentedAreaInset = .init(top: topInset, left: 0, bottom: 0, right: 0)
-                                layout.initialCornerRadius = 5
-                            }
-                        }
-                        
-                        owner.wisp.present(
-                            naviCon,
-                            collectionView: owner.rootView.homeCollectionView,
-                            at: indexPath,
-                            configuration: wispConfig
-                        )
-                    }
+        rootView.homeCollectionView.rx.itemSelected
+            .bind(with: self, onNext: { owner, indexPath in
+                let currentSection = indexPath.section
+                guard let selectedIndexPaths = owner.rootView.homeCollectionView.indexPathsForSelectedItems else { return }
+                let selectedSameSection = selectedIndexPaths.filter {
+                    $0.section == currentSection && $0 != indexPath
                 }
-            )
+                for oldIndexPath in selectedSameSection {
+                    owner.rootView.homeCollectionView.deselectItem(at: oldIndexPath, animated: true)
+                }
+                
+            })
+            .disposed(by: disposeBag)
+        
+        
+        rootView.homeCollectionView.rx.itemSelected
+            .bind(with: self, onNext: { owner, indexPath in
+                guard let selectedItem = owner.dataSource.itemIdentifier(for: indexPath) else {
+                    return
+                }
+                let boxOfficeItem: BoxOfficeItem
+                var selectedItemImage: UIImage? = nil
+                switch selectedItem {
+                case .topTen(let model):
+                    boxOfficeItem = model
+                    selectedItemImage = (owner.rootView.homeCollectionView.cellForItem(at: indexPath) as? HomeTopTenCell)?.imageView.image
+                    owner.presentDetailVC(
+                        performanceID: boxOfficeItem.id,
+                        posterURL: boxOfficeItem.posterURL,
+                        thumbnail: selectedItemImage,
+                        style: .modal
+                    )
+                case .trending(let model):
+                    boxOfficeItem = model
+                    selectedItemImage = (owner.rootView.homeCollectionView.cellForItem(at: indexPath) as? HomeTrendingCell)?.imageView.image
+                    owner.presentDetailVC(
+                        performanceID: boxOfficeItem.id,
+                        posterURL: boxOfficeItem.posterURL,
+                        thumbnail: selectedItemImage,
+                        style: .wisp(indexPath: indexPath)
+                    )
+                default:
+                    return
+                }
+            })
             .disposed(by: disposeBag)
     }
     
@@ -129,17 +139,14 @@ private extension HomeViewController {
 private extension HomeViewController {
     
     func setupCollectionView() {
+        rootView.homeCollectionView.delegate = self
         let topTenCellRegistration = TopTenCellRegistration { cell, indexPath, itemIdentifier in
-            // configuring Cell...
             cell.configure(with: itemIdentifier)
         }
-        
         let genreCellRegistration = GenreCellRegistration { cell, indexPath, itemIdentifier in
             cell.configure(with: itemIdentifier)
         }
-        
         let trendingCellRegistration = TrendingCellRegistration { cell, indexPath, itemIdentifier in
-            // configuring Cell...
             cell.configure(with: itemIdentifier)
         }
         
@@ -192,5 +199,55 @@ private extension HomeViewController {
             }
         }
     }
+    
+    
+    enum DetailViewPresentStyle {
+        case modal
+        case wisp(indexPath: IndexPath)
+    }
+    
+    func presentDetailVC(performanceID: String, posterURL: String, thumbnail: UIImage? = nil, style: DetailViewPresentStyle) {
+        let performanceDetailVC = PerformanceDetailViewController(
+            performanceID: performanceID,
+            posterURL: posterURL,
+            posterThumbnail: thumbnail
+        )
+        let naviCon = UINavigationController(rootViewController: performanceDetailVC)
+        
+        switch style {
+        case .modal:
+            present(naviCon, animated: true)
+        case .wisp(let indexPath):
+            let wispConfig = WispConfiguration { config in
+                config.setGesture { gesture in
+                    gesture.allowedDirections = [.right, .down]
+                }
+                config.setLayout { layout in
+                    let topInset = self.view.safeAreaInsets.top
+                    layout.presentedAreaInset = .init(top: topInset, left: 0, bottom: 0, right: 0)
+                    layout.initialCornerRadius = 5
+                }
+            }
+            wisp.present(
+                naviCon,
+                collectionView: rootView.homeCollectionView,
+                at: indexPath,
+                configuration: wispConfig
+            )
+        }
+    }
+    
+}
+
+
+extension HomeViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        if collectionView.indexPathsForSelectedItems?.contains(indexPath) == true {
+            collectionView.deselectItem(at: indexPath, animated: true)
+        }
+        return true
+    }
+    
     
 }

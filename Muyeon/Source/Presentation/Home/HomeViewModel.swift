@@ -27,8 +27,6 @@ final class HomeViewModel {
         let topTenContents: BehaviorRelay<[BoxOfficeItem]>
         let boxOfficeGenres: BehaviorRelay<[Constant.BoxOfficeGenre]>
         let trendingContents: BehaviorRelay<[BoxOfficeItem]>
-        /// (선택된 `IndexPath`, performance ID, posterURL) 을 전달
-        let presentDetail: PublishRelay<(IndexPath, String, String)>
         let errorRelay: PublishRelay<any Error>
     }
     
@@ -44,8 +42,6 @@ final class HomeViewModel {
         let topTenContents = BehaviorRelay<[BoxOfficeItem]>(value: [])
         let boxOfficeGenres = BehaviorRelay<[Constant.BoxOfficeGenre]>(value: Constant.BoxOfficeGenre.allCases)
         let trendingBoxOffice = BehaviorRelay<[BoxOfficeItem]>(value: [])
-        /// (선택된 `IndexPath`, performance ID, posterURL) 을 전달
-        let presentDetail = PublishRelay<(IndexPath, String, String)>()
         let errorRelay = PublishRelay<any Error>()
         
         input.topTenLoadingTrigger
@@ -110,31 +106,10 @@ final class HomeViewModel {
             }
             .disposed(by: disposeBag)
         
-        
-        let boxOfficItemSelected = input.itemSelected
-            .filter { [0, 2].contains($0.section) }
-        
-        boxOfficItemSelected
-            .map { indexPath in
-                let selectedItem: BoxOfficeItem
-                if indexPath.section == 0 {
-                    selectedItem = topTenContents.value[indexPath.item]
-                } else {
-                    selectedItem = trendingBoxOffice.value[indexPath.item]
-                }
-                
-                let performanceID = selectedItem.id
-                let posterURL = selectedItem.posterURL
-                return (indexPath, performanceID, posterURL)
-            }
-            .bind(to: presentDetail)
-            .disposed(by: disposeBag)
-        
         return .init(
             topTenContents: topTenContents,
             boxOfficeGenres: boxOfficeGenres,
             trendingContents: trendingBoxOffice,
-            presentDetail: presentDetail,
             errorRelay: errorRelay
         )
     }

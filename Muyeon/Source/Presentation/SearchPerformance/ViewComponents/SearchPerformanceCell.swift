@@ -68,7 +68,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         // Poster Image
         posterImageView.contentMode = .scaleAspectFill
         posterImageView.clipsToBounds = true
-        posterImageView.layer.cornerRadius = 8
+        posterImageView.layer.cornerRadius = 6
 
         // Status Label
         statusLabelContainer.backgroundColor = .Main.third
@@ -140,7 +140,7 @@ final class SearchPerformanceCell: UICollectionViewCell {
         }
         
         posterImageView.snp.makeConstraints { make in
-            make.leading.top.bottom.equalToSuperview().inset(12)
+            make.leading.verticalEdges.equalToSuperview().inset(8)
             make.width.equalTo(posterImageView.snp.height).multipliedBy(0.75)
         }
         

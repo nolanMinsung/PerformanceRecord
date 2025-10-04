@@ -14,20 +14,23 @@ class PerformanceDetailViewController: UIViewController {
     private let rootView = PerformanceDetailView()
     private let viewModel: PerformanceDetailViewModel
     
-    init(performanceID: String, posterURL: String) {
+    private let disposeBag = DisposeBag()
+    
+    init(performanceID: String, posterURL: String, posterThumbnail: UIImage? = nil) {
         self.viewModel = PerformanceDetailViewModel(
             performanceID: performanceID,
             posterURL: posterURL,
             fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase()
         )
         super.init(nibName: nil, bundle: nil)
+        if let posterThumbnail {
+            rootView.updatePosterImage(withThumbnail: posterThumbnail)
+        }
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    private let disposeBag = DisposeBag()
     
     override func loadView() {
         view = rootView

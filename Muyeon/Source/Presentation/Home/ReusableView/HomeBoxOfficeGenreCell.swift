@@ -35,8 +35,8 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell {
     }
     
     func setSelected(_ isSelected: Bool) {
-        genreNameLabel.textColor = isSelected ? .label : .systemGray4
-        contentView.backgroundColor = isSelected ? .systemOrange : .systemGray6
+        genreNameLabel.textColor = isSelected ? .Main.primary : .systemGray4
+        contentView.backgroundColor = isSelected ? .Main.third : .systemGray6
     }
     
     func configure(with model: HomeUIModel) {
