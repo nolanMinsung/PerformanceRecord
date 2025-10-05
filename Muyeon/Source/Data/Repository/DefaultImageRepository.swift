@@ -30,8 +30,15 @@ final class DefaultImageRepository: ImageRepository {
         return imageID
     }
     
-    func loadImage(with id: String, category: ImageCategory) async throws -> UIImage {
+    func loadImage(with id: String, category: ImageCategory) throws -> UIImage {
         try localDataSource.load(imageID: id, category: category)
     }
     
+    func deleteImage(with id: String, category: ImageCategory) throws {
+        try localDataSource.delete(imageID: id, category: category)
+    }
+    
+    func deleteAllImages(of performance: Performance, category: ImageCategory) throws {
+        try localDataSource.deleteAllImages(of: performance, category: category)
+    }
 }

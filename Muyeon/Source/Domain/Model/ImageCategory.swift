@@ -15,9 +15,9 @@ enum ImageCategory {
     var subpath: String {
         switch self {
         case .performance(let id):
-            return "Performances/\(id)"
+            return "Images/Performances/\(id)"
         case .diary(let id):
-            return "Reviews/\(id)"
+            return "Images/Reviews/\(id)"
         }
     }
 }

@@ -22,8 +22,16 @@ class PerformanceDetailViewController: UIViewController {
             posterURL: posterURL,
             fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
             togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(),
-            storePerformanceUseCase: DefaultStorePerformanceUseCase(
+            savePerformanceUseCase: DefaultStorePerformanceUseCase(
                 repository: DefaultPerformanceRepository(
+                    imageRepository: DefaultImageRepository(
+                        remoteDataSource: DefaultRemoteImageDataSource(),
+                        localDataSource: DefaultLocalImageDataSource()
+                    )
+                )
+            ),
+            deletePerformanceUseCase: DefaultDeletePerformanceUseCase(
+                performanceRepository: DefaultPerformanceRepository(
                     imageRepository: DefaultImageRepository(
                         remoteDataSource: DefaultRemoteImageDataSource(),
                         localDataSource: DefaultLocalImageDataSource()
@@ -108,6 +116,14 @@ private extension PerformanceDetailViewController {
         
         output.likeButtonSelectionState
             .bind(to: rootView.likeButton.rx.isSelected)
+            .disposed(by: disposeBag)
+        
+        output.error
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, error in
+                print(error.localizedDescription)
+                owner.wisp.dismiss(autoFallback: true)
+            }
             .disposed(by: disposeBag)
     }
     

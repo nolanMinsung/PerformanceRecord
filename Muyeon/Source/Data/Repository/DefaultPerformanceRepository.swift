@@ -74,4 +74,26 @@ final class DefaultPerformanceRepository: PerformanceRepository {
         
     }
     
+    func delete(performance: Performance) async throws {
+        // Realm Object 부터 가져오자
+        guard let performanceObject = realm.objects(PerformanceObject.self)
+                .filter({ $0.id == performance.id })
+                .first
+        else {
+            fatalError()
+        }
+        // 이미지 먼저 삭제 - 포스터, 상세 이미지 모두
+        try imageRepository.deleteAllImages(of: performance, category: .performance(id: performance.id))
+        
+        // --- 이미지 삭제 완료 ---
+        
+        // RelatedLinkObject 삭제
+        
+        // Realm Object 삭제
+        try realm.write {
+            realm.delete(performanceObject.relatedLinks)
+            realm.delete(performanceObject)
+        }
+    }
+    
 }

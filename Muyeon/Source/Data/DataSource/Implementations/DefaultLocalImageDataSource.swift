@@ -40,7 +40,7 @@ final class DefaultLocalImageDataSource: LocalImageDataSource {
         
         // Documents 디렉토리 경로 가져오기
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "ImageSaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+            throw NSError(domain: "ImageLoadingError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
         }
         
         // 저장된 이미지의 전체 경로 생성
@@ -58,6 +58,49 @@ final class DefaultLocalImageDataSource: LocalImageDataSource {
             throw NSError(domain: "FaileToConvertToUIImage", code: 3, userInfo: [NSLocalizedDescriptionKey: "Converting File to UIImage Failed."])
         }
         return image
+    }
+    
+    func delete(imageID: String, category: ImageCategory) throws {
+        let fileManager = FileManager.default
+        
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw NSError(domain: "ImageLoadingError", code: 4, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+        }
+        
+        // 저장된 이미지의 전체 경로 생성
+        let fileURL = documentsURL.appendingPathComponent(category.subpath)
+            .appendingPathComponent(imageID)
+            .appendingPathExtension("jpeg")
+        
+        // 해당 경로에 파일이 실제로 존재하는지 확인
+        guard fileManager.fileExists(atPath: fileURL.path) else {
+            throw NSError(domain: "ImageNotFound", code: 2, userInfo: [NSLocalizedDescriptionKey: "Image File not found."])
+        }
+        
+        try fileManager.removeItem(at: fileURL)
+    }
+    
+    func deleteAllImages(of performance: Performance, category: ImageCategory) throws {
+        let fileManager = FileManager.default
+        
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw NSError(domain: "ImageLoadingError", code: 4, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+        }
+        
+        // 이미지 폴더의 전체 경로 생성
+        let folderURL = documentsURL.appendingPathComponent(category.subpath)
+        
+        guard documentsURL.isFileURL else {
+            print("삭제를 시도하려는 경로가 folder가 아닙니다.")
+            return
+        }
+        
+        // 해당 경로에 파일이 실제로 존재하는지 확인
+        guard fileManager.fileExists(atPath: folderURL.path) else {
+            throw NSError(domain: "ImageFolderNotFound", code: 5, userInfo: [NSLocalizedDescriptionKey: "Image Folder not found."])
+        }
+        // Performance의 이미지가 모두 들어있는 폴더 자체를 삭제
+        try fileManager.removeItem(at: folderURL)
     }
     
 }

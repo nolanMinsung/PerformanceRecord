@@ -1,5 +1,5 @@
 //
-//  StorePerformanceUseCase.swift
+//  SavePerformanceUseCase.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/5/25.
@@ -7,12 +7,12 @@
 
 import Foundation
 
-protocol StorePerformanceUseCase {
+protocol SavePerformanceUseCase {
     func execute(performance: Performance) async throws
 }
 
 
-final class DefaultStorePerformanceUseCase: StorePerformanceUseCase {
+final class DefaultStorePerformanceUseCase: SavePerformanceUseCase {
     
     private let repository: PerformanceRepository
     
