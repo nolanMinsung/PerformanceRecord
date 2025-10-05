@@ -58,3 +58,19 @@ extension DiaryObject {
     
 }
 
+
+extension DiaryObject {
+    
+    func toDomain() -> Diary {
+        return Diary(
+            performance: self.performance?.toDomain(),
+            createdAt: self.createdAt,
+            viewedAt: self.viewedAt,
+            rating: self.rating,
+            reviewText: self.reviewText,
+            diaryImageUUIDs: Array(self.diaryImageUUIDs)
+        )
+    }
+    
+}
+
