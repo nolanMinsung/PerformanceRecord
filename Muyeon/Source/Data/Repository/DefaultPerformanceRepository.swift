@@ -12,11 +12,12 @@ import RealmSwift
 @MainActor
 final class DefaultPerformanceRepository: PerformanceRepository {
     
-    let imageStoreService = FileManagerImageStoreService()
+    let imageRepository: any ImageRepository
     let realm = try! Realm()
     
-    init() {
-        print(realm.configuration.fileURL)
+    init(imageRepository: some ImageRepository) {
+        self.imageRepository = imageRepository
+        print(realm.configuration.fileURL ?? "⚠️에러!! realm 주소 확인 불가")
     }
     
     func fetchDetailFromRemote(id: String) async throws -> Performance {
@@ -30,11 +31,9 @@ final class DefaultPerformanceRepository: PerformanceRepository {
     }
     
     func save(performance: Performance) async throws {
-        let posterUUID = try await FileManagerImageStoreService.downloadAndSaveImage(
-            from: performance.posterURL,
-            folderName: performance.id
-        )
         
+        // 포스터 이미지 저장 후 포스터 ID 상수에 저장
+        let posterID = try await imageRepository.saveImage(urlString: performance.posterURL, category: .performance(id: performance.id))
         let detailImageUUIDs = try await withThrowingTaskGroup(
             of: (index: Int, uuid: String?).self,
             returning: [String].self,
@@ -42,9 +41,9 @@ final class DefaultPerformanceRepository: PerformanceRepository {
                 let detailURLs = performance.detail?.detailImageURLs ?? []
                 for (index, imageURL) in detailURLs.enumerated() {
                     group.addTask {
-                        let uuid = try await FileManagerImageStoreService.downloadAndSaveImage(
-                            from: imageURL,
-                            folderName: performance.id
+                        let uuid = try await self.imageRepository.saveImage(
+                            urlString: imageURL,
+                            category: .performance(id: performance.id)
                         )
                         return (index, uuid)
                     }
@@ -66,7 +65,7 @@ final class DefaultPerformanceRepository: PerformanceRepository {
         
         let performanceObject = PerformanceObject.create(
             from: performance,
-            posterUUID: posterUUID,
+            posterUUID: posterID,
             detailImageUUIDs: detailImageUUIDs
         )
         try realm.write {

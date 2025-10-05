@@ -76,11 +76,10 @@ final class RelatedLinkObject: Object {
     @Persisted(originProperty: "relatedLinks") var performance: LinkingObjects<PerformanceObject>
 }
 
-import UIKit
 
 extension PerformanceObject {
-    func toDomain(localImageLoader: (String) -> UIImage?) -> Performance {
-        
+    
+    func toDomain() -> Performance {
         // RelatedLink 변환
         let domainRelatedLinks = Array(self.relatedLinks.map { linkObject -> RelatedLink in
             return RelatedLink(name: linkObject.name, url: linkObject.url)
@@ -134,6 +133,7 @@ extension PerformanceObject {
             detail: domainDetail
         )
     }
+    
 }
 
 

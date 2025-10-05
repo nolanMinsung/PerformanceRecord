@@ -23,7 +23,12 @@ class PerformanceDetailViewController: UIViewController {
             fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
             togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(),
             storePerformanceUseCase: DefaultStorePerformanceUseCase(
-                repository: DefaultPerformanceRepository()
+                repository: DefaultPerformanceRepository(
+                    imageRepository: DefaultImageRepository(
+                        remoteDataSource: DefaultRemoteImageDataSource(),
+                        localDataSource: DefaultLocalImageDataSource()
+                    )
+                )
             )
         )
         super.init(nibName: nil, bundle: nil)
