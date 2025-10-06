@@ -25,6 +25,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let searchNaviCon = UINavigationController(rootViewController: SearchViewController())
         searchNaviCon.tabBarItem = UITabBarItem(title: "검색", image: .init(systemName: "magnifyingglass"), tag: 1)
         
+        let performanceRecordNaviCon = UINavigationController(rootViewController: PerformanceRecordViewController())
+        performanceRecordNaviCon.tabBarItem = UITabBarItem(title: "나의 기록", image: .init(systemName: "pencil.and.scribble"), tag: 2)
+        
         let mainTabBarCon = UITabBarController()
         
         let defaultTabBarAppearance = UITabBarAppearance()
@@ -33,7 +36,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         mainTabBarCon.tabBar.scrollEdgeAppearance = defaultTabBarAppearance
         
         mainTabBarCon.tabBar.tintColor = .label
-        mainTabBarCon.viewControllers = [homeNaviCon, searchNaviCon, ViewController()]
+        mainTabBarCon.viewControllers = [homeNaviCon, searchNaviCon, performanceRecordNaviCon]
         window?.rootViewController = mainTabBarCon
         window?.makeKeyAndVisible()
     }
