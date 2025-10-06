@@ -10,13 +10,25 @@ import SnapKit
 
 class SelectPerformanceView: UIView {
     
-    // ViewController에서 접근해야 하는 UI 컴포넌트
-    let tableView: UITableView = {
-        let tv = UITableView()
-        tv.register(PerformanceSelectionCell.self, forCellReuseIdentifier: PerformanceSelectionCell.identifier)
-        tv.separatorStyle = .none
-        tv.rowHeight = 100
-        return tv
+    let collectionView: UICollectionView = {
+        let itemSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(250)
+        )
+        let item = NSCollectionLayoutItem(layoutSize: itemSize)
+        let groupSize = NSCollectionLayoutSize(
+            widthDimension: .fractionalWidth(1.0),
+            heightDimension: .estimated(250)
+        )
+        let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
+        let section = NSCollectionLayoutSection(group: group)
+        let layout = UICollectionViewCompositionalLayout(section: section)
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(
+            PerformanceSelectionCell.self,
+            forCellWithReuseIdentifier: PerformanceSelectionCell.reuseIdentifier
+        )
+        return collectionView
     }()
     
     let continueButton: UIButton = {
@@ -66,7 +78,7 @@ class SelectPerformanceView: UIView {
         buttonStack.spacing = 8
         buttonStack.distribution = .fillEqually
         
-        let mainStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, tableView, buttonStack])
+        let mainStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, collectionView, buttonStack])
         mainStack.axis = .vertical
         mainStack.spacing = 16
         
@@ -77,7 +89,7 @@ class SelectPerformanceView: UIView {
             make.leading.trailing.bottom.equalToSuperview().inset(24)
         }
         
-        tableView.snp.makeConstraints { make in
+        collectionView.snp.makeConstraints { make in
             make.height.equalTo(300)
         }
     }

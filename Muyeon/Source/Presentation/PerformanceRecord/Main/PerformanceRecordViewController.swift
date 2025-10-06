@@ -12,7 +12,17 @@ import RxCocoa
 
 class PerformanceRecordViewController: UIViewController {
     
-    let rootView = PerformanceRecordView()
+    private let rootView = PerformanceRecordView()
+    private let viewModel = PerformanceRecordViewModel(
+        fetchLikePerformanceListUseCase: DefaultFetchLikePerformanceListUseCase(
+            performanceRepository: DefaultPerformanceRepository(
+                imageRepository: DefaultImageRepository(
+                    remoteDataSource: DefaultRemoteImageDataSource(),
+                    localDataSource: DefaultLocalImageDataSource()
+                )
+            )
+        )
+    )
     let disposeBag = DisposeBag()
     
     // MARK: - Properties
@@ -31,13 +41,7 @@ class PerformanceRecordViewController: UIViewController {
         rootView.collectionView.dataSource = self
         loadSampleData()
         configureData()
-        
-        
-        rootView.addRecordButton.rx.tap
-            .bind(with: self, onNext: { owner, _ in
-                owner.showAddRecordFlow()
-            })
-            .disposed(by: disposeBag)
+        bind()
     }
     
     
@@ -96,6 +100,24 @@ class PerformanceRecordViewController: UIViewController {
             self.rootView.updateCollectionViewHeight()
         }
     }
+    
+    private func bind() {
+        let input = PerformanceRecordViewModel.Input(
+            addRecordButtonTapped: rootView.addRecordButton.rx.tap.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        output.showAddRecordView
+            .observe(on: MainScheduler.instance)
+            .bind(
+                with: self,
+                onNext: { owner, likePerformances in
+                    owner.showAddRecordFlow(performances: likePerformances)
+                }
+            )
+            .disposed(by: disposeBag)
+    }
+    
     
 }
 
@@ -166,7 +188,7 @@ private extension PerformanceRecordViewController {
 // 기존 RecordViewController 또는 다른 ViewController에서...
 extension PerformanceRecordViewController: SelectPerformanceDelegate {
     
-    func showAddRecordFlow() {
+    func showAddRecordFlow(performances: [Performance]) {
         let selectVC = SelectPerformanceViewController(performances: performances)
         selectVC.delegate = self
         selectVC.modalPresentationStyle = .overFullScreen

@@ -8,16 +8,25 @@
 import UIKit
 import SnapKit
 
-class PerformanceSelectionCell: UITableViewCell {
+class PerformanceSelectionCell: UICollectionViewCell {
     static let identifier = "PerformanceSelectionCell"
-
+    
+    private let containerView = UIView()
     private let titleLabel = UILabel()
     private let venueLabel = UILabel()
     private let genreTagLabelContainer = UIView()
     private let genreTagLabel = UILabel()
-
-    override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
-        super.init(style: style, reuseIdentifier: reuseIdentifier)
+    
+    override var isSelected: Bool {
+        didSet {
+            containerView.layer.borderColor = isSelected ? UIColor.systemBlue.cgColor : UIColor.systemGray5.cgColor
+            containerView.backgroundColor = isSelected ? .systemBlue.withAlphaComponent(0.05) : .clear
+        }
+    }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
         setupUI()
     }
     
@@ -27,9 +36,11 @@ class PerformanceSelectionCell: UITableViewCell {
 
     private func setupUI() {
         // UI 컴포넌트 속성 설정
-        titleLabel.font = .systemFont(ofSize: 17, weight: .semibold)
+        titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
+        titleLabel.numberOfLines = 0
         venueLabel.font = .systemFont(ofSize: 14)
         venueLabel.textColor = .secondaryLabel
+        venueLabel.numberOfLines = 2
         
         genreTagLabelContainer.backgroundColor = .systemBlue.withAlphaComponent(0.1)
         genreTagLabelContainer.layer.cornerRadius = 6
@@ -38,27 +49,45 @@ class PerformanceSelectionCell: UITableViewCell {
         genreTagLabel.textColor = .systemBlue
         genreTagLabel.textAlignment = .center
         
-        contentView.layer.cornerRadius = 12
-        contentView.layer.borderWidth = 1.5
-        contentView.layer.borderColor = UIColor.systemGray5.cgColor
+        containerView.layer.cornerRadius = 12
+        containerView.layer.borderWidth = 1.5
+        containerView.layer.borderColor = UIColor.systemGray5.cgColor
+        containerView.clipsToBounds = true
         
         let infoStack = UIStackView(arrangedSubviews: [titleLabel, venueLabel])
         infoStack.axis = .vertical
         infoStack.alignment = .leading
         infoStack.spacing = 4
+        infoStack.distribution = .fill
         
         genreTagLabelContainer.addSubview(genreTagLabel)
-        let mainStack = UIStackView(arrangedSubviews: [infoStack, genreTagLabelContainer])
-        mainStack.axis = .horizontal
-        mainStack.alignment = .center
         
-        contentView.addSubview(mainStack)
+        contentView.addSubview(containerView)
+        containerView.addSubview(infoStack)
+        containerView.addSubview(genreTagLabelContainer)
         
-        mainStack.snp.makeConstraints { make in
-            make.edges.equalToSuperview().inset(16)
+        containerView.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview().inset(6)
+            make.horizontalEdges.equalToSuperview()
         }
         
+        infoStack.snp.makeConstraints { make in
+            make.leading.verticalEdges.equalToSuperview().inset(16)
+        }
+        
+        titleLabel.snp.contentCompressionResistanceVerticalPriority = 1000
+        titleLabel.snp.contentHuggingVerticalPriority = 1000
+        venueLabel.snp.contentCompressionResistanceVerticalPriority = 1000
+        venueLabel.snp.contentHuggingVerticalPriority = 1000
+        
         genreTagLabelContainer.snp.contentHuggingHorizontalPriority = 800
+        genreTagLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
+        genreTagLabelContainer.snp.makeConstraints { make in
+            make.centerY.equalTo(infoStack)
+            make.leading.equalTo(infoStack.snp.trailing).offset(12)
+            make.trailing.equalToSuperview().inset(16)
+        }
+        
         genreTagLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(5)
             make.horizontalEdges.equalToSuperview().inset(8)
@@ -67,19 +96,8 @@ class PerformanceSelectionCell: UITableViewCell {
 
     func configure(with performance: Performance) {
         titleLabel.text = performance.name
-        venueLabel.text = "📍 \(performance.facilityFullName)"
+        venueLabel.text = performance.facilityFullName
         genreTagLabel.text = performance.genre.description
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        super.setSelected(selected, animated: animated)
-        contentView.layer.borderColor = selected ? UIColor.systemBlue.cgColor : UIColor.systemGray5.cgColor
-        contentView.backgroundColor = selected ? .systemBlue.withAlphaComponent(0.05) : .clear
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        // 셀 사이의 간격
-        contentView.frame = contentView.frame.inset(by: UIEdgeInsets(top: 6, left: 0, bottom: 6, right: 0))
-    }
 }

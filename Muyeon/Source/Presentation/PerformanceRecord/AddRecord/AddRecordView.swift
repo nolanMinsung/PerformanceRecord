@@ -24,14 +24,7 @@ class AddRecordView: UIView {
     // MARK: - Private UI Components
     private let dateTextField = UITextField()
     private let imageAddBox = UIView()
-    private var ratingButtons: [UIButton] = []
-    private let ratingValueLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 15)
-        label.textColor = .label
-        label.text = "5점"
-        return label
-    }()
+    private let ratingView = StarRatingView()
     
     init(performance: Performance) {
         let layout = UICollectionViewFlowLayout()
@@ -51,6 +44,11 @@ class AddRecordView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesEnded(touches, with: event)
+        endEditing(true)
+    }
+    
     // MARK: - Public Methods
     func updatePhotoSection(imageCount: Int) {
         let hasImages = imageCount > 0
@@ -67,6 +65,7 @@ class AddRecordView: UIView {
     // MARK: - Layout
     private func setupLayout(with performance: Performance) {
         let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
         let contentStackView = UIStackView()
         contentStackView.axis = .vertical
         contentStackView.spacing = 24
@@ -91,23 +90,29 @@ class AddRecordView: UIView {
         
         contentStackView.snp.makeConstraints { $0.edges.width.equalToSuperview() }
         
-        // 섹션 추가
-        contentStackView.addArrangedSubview(createPerformanceHeader(with: performance))
-        contentStackView.addArrangedSubview(createSection(title: "관람 날짜", content: createDatePicker(with: performance), axis: .horizontal))
-        contentStackView.addArrangedSubview(createSection(title: "평점", content: createRatingControl(), axis: .horizontal))
-        contentStackView.addArrangedSubview(createSection(title: "메모 (선택사항)", content: createMemoView()))
-        contentStackView.addArrangedSubview(createSection(title: "사진 (선택사항)", content: createPhotoSection()))
+        ratingView.snp.contentHuggingHorizontalPriority = 800
+        [createPerformanceHeader(with: performance),
+         createSection(title: "언제 관람했나요?", content: createDatePicker(with: performance), axis: .horizontal),
+         createSection(title: "공연은 어땠나요?", content: ratingView, axis: .horizontal, spacing: 20),
+         createSection(title: "메모", content: createMemoView()),
+         createSection(title: "사진", content: createPhotoSection())]
+            .forEach(contentStackView.addArrangedSubview(_:))
     }
     
     // MARK: - UI Creation Methods
-    private func createSection(title: String, content: UIView, axis: NSLayoutConstraint.Axis = .vertical) -> UIView {
+    private func createSection(
+        title: String,
+        content: UIView,
+        axis: NSLayoutConstraint.Axis = .vertical,
+        spacing: CGFloat = 10
+    ) -> UIView {
         let titleLabel = UILabel()
         titleLabel.text = title
         titleLabel.font = .systemFont(ofSize: 16, weight: .semibold)
         
         let stackView = UIStackView(arrangedSubviews: [titleLabel, content])
         stackView.axis = axis
-        stackView.spacing = 10
+        stackView.spacing = spacing
         return stackView
     }
     private func createPerformanceHeader(with performance: Performance) -> UIView {
@@ -133,7 +138,7 @@ class AddRecordView: UIView {
         let picker = UIDatePicker()
         picker.datePickerMode = .date
         picker.minimumDate = performance.startDate
-        picker.maximumDate = performance.endDate
+        picker.maximumDate = min(performance.endDate, .now)
         picker.preferredDatePickerStyle = .compact
         picker.locale = Locale(identifier: "ko_KR")
         picker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
@@ -210,65 +215,12 @@ class AddRecordView: UIView {
         stack.spacing = 8
         return stack
     }
-    private func createRatingControl() -> UIView {
-        let container = UIView()
-        container.backgroundColor = .secondarySystemBackground
-        container.layer.cornerRadius = 10
-
-        // 별점 버튼들을 담을 스택뷰
-        let starButtonStack = UIStackView()
-        starButtonStack.axis = .horizontal
-        starButtonStack.spacing = 2
-        
-        // 이전에 생성된 버튼이 있다면 제거
-        ratingButtons.removeAll()
-
-        for i in 1...5 {
-            let button = UIButton(type: .system)
-            button.setImage(UIImage(systemName: "star.fill"), for: .normal)
-            button.tintColor = .systemYellow
-            button.tag = i // 각 버튼을 식별하기 위해 태그 설정
-            button.addTarget(self, action: #selector(ratingButtonTapped), for: .touchUpInside)
-            
-            ratingButtons.append(button)
-            starButtonStack.addArrangedSubview(button)
-            
-            button.snp.makeConstraints { make in
-                make.width.height.equalTo(28) // 버튼 크기 고정
-            }
-        }
-        
-        // 별점 버튼, 점수 라벨, 드롭다운 아이콘을 모두 담는 최종 스택뷰
-        let mainStack = UIStackView(arrangedSubviews: [starButtonStack, ratingValueLabel])
-        mainStack.axis = .horizontal
-        mainStack.spacing = 8
-        mainStack.alignment = .center
-
-        container.addSubview(mainStack)
-        mainStack.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(8)
-            make.horizontalEdges.equalToSuperview().inset(8)
-        }
-
-        // 점수 라벨이 다른 요소에 의해 눌리지 않도록 우선순위 설정
-        ratingValueLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
-
-        return container
-    }
     
     // MARK: - Actions
     @objc private func dateChanged(_ sender: UIDatePicker) {
         let formatter = DateFormatter(); formatter.dateFormat = "yyyy. MM. dd."
         dateTextField.text = formatter.string(from: sender.date)
         onDateChanged?(sender.date)
-    }
-    @objc private func ratingButtonTapped(_ sender: UIButton) {
-        let selectedRating = sender.tag
-        for button in ratingButtons {
-            button.setImage(UIImage(systemName: button.tag <= selectedRating ? "star.fill" : "star"), for: .normal)
-        }
-        ratingValueLabel.text = "\(selectedRating)점"
-        onRatingChanged?(selectedRating)
     }
     @objc private func addImageTapped() { onAddImageTapped?() }
     @objc private func saveButtonTapped() { onSaveButtonTapped?() }

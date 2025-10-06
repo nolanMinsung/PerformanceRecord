@@ -38,15 +38,11 @@ class SelectPerformanceViewController: ModalCardViewController {
             make.top.equalToSuperview().inset(46)
             make.horizontalEdges.bottom.equalToSuperview()
         }
-        
-        setupActions()
-    }
-    
-    // View의 컴포넌트와 Controller의 로직 연결
-    private func setupActions() {
-        rootView.tableView.dataSource = self
-        rootView.tableView.delegate = self
+        rootView.collectionView.dataSource = self
+        rootView.collectionView.delegate = self
         rootView.continueButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
+        
+        rootView.collectionView.reloadData()
     }
     
     @objc private func continueButtonTapped() {
@@ -57,24 +53,23 @@ class SelectPerformanceViewController: ModalCardViewController {
     }
 }
 
-extension SelectPerformanceViewController: UITableViewDataSource {
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+extension SelectPerformanceViewController: UICollectionViewDataSource {
+    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return performances.count
     }
     
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        guard let cell = tableView.dequeueReusableCell(withIdentifier: PerformanceSelectionCell.identifier, for: indexPath) as? PerformanceSelectionCell else {
-            return UITableViewCell()
+    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PerformanceSelectionCell.identifier, for: indexPath) as? PerformanceSelectionCell else {
+            fatalError()
         }
         cell.configure(with: performances[indexPath.row])
-        cell.selectionStyle = .none
         return cell
     }
 }
 
 
-extension SelectPerformanceViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+extension SelectPerformanceViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedPerformance = performances[indexPath.row]
         rootView.continueButton.isEnabled = true
     }

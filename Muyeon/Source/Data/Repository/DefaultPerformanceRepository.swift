@@ -15,6 +15,9 @@ final class DefaultPerformanceRepository: PerformanceRepository {
     let imageRepository: any ImageRepository
     let realm = try! Realm()
     
+    @UserDefault(key: .likePerformanceIDs, defaultValue: [])
+    var likePerformancesID: [String]
+    
     init(imageRepository: some ImageRepository) {
         self.imageRepository = imageRepository
         print(realm.configuration.fileURL ?? "⚠️에러!! realm 주소 확인 불가")
@@ -28,6 +31,12 @@ final class DefaultPerformanceRepository: PerformanceRepository {
     func fetchDetailFromLocal(id: String) async throws -> Performance {
         // TODO: 구현하기
         fatalError()
+    }
+    
+    func fetchLikeFromLocal() async throws -> [Performance] {
+        realm.objects(PerformanceObject.self)
+            .map { $0.toDomain() }
+            .filter { likePerformancesID.contains($0.id) }
     }
     
     func save(performance: Performance) async throws {
@@ -80,7 +89,7 @@ final class DefaultPerformanceRepository: PerformanceRepository {
                 .filter({ $0.id == performance.id })
                 .first
         else {
-            fatalError()
+            return
         }
         // 이미지 먼저 삭제 - 포스터, 상세 이미지 모두
         try imageRepository.deleteAllImages(of: performance, category: .performance(id: performance.id))
