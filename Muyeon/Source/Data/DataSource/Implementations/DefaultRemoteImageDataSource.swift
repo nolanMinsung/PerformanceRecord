@@ -11,7 +11,7 @@ import Kingfisher
 
 final class DefaultRemoteImageDataSource: RemoteImageDataSource {
     
-    func download(from url: String) async throws -> Data {
+    func download(from url: String) async throws -> ImageDataForSaving {
         guard let url = URL(string: url) else {
             fatalError()
         }
@@ -20,7 +20,7 @@ final class DefaultRemoteImageDataSource: RemoteImageDataSource {
         guard let imageData = retrieveResult.jpegData(compressionQuality: 0.8) else {
             fatalError()
         }
-        return imageData
+        return ImageDataForSaving(data: imageData, type: .jpeg)
     }
     
 }

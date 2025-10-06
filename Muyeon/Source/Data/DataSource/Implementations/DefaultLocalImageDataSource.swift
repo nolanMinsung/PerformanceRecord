@@ -11,10 +11,10 @@ import UniformTypeIdentifiers
 
 final class DefaultLocalImageDataSource: LocalImageDataSource {
     
-    func save(imageData: Data, imageID: String, category: ImageCategory) throws {
-        guard let fileExtension = self.imageFileExtension(from: imageData) else {
-            throw NSError(domain: "ImageSaveError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid image data."])
-        }
+    func save(imageData: ImageDataForSaving, imageID: String, category: ImageCategory) throws {
+//        guard let fileExtension = self.imageFileExtension(from: imageData) else {
+//            throw NSError(domain: "ImageSaveError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid image data."])
+//        }
         
         let fileManager = FileManager.default
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
@@ -30,8 +30,8 @@ final class DefaultLocalImageDataSource: LocalImageDataSource {
         }
         
         // 최종 파일 URL 결정 후 저장
-        let fileURL = folderURL.appendingPathComponent(imageID).appendingPathExtension(fileExtension)
-        try imageData.write(to: fileURL)
+        let fileURL = folderURL.appendingPathComponent(imageID).appendingPathExtension(imageData.type.identifier)
+        try imageData.data.write(to: fileURL)
         print("이미지 저장 성공: \(fileURL.path)")
     }
     

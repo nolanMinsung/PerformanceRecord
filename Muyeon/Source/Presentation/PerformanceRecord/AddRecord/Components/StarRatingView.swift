@@ -13,7 +13,10 @@ final class StarRatingView: UIView {
 
     // MARK: - Properties
 
-    public let ratingRelay = BehaviorRelay<Double>(value: 0.0)
+    private let ratingRelay = BehaviorRelay<Double>(value: 0.0)
+    public var rating: Observable<Double> {
+        return ratingRelay.asObservable()
+    }
     
     private let maxRating: Int = 5
     

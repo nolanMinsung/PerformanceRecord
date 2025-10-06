@@ -13,18 +13,16 @@ class AddRecordView: UIView {
     // MARK: - UI Components (ViewController에서 접근 필요)
     let memoTextView = UITextView()
     let imagesCollectionView: UICollectionView
+    let saveButton = UIButton()
     
     // MARK: - Actions (Closures)
-    var onDateChanged: ((Date) -> Void)?
-    var onRatingChanged: ((Int) -> Void)?
     var onAddImageTapped: (() -> Void)?
-    var onSaveButtonTapped: (() -> Void)?
     var onDeleteImage: ((Int) -> Void)?
     
     // MARK: - Private UI Components
-    private let dateTextField = UITextField()
+    let viewedDatePicker = UIDatePicker()
     private let imageAddBox = UIView()
-    private let ratingView = StarRatingView()
+    let ratingView = StarRatingView()
     
     init(performance: Performance) {
         let layout = UICollectionViewFlowLayout()
@@ -32,6 +30,14 @@ class AddRecordView: UIView {
         layout.itemSize = CGSize(width: 100, height: 100)
         layout.minimumLineSpacing = 10
         self.imagesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
+        viewedDatePicker.datePickerMode = .date
+        viewedDatePicker.minimumDate = performance.startDate
+        viewedDatePicker.maximumDate = min(performance.endDate, .now)
+        viewedDatePicker.preferredDatePickerStyle = .compact
+        viewedDatePicker.locale = Locale(identifier: "ko_KR")
+        
+        ratingView.setRating(5.0)
         
         super.init(frame: .zero)
         
@@ -92,7 +98,7 @@ class AddRecordView: UIView {
         
         ratingView.snp.contentHuggingHorizontalPriority = 800
         [createPerformanceHeader(with: performance),
-         createSection(title: "언제 관람했나요?", content: createDatePicker(with: performance), axis: .horizontal),
+         createSection(title: "언제 관람했나요?", content: viewedDatePicker, axis: .horizontal),
          createSection(title: "공연은 어땠나요?", content: ratingView, axis: .horizontal, spacing: 20),
          createSection(title: "메모", content: createMemoView()),
          createSection(title: "사진", content: createPhotoSection())]
@@ -134,16 +140,7 @@ class AddRecordView: UIView {
         stack.snp.makeConstraints { $0.edges.equalToSuperview().inset(UIEdgeInsets(top: 0, left: 0, bottom: 8, right: 0)) }
         return container
     }
-    private func createDatePicker(with performance: Performance) -> UIView {
-        let picker = UIDatePicker()
-        picker.datePickerMode = .date
-        picker.minimumDate = performance.startDate
-        picker.maximumDate = min(performance.endDate, .now)
-        picker.preferredDatePickerStyle = .compact
-        picker.locale = Locale(identifier: "ko_KR")
-        picker.addTarget(self, action: #selector(dateChanged), for: .valueChanged)
-        return picker
-    }
+    
     private func createMemoView() -> UIView {
         memoTextView.font = .systemFont(ofSize: 15)
         memoTextView.backgroundColor = .secondarySystemBackground
@@ -203,12 +200,10 @@ class AddRecordView: UIView {
         backButton.setTitleColor(.label, for: .normal)
         backButton.layer.cornerRadius = 10
         
-        let saveButton = UIButton()
         saveButton.setTitle("기록 저장", for: .normal)
         saveButton.backgroundColor = .label
         saveButton.setTitleColor(.systemBackground, for: .normal)
         saveButton.layer.cornerRadius = 10
-        saveButton.addTarget(self, action: #selector(saveButtonTapped), for: .touchUpInside)
 
         let stack = UIStackView(arrangedSubviews: [backButton, saveButton])
         stack.distribution = .fillEqually
@@ -217,11 +212,6 @@ class AddRecordView: UIView {
     }
     
     // MARK: - Actions
-    @objc private func dateChanged(_ sender: UIDatePicker) {
-        let formatter = DateFormatter(); formatter.dateFormat = "yyyy. MM. dd."
-        dateTextField.text = formatter.string(from: sender.date)
-        onDateChanged?(sender.date)
-    }
     @objc private func addImageTapped() { onAddImageTapped?() }
-    @objc private func saveButtonTapped() { onSaveButtonTapped?() }
+//    @objc private func saveButtonTapped() { onSaveButtonTapped?() }
 }

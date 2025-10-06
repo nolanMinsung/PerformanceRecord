@@ -6,22 +6,42 @@
 //
 
 import UIKit
-import SnapKit
 import PhotosUI
 
+import RxSwift
+import RxCocoa
+import SnapKit
+
 class AddRecordViewController: ModalCardViewController {
-
-    // View를 lazy var로 선언 (초기화 시 self 사용)
-    private lazy var rootView = AddRecordView(performance: self.performance)
-
+    
+    private let rootView: AddRecordView
+    private let viewModel: AddRecordViewModel
+    
     // 데이터 프로퍼티
     private let performance: Performance
     private var selectedDate: Date = Date()
     private var rating: Double = 5.0
-    private var imageRecords: [ImageRecord] = []
+//    private var currentSelectedImage: [ImageRecord] = []
+    private var addedImageData = PublishRelay<[(ImageDataForSaving, UIImage)]>()
+    private var deleteImageData = PublishRelay<IndexPath>()
+    private var currentSelectedImage: [UIImage] = []
+    
+    private let disposeBag = DisposeBag()
     
     init(performance: Performance) {
         self.performance = performance
+        self.rootView = AddRecordView(performance: performance)
+        self.viewModel = AddRecordViewModel(
+            performance: performance,
+            createDiaryUseCase: DefaultCreateDiaryUseCase(
+                diaryRepository: DefaultDiaryRepository(
+                    imageRepository: DefaultImageRepository(
+                        remoteDataSource: DefaultRemoteImageDataSource(),
+                        localDataSource: DefaultLocalImageDataSource()
+                    )
+                )
+            )
+        )
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -37,7 +57,7 @@ class AddRecordViewController: ModalCardViewController {
             make.top.equalToSuperview().inset(46)
             make.horizontalEdges.bottom.equalToSuperview()
         }
-        
+        bind()
         setupActions()
     }
     
@@ -46,33 +66,48 @@ class AddRecordViewController: ModalCardViewController {
         
         view.endEditing(true)
     }
-
-    // View의 클로저들과 Controller의 로직 연결
+    
+    private func bind() {
+        let input = AddRecordViewModel.Input(
+            viewedDate: rootView.viewedDatePicker.rx.date.asObservable(),
+            ratingInput: rootView.ratingView.rating.asObservable(),
+            reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable(),
+            addedImageData: addedImageData.asObservable(),
+            deleteImageData: deleteImageData.asObservable(),
+            saveButtonTapped: rootView.saveButton.rx.tap.asObservable(),
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.selectedImage
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, imageData in
+                owner.currentSelectedImage = imageData.map(\.1)
+                owner.rootView.imagesCollectionView.reloadData()
+                owner.rootView.updatePhotoSection(imageCount: imageData.count)
+            })
+            .disposed(by: disposeBag)
+        
+        output.successCreateDiary
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, _ in
+                owner.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
+    }
+    
     private func setupActions() {
         rootView.memoTextView.delegate = self
         rootView.imagesCollectionView.dataSource = self
-        
-        rootView.onDateChanged = { [weak self] date in
-            self?.selectedDate = date
-        }
-        
-        rootView.onRatingChanged = { [weak self] rating in
-            self?.rating = Double(rating)
-        }
-        
         rootView.onAddImageTapped = { [weak self] in
             self?.presentImagePicker()
-        }
-        
-        rootView.onSaveButtonTapped = { [weak self] in
-            self?.saveRecord()
         }
     }
     
     // MARK: - Logic
     private func presentImagePicker() {
         var config = PHPickerConfiguration()
-        config.selectionLimit = 5 - imageRecords.count
+        config.selectionLimit = 5 - currentSelectedImage.count
         config.filter = .images
         let picker = PHPickerViewController(configuration: config)
         picker.delegate = self
@@ -87,48 +122,84 @@ class AddRecordViewController: ModalCardViewController {
         print("관람일: \(selectedDate)")
         print("평점: \(rating)")
         print("메모: \(memo ?? "없음")")
-        print("이미지 개수: \(imageRecords.count)")
+        print("이미지 개수: \(currentSelectedImage.count)")
     }
 }
 
-// MARK: - Extensions (Delegate Implementations)
+// MARK: - PHPickerViewControllerDelegate
 extension AddRecordViewController: PHPickerViewControllerDelegate {
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        let group = DispatchGroup()
-        results.forEach { result in
-            group.enter()
-            let itemProvider = result.itemProvider
-            guard itemProvider.canLoadObject(ofClass: UIImage.self) else { group.leave(); return }
-            let assetIdentifier = result.assetIdentifier
-            let phAsset = assetIdentifier != nil ? PHAsset.fetchAssets(withLocalIdentifiers: [assetIdentifier!], options: nil).firstObject : nil
-            itemProvider.loadObject(ofClass: UIImage.self) { [weak self] image, error in
-                DispatchQueue.main.async {
-                    if let image = image as? UIImage {
-                        self?.imageRecords.append(ImageRecord(image: image, creationDate: phAsset?.creationDate, location: phAsset?.location))
+        Task {
+            let loadedImageDataList = await loadDataAndImage(from: results)
+            addedImageData.accept(loadedImageDataList)
+        }
+    }
+    
+    private func loadDataAndImage(from results: [PHPickerResult]) async -> [(ImageDataForSaving, UIImage)] {
+        var imageDataArray: [(ImageDataForSaving, UIImage)] = []
+        
+        await withTaskGroup(of: (ImageDataForSaving, UIImage)?.self) { group in
+            for result in results {
+                group.addTask {
+                    let itemProvider = result.itemProvider
+                    // itemProvider가 이미지를 나타낼 수 있는지 확인(UTType.image 사용)
+                    guard itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier),
+                          itemProvider.canLoadObject(ofClass: UIImage.self)
+                    else {
+                        return nil
                     }
-                    group.leave()
+                    do {
+                        let data = try await self.prepareImageData(from: itemProvider)
+                        let image = try await itemProvider.loadImage()
+                        return (data, image)
+                    } catch {
+                        print("이미지 데이터를 로드하는 데 실패했습니다: \(error)")
+                        return nil
+                    }
+                }
+            }
+            
+            // group 내의 모든 작업이 완료될 때까지 기다리고, nil이 아닌 결과만 필터링하여 배열에 추가
+            for await data in group {
+                if let data = data {
+                    imageDataArray.append(data)
                 }
             }
         }
-        group.notify(queue: .main) { [weak self] in
-            self?.rootView.updatePhotoSection(imageCount: self?.imageRecords.count ?? 0)
+        
+        return imageDataArray
+    }
+    
+    private func prepareImageData(from provider: NSItemProvider) async throws -> ImageDataForSaving {
+        if let heicData = try? await provider.loadDataRepresentation(for: .heic) {
+            return .init(data: heicData, type: .heic)
+        } else if let jpegData = try? await provider.loadDataRepresentation(for: .jpeg) {
+            return .init(data: jpegData, type: .jpeg)
+        } else {
+            fatalError()
         }
     }
+    
+    
 }
 
+
+// MARK: - UICollectionViewDataSource
 extension AddRecordViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return imageRecords.count
+        return currentSelectedImage.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AddedPhotoCell.identifier, for: indexPath) as? AddedPhotoCell else { return UICollectionViewCell() }
-        cell.imageView.image = imageRecords[indexPath.item].image
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: AddedPhotoCell.identifier,
+            for: indexPath
+        ) as? AddedPhotoCell else { return UICollectionViewCell() }
+        cell.imageView.image = currentSelectedImage[indexPath.item]
         cell.onDelete = { [weak self] in
             guard let self = self else { return }
-            self.imageRecords.remove(at: indexPath.item)
-            self.rootView.updatePhotoSection(imageCount: self.imageRecords.count)
+            self.deleteImageData.accept(indexPath)
         }
         return cell
     }

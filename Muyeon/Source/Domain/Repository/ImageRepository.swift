@@ -13,7 +13,7 @@ protocol ImageRepository {
     func saveImage(urlString: String, category: ImageCategory) async throws -> String
     
     /// Image Data 를 직접 저장 후 이미지 ID(파일 이름) 반환
-    func saveImage(data: Data, category: ImageCategory) async throws -> String
+    func saveImage(data: ImageDataForSaving, category: ImageCategory) async throws -> String
     
     /// 로컬 저장소에서 이미지를 가져와 반환
     func loadImage(with id: String, category: ImageCategory) throws -> UIImage

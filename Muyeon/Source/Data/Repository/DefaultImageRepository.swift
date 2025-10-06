@@ -24,7 +24,7 @@ final class DefaultImageRepository: ImageRepository {
         return imageID
     }
     
-    func saveImage(data: Data, category: ImageCategory) async throws -> String {
+    func saveImage(data: ImageDataForSaving, category: ImageCategory) async throws -> String {
         let imageID = UUID().uuidString
         try localDataSource.save(imageData: data, imageID: imageID, category: category)
         return imageID

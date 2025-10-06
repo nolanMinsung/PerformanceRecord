@@ -8,5 +8,5 @@
 import Foundation
 
 protocol RemoteImageDataSource {
-    func download(from url: String) async throws -> Data
+    func download(from url: String) async throws -> ImageDataForSaving
 }

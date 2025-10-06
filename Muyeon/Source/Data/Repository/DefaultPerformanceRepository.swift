@@ -9,6 +9,10 @@ import Foundation
 
 import RealmSwift
 
+enum DefaultPerformanceRepositoryError: LocalizedError {
+    case performanceObjectNotFound
+}
+
 @MainActor
 final class DefaultPerformanceRepository: PerformanceRepository {
     
