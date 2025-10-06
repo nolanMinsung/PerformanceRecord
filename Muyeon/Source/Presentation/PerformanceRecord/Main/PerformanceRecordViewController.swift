@@ -31,6 +31,13 @@ class PerformanceRecordViewController: UIViewController {
         rootView.collectionView.dataSource = self
         loadSampleData()
         configureData()
+        
+        
+        rootView.addRecordButton.rx.tap
+            .bind(with: self, onNext: { owner, _ in
+                owner.showAddRecordFlow()
+            })
+            .disposed(by: disposeBag)
     }
     
     
@@ -118,8 +125,8 @@ private extension PerformanceRecordViewController {
         let p1 = Performance(
             id: "perf_1",
             name: "레미제라블",
-            startDate: .now - 10,
-            endDate: .now-1,
+            startDate: .now.addingDay(-30),
+            endDate: .now.addingDay(-4),
             facilityFullName: "샤롯데씨어터",
             posterURL: "",
             area: .seoul,
@@ -131,8 +138,8 @@ private extension PerformanceRecordViewController {
         let p2 = Performance(
             id: "perf_2",
             name: "BTS WORLD TOUR",
-            startDate: .now - 10,
-            endDate: .now-1,
+            startDate: .now.addingDay(-10),
+            endDate: .now.addingDay(-1),
             facilityFullName: "잠실종합운동장",
             posterURL: "",
             area: .seoul,
@@ -153,4 +160,25 @@ private extension PerformanceRecordViewController {
         self.performances = [p1, p2]
     }
     
+}
+
+
+// 기존 RecordViewController 또는 다른 ViewController에서...
+extension PerformanceRecordViewController: SelectPerformanceDelegate {
+    
+    func showAddRecordFlow() {
+        let selectVC = SelectPerformanceViewController(performances: performances)
+        selectVC.delegate = self
+        selectVC.modalPresentationStyle = .overFullScreen
+        selectVC.modalTransitionStyle = .crossDissolve
+        present(selectVC, animated: true)
+    }
+    
+    // MARK: - SelectPerformanceDelegate
+    func didSelectPerformance(_ performance: Performance) {
+        let addRecordVC = AddRecordViewController(performance: performance)
+        addRecordVC.modalPresentationStyle = .overFullScreen
+        addRecordVC.modalTransitionStyle = .crossDissolve
+        present(addRecordVC, animated: true)
+    }
 }

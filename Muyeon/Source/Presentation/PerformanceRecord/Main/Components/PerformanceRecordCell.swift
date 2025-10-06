@@ -135,13 +135,13 @@ class PerformanceRecordCell: UICollectionViewCell {
         }
         
         countLabel.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(3)
-            make.horizontalEdges.equalToSuperview().inset(5)
+            make.verticalEdges.equalToSuperview().inset(5)
+            make.horizontalEdges.equalToSuperview().inset(6)
         }
         
         genreTagLabel.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(3)
-            make.horizontalEdges.equalToSuperview().inset(5)
+            make.verticalEdges.equalToSuperview().inset(5)
+            make.horizontalEdges.equalToSuperview().inset(6)
         }
         
         vStack.snp.makeConstraints { make in

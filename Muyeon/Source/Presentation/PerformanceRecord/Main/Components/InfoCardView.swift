@@ -7,14 +7,15 @@
 
 import UIKit
 
+import SnapKit
+
 // MARK: - 정보 카드 뷰 (최근/최다 관람 등)
 class InfoCardView: UIView {
     private let iconImageView: UIImageView = {
-        let iv = UIImageView()
-        iv.contentMode = .scaleAspectFit
-        iv.tintColor = .label
-        iv.translatesAutoresizingMaskIntoConstraints = false
-        return iv
+        let imageView = UIImageView()
+        imageView.contentMode = .scaleAspectFit
+        imageView.tintColor = .label
+        return imageView
     }()
 
     private let titleLabel: UILabel = {
@@ -30,13 +31,18 @@ class InfoCardView: UIView {
         return label
     }()
     
+    private let tagLabelContainer: UIView = {
+        let view = UIView()
+        view.layer.cornerRadius = 8
+        view.layer.masksToBounds = true
+        return view
+    }()
+    
     private let tagLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .semibold)
         label.textColor = .white
         label.textAlignment = .center
-        label.layer.cornerRadius = 8
-        label.layer.masksToBounds = true
         label.setContentHuggingPriority(.defaultHigh, for: .horizontal)
         label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         return label
@@ -69,7 +75,8 @@ class InfoCardView: UIView {
         headerStack.spacing = 8
         headerStack.alignment = .center
         
-        let contentStack = UIStackView(arrangedSubviews: [mainContentLabel, tagLabel])
+        tagLabelContainer.addSubview(tagLabel)
+        let contentStack = UIStackView(arrangedSubviews: [mainContentLabel, tagLabelContainer])
         contentStack.axis = .horizontal
         contentStack.spacing = 8
         contentStack.alignment = .center
@@ -78,22 +85,21 @@ class InfoCardView: UIView {
         mainVStack.axis = .vertical
         mainVStack.spacing = 10
         mainVStack.alignment = .leading
-        mainVStack.translatesAutoresizingMaskIntoConstraints = false
         
         addSubview(mainVStack)
         
-        NSLayoutConstraint.activate([
-            iconImageView.widthAnchor.constraint(equalToConstant: 20),
-            iconImageView.heightAnchor.constraint(equalToConstant: 20),
-            
-            tagLabel.widthAnchor.constraint(greaterThanOrEqualToConstant: 44),
-            tagLabel.heightAnchor.constraint(equalToConstant: 22),
-            
-            mainVStack.topAnchor.constraint(equalTo: topAnchor, constant: 20),
-            mainVStack.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 20),
-            mainVStack.trailingAnchor.constraint(equalTo: trailingAnchor, constant: -20),
-            mainVStack.bottomAnchor.constraint(equalTo: bottomAnchor, constant: -20),
-        ])
+        iconImageView.snp.makeConstraints { make in
+            make.size.equalTo(20)
+        }
+        
+        tagLabel.snp.makeConstraints { make in
+            make.verticalEdges.equalToSuperview().inset(5)
+            make.horizontalEdges.equalToSuperview().inset(6)
+        }
+        
+        mainVStack.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(20)
+        }
     }
     
     func configure(mainText: String, tagText: String?, tagColor: UIColor?, subText: String) {
@@ -102,8 +108,8 @@ class InfoCardView: UIView {
         
         if let tagText = tagText, let tagColor = tagColor {
             tagLabel.text = tagText
-            tagLabel.backgroundColor = tagColor
-            tagLabel.isHidden = false
+            tagLabelContainer.backgroundColor = tagColor
+            tagLabelContainer.isHidden = false
         } else {
             tagLabel.isHidden = true
         }
