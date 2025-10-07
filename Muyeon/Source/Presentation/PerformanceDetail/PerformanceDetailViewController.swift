@@ -20,12 +20,10 @@ class PerformanceDetailViewController: UIViewController {
         self.viewModel = PerformanceDetailViewModel(
             performanceID: performanceID,
             posterURL: posterURL,
-            fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
-            togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(),
-            savePerformanceUseCase: DefaultStorePerformanceUseCase(
-                repository: DefaultPerformanceRepository.shared
+            fetchPerformanceDetailUseCase: DefaultFetchRemotePerformanceDetailUseCase(
+                performanceRepository: DefaultPerformanceRepository.shared
             ),
-            deletePerformanceUseCase: DefaultDeletePerformanceUseCase(
+            togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(
                 performanceRepository: DefaultPerformanceRepository.shared
             )
         )

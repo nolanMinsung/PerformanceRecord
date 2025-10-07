@@ -19,24 +19,39 @@ final class PerformanceRecordViewModel {
     
     struct Output {
         let allDiaries: Observable<[Diary]>
+        let recentRecord: Observable<(record: Diary?, performance: Performance)>
+        let mostViewedPerformance: Observable<Performance>
+        let performancesWithRecord: Observable<[Performance]>
         let showAddRecordView: Observable<[Performance]>
         let errorRelay: PublishRelay<any Error>
     }
     
     private let fetchLikePerformanceListUseCase: any FetchLikePerformanceListUseCase
+    private let fetchLocalPerformanceListUseCase: any FetchLocalPerformanceListUseCase
+    private let fetchLocalPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase
+    private let fetchMostViewedPerformanceUseCase: any FetchMostViewedPerformanceUseCase
     private let fetchAllDiariesUseCase: any FetchAllDiariesUseCase
     private let disposeBag = DisposeBag()
     
     init(
         fetchLikePerformanceListUseCase: any FetchLikePerformanceListUseCase,
-        fetchDiariesUseCase: any FetchAllDiariesUseCase
+        fetchLocalPerformanceListUseCase: any FetchLocalPerformanceListUseCase,
+        fetchPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase,
+        fetchMostViewedPerformanceUseCase: any FetchMostViewedPerformanceUseCase,
+        fetchAllDiariesUseCase: any FetchAllDiariesUseCase
     ) {
         self.fetchLikePerformanceListUseCase = fetchLikePerformanceListUseCase
-        self.fetchAllDiariesUseCase = fetchDiariesUseCase
+        self.fetchLocalPerformanceListUseCase = fetchLocalPerformanceListUseCase
+        self.fetchLocalPerformanceDetailUseCase = fetchPerformanceDetailUseCase
+        self.fetchMostViewedPerformanceUseCase = fetchMostViewedPerformanceUseCase
+        self.fetchAllDiariesUseCase = fetchAllDiariesUseCase
     }
     
     func transform(input: Input) -> Output {
-        let allDiariesRelay = PublishRelay<[Diary]>()
+        let allRecordsRelay = PublishRelay<[Diary]>()
+        let recentRecordRelay = PublishRelay<(record: Diary?, performance: Performance)>()
+        let mostViewedPerformanceRelay = PublishRelay<Performance>()
+        let performancesWithRecordsRelay = PublishRelay<[Performance]>()
         let likePerformanceListRelay = PublishRelay<[Performance]>()
         let errorRelay = PublishRelay<any Error>()
         
@@ -44,15 +59,30 @@ final class PerformanceRecordViewModel {
             .bind { _ in
                 Task {
                     do {
-                        let allDiaries = try await self.fetchAllDiariesUseCase.execute()
-                        allDiariesRelay.accept(allDiaries)
+                        let allRecords = try await self.fetchAllDiariesUseCase.execute()
+                        let recentRecord = allRecords.sorted(by: { $0.viewedAt > $1.viewedAt }).first
+                        if let performanceID = recentRecord?.performanceID {
+                            let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performanceID)
+                            recentRecordRelay.accept((record: recentRecord, performance: detailPerformance))
+                        }
+                        let allPerformances = try await self.fetchLocalPerformanceListUseCase.execute()
+                        let mostViewedPerformance = try await self.fetchMostViewedPerformanceUseCase.execute()
+                        mostViewedPerformanceRelay.accept(mostViewedPerformance)
+                        allRecordsRelay.accept(allRecords)
+                        
+                        let performancesWithRecords = allPerformances.filter({ !$0.records.isEmpty }).sorted(by: { p1, p2 in
+                            let latestDate1 = allRecords.filter { $0.performanceID == p1.id }.map { $0.viewedAt }.max() ?? Date.distantPast
+                            let latestDate2 = allRecords.filter { $0.performanceID == p2.id }.map { $0.viewedAt }.max() ?? Date.distantPast
+                            return latestDate1 > latestDate2
+                        })
+                        
+                        performancesWithRecordsRelay.accept(performancesWithRecords)
                     } catch {
                         errorRelay.accept(error)
                     }
                 }
             }
             .disposed(by: disposeBag)
-            
         
         input.addRecordButtonTapped
             .bind { _ in
@@ -71,11 +101,11 @@ final class PerformanceRecordViewModel {
             }
             .disposed(by: disposeBag)
             
-        
-        
-        
         return .init(
-            allDiaries: allDiariesRelay.asObservable(),
+            allDiaries: allRecordsRelay.asObservable(),
+            recentRecord: recentRecordRelay.asObservable(),
+            mostViewedPerformance: mostViewedPerformanceRelay.asObservable(),
+            performancesWithRecord: performancesWithRecordsRelay.asObservable(),
             showAddRecordView: likePerformanceListRelay.asObservable(),
             errorRelay: errorRelay
         )

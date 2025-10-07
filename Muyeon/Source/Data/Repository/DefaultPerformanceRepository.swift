@@ -11,6 +11,7 @@ import RealmSwift
 
 enum DefaultPerformanceRepositoryError: LocalizedError {
     case performanceObjectNotFound
+    case performanceNotExist
 }
 
 
@@ -32,13 +33,32 @@ actor DefaultPerformanceRepository: PerformanceRepository {
     }
     
     func fetchDetailFromRemote(id: String) async throws -> Performance {
-        // TODO: 구현하기
-        fatalError()
+        return try await NetworkManager.requestValue(
+            router: .getPerformanceDetail(apiKey: InfoPlist.apiKey, performanceID: id),
+            decodingType: PerformanceDetailListResponse.self
+        )
+        .toDomain()
     }
     
     func fetchDetailFromLocal(id: String) async throws -> Performance {
-        // TODO: 구현하기
-        fatalError()
+        try await Task.detached {
+            let realm = try Realm()
+            guard let performance = try realm.objects(PerformanceObject.self)
+                .filter({ $0.id == id })
+                .map({ try $0.toDomain() })
+                .first
+            else {
+                throw DefaultPerformanceRepositoryError.performanceObjectNotFound
+            }
+            return performance
+        }.value
+    }
+    
+    func fetchAllPerformanceListFromLocal() async throws -> [Performance] {
+        try await Task.detached {
+            let realm = try Realm()
+            return try realm.objects(PerformanceObject.self).map { try $0.toDomain() }
+        }.value
     }
     
     func fetchLikeFromLocal() async throws -> [Performance] {
@@ -47,15 +67,28 @@ actor DefaultPerformanceRepository: PerformanceRepository {
         
         return try await Task.detached {
             let realm = try Realm()
-            return realm.objects(PerformanceObject.self)
-                .map { $0.toDomain() }
+            return try realm.objects(PerformanceObject.self)
+                .map { try $0.toDomain() }
                 .filter { likePerformancesID.contains($0.id) }
+        }.value
+    }
+    
+    func fetchMostViewedFromLocal() async throws -> Performance {
+        try await Task.detached {
+            let realm = try Realm()
+            let mostViewed = realm.objects(PerformanceObject.self)
+                .max { $0.records.count < $1.records.count }
+            if let mostViewed {
+                return try mostViewed.toDomain()
+            } else {
+                throw DefaultPerformanceRepositoryError.performanceNotExist
+            }
         }.value
     }
     
     func save(performance: Performance) async throws {
         // 포스터 이미지 저장 후 포스터 ID 상수에 저장
-        let posterID = try await imageRepository.saveImage(urlString: performance.posterURL, category: .performance(id: performance.id))
+        let posterID = try await imageRepository.saveImage(urlString: performance.posterURL, to: .performance(id: performance.id))
         let detailImageUUIDs = try await withThrowingTaskGroup(
             of: (index: Int, uuid: String?).self,
             returning: [String].self,
@@ -65,7 +98,7 @@ actor DefaultPerformanceRepository: PerformanceRepository {
                     group.addTask {
                         let uuid = try await self.imageRepository.saveImage(
                             urlString: imageURL,
-                            category: .performance(id: performance.id)
+                            to: .performance(id: performance.id)
                         )
                         return (index, uuid)
                     }
@@ -118,6 +151,8 @@ actor DefaultPerformanceRepository: PerformanceRepository {
             try realm.write {
                 // RelatedLinkObject 삭제
                 realm.delete(performanceObject.relatedLinks)
+                // RecoredObject 삭제
+                realm.delete(performanceObject.records)
                 // Realm Object 삭제
                 realm.delete(performanceObject)
             }

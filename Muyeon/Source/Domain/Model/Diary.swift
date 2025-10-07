@@ -7,11 +7,12 @@
 
 import Foundation
 
-struct Diary {
-    var performance: Performance?
-    var createdAt: Date
-    var viewedAt: Date
-    var rating: Double
-    var reviewText: String
-    var diaryImageUUIDs: [String]
+struct Diary: Identifiable, Hashable {
+    let id: String
+    let performanceID: String
+    let createdAt: Date
+    let viewedAt: Date
+    let rating: Double
+    let reviewText: String
+    let diaryImageUUIDs: [String]
 }

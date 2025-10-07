@@ -1,5 +1,5 @@
 //
-//  DiaryObject.swift
+//  RecordObject.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/5/25.
@@ -9,15 +9,15 @@ import Foundation
 
 import RealmSwift
 
-// MARK: - DiaryObject (공연 후기/일기)
+// MARK: - RecordObject (공연 후기/일기)
 
-final class DiaryObject: Object {
+final class RecordObject: Object {
     // Primary Key
-    @Persisted(primaryKey: true) var id: String = UUID().uuidString
+    @Persisted(primaryKey: true) var id: String
     
     // MARK: - Performance 정보 (1:1 관계)
     // PerformanceObject의 id를 참조하는 Link
-    @Persisted var performance: PerformanceObject?
+    @Persisted(originProperty: "records") var performance: LinkingObjects<PerformanceObject>
     
     // MARK: - 날짜/시각 정보
     @Persisted var createdAt: Date = Date()   // 공연 기록 생성 날짜 (일기 작성 시점)
@@ -37,17 +37,21 @@ final class DiaryObject: Object {
     @Persisted var castMembers: RealmSwift.List<CastMemberObject>
 }
 
-extension DiaryObject {
+extension RecordObject {
     
     static func create(
-        performance: PerformanceObject,
+        id: String,
+        performance: PerformanceObject? = nil,
         viewedAt: Date,
         rating: Double,
         reviewText: String,
         imageUUIDs: [String] = []
-    ) -> DiaryObject  {
-        let object = DiaryObject()
-        object.performance = performance
+    ) -> RecordObject  {
+        let object = RecordObject()
+        object.id = id
+        if let performance {
+            object.performance.realm?.add(performance)
+        }
         object.createdAt = .now
         object.viewedAt = viewedAt
         object.rating = max(0, min(rating, 5.0))
@@ -59,11 +63,15 @@ extension DiaryObject {
 }
 
 
-extension DiaryObject {
+extension RecordObject {
     
-    func toDomain() -> Diary {
+    func toDomain() throws -> Diary {
+        guard let performance = self.performance.first else {
+            throw DefaultDiaryRepositoryError.diaryNotHavingPerformance
+        }
         return Diary(
-            performance: self.performance?.toDomain(),
+            id: self.id,
+            performanceID: performance.id,
             createdAt: self.createdAt,
             viewedAt: self.viewedAt,
             rating: self.rating,

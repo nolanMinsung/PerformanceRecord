@@ -71,6 +71,7 @@ extension PerformanceListResponse {
                 genre: Constant.Genre.findBy(name: $0.genrenm),
                 openRun: ($0.openrun == "Y"),
                 state: Constant.PerformanceState.findBy(name: $0.prfstate),
+                records: [],
                 detail: nil
             )
         }

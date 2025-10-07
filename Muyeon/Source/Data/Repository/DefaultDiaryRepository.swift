@@ -27,7 +27,7 @@ actor DefaultDiaryRepository: DiaryRepository {
         // 플로우
         // ---- 트랜잭션 1 시작 ----
         // - 기록할 performanceObject 먼저 찾기
-        // - 기록할 performanceObject에 DiaryObject 추가하기
+        // - 기록할 performanceObject에 RecordObject 추가하기
         // ---- 트랜잭션 1 끝 ----
         //       |
         //       |  동기 작업
@@ -42,25 +42,23 @@ actor DefaultDiaryRepository: DiaryRepository {
         
         let createdDiaryID = try await Task.detached {
             let realm = try Realm()
-            guard diary.performance != nil else {
-                throw DefaultDiaryRepositoryError.diaryNotHavingPerformance
-            }
             guard let performanceObject = realm.objects(PerformanceObject.self)
-                .filter({ $0.id == diary.performance?.id })
+                .filter({ $0.id == diary.performanceID })
                 .first
             else {
                 throw DefaultPerformanceRepositoryError.performanceObjectNotFound
             }
-            let diaryObject = DiaryObject.create(
-                performance: performanceObject,
+            let diaryID = UUID().uuidString
+            let recordObject = RecordObject.create(
+                id: diaryID,
                 viewedAt: diary.viewedAt,
                 rating: diary.rating,
                 reviewText: diary.reviewText
             )
             try realm.write {
-                realm.add(diaryObject, update: .modified)
+                performanceObject.records.append(recordObject)
             }
-            return diaryObject.id
+            return diaryID
         }.value
         
         // 생성한 DiaryObject의 id를 이용해 폴더를 만들고 그 폴더에 이미지 저장(폴더의 이름이 일기의 ID)
@@ -70,7 +68,7 @@ actor DefaultDiaryRepository: DiaryRepository {
         try await Task.detached {
             let realm = try Realm()
             try realm.write {
-                guard let diaryObject = realm.objects(DiaryObject.self)
+                guard let diaryObject = realm.objects(RecordObject.self)
                     .filter({ $0.id == createdDiaryID })
                     .first
                 else {
@@ -85,16 +83,17 @@ actor DefaultDiaryRepository: DiaryRepository {
     func fetchDiaries(of performance: Performance) async throws -> [Diary] {
         return try await Task.detached {
             let realm = try Realm()
-            return realm.objects(DiaryObject.self)
-                .filter({$0.performance?.id == performance.id})
-                .map { $0.toDomain() }
+            return try realm.objects(RecordObject.self)
+                .filter({$0.performance.first?.id == performance.id})
+                .map { try $0.toDomain() }
         }.value
     }
     
     func fetchAllDiaries() async throws -> [Diary] {
         return try await Task.detached {
             let realm = try Realm()
-            return realm.objects(DiaryObject.self).map { $0.toDomain() }
+            return try realm.objects(RecordObject.self)
+                .map { try $0.toDomain() }
         }.value
     }
     
@@ -110,7 +109,7 @@ private extension DefaultDiaryRepository {
             body: { group in
                 for (index, dataForSaving) in imageData.enumerated() {
                     group.addTask {
-                        let imageUUID = try await self.imageRepository.saveImage(data: dataForSaving, category: .diary(id: diaryID))
+                        let imageUUID = try await self.imageRepository.saveImage(data: dataForSaving, to: .diary(id: diaryID))
                         return (index, imageUUID)
                     }
                 }

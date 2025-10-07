@@ -8,7 +8,9 @@
 protocol PerformanceRepository {
     func fetchDetailFromRemote(id: String) async throws -> Performance
     func fetchDetailFromLocal(id: String) async throws -> Performance
+    func fetchAllPerformanceListFromLocal() async throws -> [Performance]
     func fetchLikeFromLocal() async throws -> [Performance]
+    func fetchMostViewedFromLocal() async throws -> Performance
     func save(performance: Performance) async throws
     func delete(performanceID: String) async throws
 }

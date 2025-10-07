@@ -62,6 +62,9 @@ final class PerformanceObject: Object {
     // MARK: Relationships (1:N)
     // RelatedLink와의 1:N 관계: RelatedLinkObject들을 저장하는 List
     @Persisted var relatedLinks = RealmSwift.List<RelatedLinkObject>()
+    
+    // Diary와의 1:N 관계
+    @Persisted var records = RealmSwift.List<RecordObject>()
 }
 
 // MARK: - RelatedLink
@@ -79,7 +82,7 @@ final class RelatedLinkObject: Object {
 
 extension PerformanceObject {
     
-    func toDomain() -> Performance {
+    func toDomain() throws -> Performance {
         // RelatedLink 변환
         let domainRelatedLinks = Array(self.relatedLinks.map { linkObject -> RelatedLink in
             return RelatedLink(name: linkObject.name, url: linkObject.url)
@@ -130,6 +133,7 @@ extension PerformanceObject {
             genre: Constant.Genre(rawValue: self.genre) ?? .unknown,
             openRun: self.openRun,
             state: Constant.PerformanceState(rawValue: self.state) ?? .unknown,
+            records: try records.map({ try $0.toDomain() }),
             detail: domainDetail
         )
     }

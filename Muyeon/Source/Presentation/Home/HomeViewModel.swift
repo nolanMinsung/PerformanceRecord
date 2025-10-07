@@ -13,7 +13,7 @@ import RxCocoa
 final class HomeViewModel {
     
     let fetchBoxOfficeUseCase: FetchBoxOfficeUseCase
-    let fetchPerformanceListUseCase: FetchPerformanceListUseCase
+    let fetchPerformanceListUseCase: FetchRemotePerformanceListUseCase
     
     private let disposeBag = DisposeBag()
     
@@ -32,7 +32,7 @@ final class HomeViewModel {
     
     init(
         fetchBoxOfficeUseCase: some FetchBoxOfficeUseCase,
-        fetchPerformanceListUseCase: some FetchPerformanceListUseCase
+        fetchPerformanceListUseCase: some FetchRemotePerformanceListUseCase
     ) {
         self.fetchBoxOfficeUseCase = fetchBoxOfficeUseCase
         self.fetchPerformanceListUseCase = fetchPerformanceListUseCase

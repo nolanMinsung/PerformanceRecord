@@ -26,11 +26,13 @@ class SearchViewController: UIViewController {
     private var diffableDataSource: DiffableDataSource!
     private let rootView = SearchView()
     private let viewModel = SearchViewModel(
-        fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase(),
-        fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
-        savePerformanceUseCase: DefaultStorePerformanceUseCase(repository: DefaultPerformanceRepository.shared),
-        deletePerformanceUseCase: DefaultDeletePerformanceUseCase(performanceRepository: DefaultPerformanceRepository.shared),
-        togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(),
+        fetchPerformanceListUseCase: DefaultFetchRemotePerformanceListUseCase(),
+        fetchPerformanceDetailUseCase: DefaultFetchRemotePerformanceDetailUseCase(
+            performanceRepository: DefaultPerformanceRepository.shared
+        ),
+        togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(
+            performanceRepository: DefaultPerformanceRepository.shared
+        ),
     )
     
     private let likeButtonTapped = PublishRelay<(IndexPath,String)>()
@@ -195,6 +197,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -208,6 +211,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -221,6 +225,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -234,6 +239,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -247,6 +253,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -260,6 +267,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -273,6 +281,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -286,6 +295,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -299,6 +309,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -312,6 +323,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -325,6 +337,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
             .init(
@@ -338,6 +351,7 @@ private extension SearchViewController {
                 genre: .popularMusic,
                 openRun: false,
                 state: .scheduled,
+                records: [],
                 detail: nil
             ),
 

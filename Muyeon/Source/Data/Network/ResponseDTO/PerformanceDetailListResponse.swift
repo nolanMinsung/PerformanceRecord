@@ -114,6 +114,7 @@ extension PerformanceDetailListResponse {
             genre: Constant.Genre.findBy(name: detailPerformance.genrenm),
             openRun: (detailPerformance.openrun == "Y"),
             state: Constant.PerformanceState.findBy(name: detailPerformance.prfstate),
+            records: [],
             detail: .init(
                 cast: detailPerformance.prfcast,
                 crew: detailPerformance.prfcrew,

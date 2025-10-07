@@ -28,26 +28,20 @@ final class SearchViewModel {
         let error: Observable<any Error>
     }
     
-    let fetchPerformanceListUseCase: any FetchPerformanceListUseCase
-    let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
-    let savePerformanceUseCase: any SavePerformanceUseCase
-    let deletePerformanceUseCase: any DeletePerformanceUseCase
+    let fetchPerformanceListUseCase: any FetchRemotePerformanceListUseCase
+    let fetchPerformanceDetailUseCase: any FetchRemotePerformanceDetailUseCase
     let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
     
     private let disposeBag = DisposeBag()
     
     init(
-        fetchPerformanceListUseCase: any FetchPerformanceListUseCase,
-        fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase,
-        savePerformanceUseCase: any SavePerformanceUseCase,
-        deletePerformanceUseCase: any DeletePerformanceUseCase,
+        fetchPerformanceListUseCase: any FetchRemotePerformanceListUseCase,
+        fetchPerformanceDetailUseCase: any FetchRemotePerformanceDetailUseCase,
         togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
     ) {
         self.fetchPerformanceListUseCase = fetchPerformanceListUseCase
         self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
-        self.savePerformanceUseCase = savePerformanceUseCase
         self.togglePerformanceLikeUseCase = togglePerformanceLikeUseCase
-        self.deletePerformanceUseCase = deletePerformanceUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -101,13 +95,7 @@ final class SearchViewModel {
                 let (indexPath, performanceID) = values
                 Task {
                     do {
-                        let newLikseStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: performanceID)
-                        if newLikseStatus {
-                            let detailPerformance = try await owner.fetchPerformanceDetailUseCase.execute(performanceID: performanceID)
-                            try await owner.savePerformanceUseCase.execute(performance: detailPerformance)
-                        } else {
-                            try await owner.deletePerformanceUseCase.execute(performanceID: performanceID)
-                        }
+                        let newLikseStatus = try await owner.togglePerformanceLikeUseCase.execute(performanceID: performanceID)
                         likeStatusUpdated.accept((indexPath, newLikseStatus))
                     } catch {
                         errorRelay.accept(error)

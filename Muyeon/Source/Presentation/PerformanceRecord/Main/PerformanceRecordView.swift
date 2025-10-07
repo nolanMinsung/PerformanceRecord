@@ -148,3 +148,60 @@ class PerformanceRecordView: UIView {
     }
     
 }
+
+
+
+// MARK: - Configuring View Contents
+extension PerformanceRecordView {
+    
+    func configureStats(
+        totalCount: Int,
+        performanceCount: Int,
+        averageRating: Double,
+        thisYearCount: Int,
+        photoCount: Int
+    ) {
+        defer { setNeedsLayout() }
+        statsSummaryView.configure(
+            totalCount: totalCount,
+            performanceCount: performanceCount,
+            averageRating: averageRating,
+            thisYearCount: thisYearCount,
+            photoCount: photoCount,
+        )
+    }
+    
+    func configureRecentRecord(recentRecord: Diary?, performance: Performance) {
+        defer { setNeedsLayout() }
+        if let recentRecord {
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "MM월 dd일"
+            recentViewCard.isHidden = false
+            recentViewCard.configure(
+                mainText: performance.name,
+                tagText: "★ \(recentRecord.rating)",
+                tagColor: .systemOrange,
+                subText: dateFormatter.string(from: recentRecord.viewedAt)
+            )
+        } else {
+            recentViewCard.isHidden = true
+        }
+    }
+    
+    func configureMostViewed(mostViewedPerformance: Performance) {
+        defer { setNeedsLayout() }
+        let recordCount = mostViewedPerformance.records.count
+        if recordCount > 0 {
+            mostViewedCard.isHidden = false
+            mostViewedCard.configure(
+                mainText: mostViewedPerformance.name,
+                tagText: "\(recordCount)회",
+                tagColor: .systemIndigo,
+                subText: mostViewedPerformance.facilityFullName
+            )
+        } else {
+            mostViewedCard.isHidden = true
+        }
+    }
+    
+}

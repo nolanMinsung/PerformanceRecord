@@ -70,7 +70,8 @@ final class AddRecordViewModel {
         .map { owner, data in
             let (viewedDate, rating, reviewText) = data
             return Diary(
-                performance: owner.performance,
+                id: UUID().uuidString,
+                performanceID: owner.performance.id,
                 createdAt: .now,
                 viewedAt: viewedDate,
                 rating: rating,

@@ -27,26 +27,20 @@ final class PerformanceDetailViewModel {
     
     let performanceID: String
     let posterURL: String
-    let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
+    let fetchPerformanceDetailUseCase: any FetchRemotePerformanceDetailUseCase
     let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
-    let savePerformanceUseCase: any SavePerformanceUseCase
-    let deletePerformanceUseCase: any DeletePerformanceUseCase
     private let disposeBag = DisposeBag()
     
     init(
         performanceID: String,
         posterURL: String,
-        fetchPerformanceDetailUseCase: FetchPerformanceDetailUseCase,
+        fetchPerformanceDetailUseCase: FetchRemotePerformanceDetailUseCase,
         togglePerformanceLikeUseCase: TogglePerformanceLikeUseCase,
-        savePerformanceUseCase: SavePerformanceUseCase,
-        deletePerformanceUseCase: DeletePerformanceUseCase
     ) {
         self.performanceID = performanceID
         self.posterURL = posterURL
         self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
         self.togglePerformanceLikeUseCase = togglePerformanceLikeUseCase
-        self.savePerformanceUseCase = savePerformanceUseCase
-        self.deletePerformanceUseCase = deletePerformanceUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -65,12 +59,7 @@ final class PerformanceDetailViewModel {
             .bind(with: self) { owner, performance in
                 Task {
                     do {
-                        let newLikeStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
-                        if newLikeStatus {
-                            try await self.savePerformanceUseCase.execute(performance: performance)
-                        } else {
-                            try await self.deletePerformanceUseCase.execute(performanceID: performance.id)
-                        }
+                        let newLikeStatus = try await owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
                         likeButtonStatusRelay.accept(newLikeStatus)
                     } catch {
                         errorRelay.accept(error)

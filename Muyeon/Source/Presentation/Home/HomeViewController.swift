@@ -29,7 +29,7 @@ class HomeViewController: UIViewController {
     
     private let viewModel = HomeViewModel(
         fetchBoxOfficeUseCase: DefaultFetchBoxOfficeUseCase(),
-        fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase()
+        fetchPerformanceListUseCase: DefaultFetchRemotePerformanceListUseCase()
     )
     
     private var dataSource: DiffableDataSource!

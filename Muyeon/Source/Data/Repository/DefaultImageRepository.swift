@@ -22,24 +22,49 @@ final class DefaultImageRepository: ImageRepository {
         self.localDataSource = localDataSource
     }
     
-    func saveImage(urlString: String, category: ImageCategory) async throws -> String {
+    func saveImage(urlString: String, to category: ImageCategory) async throws -> String {
         let imageData = try await remoteDataSource.download(from: urlString)
         let imageID = UUID().uuidString
         try await localDataSource.save(imageData: imageData, imageID: imageID, category: category)
         return imageID
     }
     
-    func saveImage(data: ImageDataForSaving, category: ImageCategory) async throws -> String {
+    func saveImage(data: ImageDataForSaving, to category: ImageCategory) async throws -> String {
         let imageID = UUID().uuidString
         try await localDataSource.save(imageData: data, imageID: imageID, category: category)
         return imageID
     }
     
-    func loadImage(with id: String, category: ImageCategory) async throws -> UIImage {
+    func loadImage(with id: String, in category: ImageCategory) async throws -> UIImage {
         try await localDataSource.load(imageID: id, category: category)
     }
     
-    func deleteImage(with id: String, category: ImageCategory) async throws {
+    func loadImages(in diary: Diary) async throws -> [UIImage] {
+        let imageIDs = diary.diaryImageUUIDs
+        
+        return try await withThrowingTaskGroup(
+            of: (index: Int, image: UIImage).self,
+            returning: [UIImage].self,
+            body: { group in
+                for item in imageIDs.enumerated() {
+                    group.addTask {
+                        let image = try await self.localDataSource.load(imageID: item.element, category: .diary(id: diary.id))
+                        return (item.offset, image)
+                    }
+                }
+                var sortedArray: [(index: Int, image: UIImage)] = []
+                for try await result in group {
+                    sortedArray.append(result)
+                }
+                let sortedImage = sortedArray
+                    .sorted { $0.index < $1.index }
+                    .map(\.image)
+                return sortedImage
+            }
+        )
+    }
+    
+    func deleteImage(with id: String, in category: ImageCategory) async throws {
         try await localDataSource.delete(imageID: id, category: category)
     }
     

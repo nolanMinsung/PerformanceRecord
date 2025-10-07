@@ -18,6 +18,7 @@ struct Performance: Identifiable, Hashable {
     let genre: Constant.Genre // genrenm(공연)
     let openRun: Bool // openrun(오픈런)
     let state: Constant.PerformanceState // prfstate(공연상태)
+    let records: [Diary]
     
     let detail: PerformanceDetail?
 }

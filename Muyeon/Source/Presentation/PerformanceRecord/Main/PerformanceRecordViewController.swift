@@ -17,7 +17,16 @@ class PerformanceRecordViewController: UIViewController {
         fetchLikePerformanceListUseCase: DefaultFetchLikePerformanceListUseCase(
             performanceRepository: DefaultPerformanceRepository.shared
         ),
-        fetchDiariesUseCase: DefaultFetchAllDiariesUseCase(
+        fetchLocalPerformanceListUseCase: DefaultFetchLocalPerformanceListUseCase(
+            performanceRepository: DefaultPerformanceRepository.shared
+        ),
+        fetchPerformanceDetailUseCase: DefaultFetchLocalPerformanceDetailUseCase(
+            performanceRepository: DefaultPerformanceRepository.shared
+        ),
+        fetchMostViewedPerformanceUseCase: DefaultFetchMostViewedPerformanceUseCase(
+            performanceRepository: DefaultPerformanceRepository.shared
+        ),
+        fetchAllDiariesUseCase: DefaultFetchAllDiariesUseCase(
             diaryRepository: DefaultDiaryRepository.shared
         )
     )
@@ -27,7 +36,6 @@ class PerformanceRecordViewController: UIViewController {
     private let diariesUpdateTrigger = PublishRelay<Void>()
     private var diaries: [Diary] = []
     private var performancesWithRecords: [Performance] = []
-    
     
     override func loadView() {
         view = rootView
@@ -42,69 +50,6 @@ class PerformanceRecordViewController: UIViewController {
         diariesUpdateTrigger.accept(())
     }
     
-    
-    // MARK: - Data Handling
-    private func configureData(diaries: [Diary]) {
-        // 통계 데이터 설정 -> 뷰모델로 옮기기
-        let totalRecords = diaries.count
-        let uniquePerformances = Set(diaries.compactMap { $0.performance })
-        let averageRating = diaries.isEmpty ? 0 : diaries.map { $0.rating }.reduce(0, +) / Double(diaries.count)
-        let thisYearCount = 0// diaries.filter { Calendar.current.isDateInThisYear($0.viewedAt) }.count
-        let photoCount = diaries.flatMap { $0.diaryImageUUIDs }.count
-        
-        rootView.statsSummaryView.configure(
-            totalCount: totalRecords,
-            performanceCount: uniquePerformances.count,
-            averageRating: averageRating,
-            thisYearCount: thisYearCount,
-            photoCount: photoCount
-        )
-        
-        // 최근 관람 데이터 설정
-        if let recentDiary = diaries.sorted(by: { $0.viewedAt > $1.viewedAt }).first {
-            let dateFormatter = DateFormatter()
-            dateFormatter.dateFormat = "MM월 dd일"
-            rootView.recentViewCard.isHidden = false
-            rootView.recentViewCard.configure(
-                mainText: recentDiary.performance?.name ?? "",
-                tagText: "★ \(recentDiary.rating)",
-                tagColor: .systemOrange,
-                subText: dateFormatter.string(from: recentDiary.viewedAt)
-            )
-        } else {
-            rootView.recentViewCard.isHidden = true
-        }
-        
-        // 최다 관람 데이터 설정
-        let performanceCounts = diaries.reduce(into: [:]) { counts, diary in
-            counts[diary.performance, default: 0] += 1
-        }
-        if let (mostViewed, count) = performanceCounts.max(by: { $0.value < $1.value }) {
-            rootView.mostViewedCard.isHidden = false
-            rootView.mostViewedCard.configure(
-                mainText: mostViewed?.name ?? "",
-                tagText: "\(count)회",
-                tagColor: .systemIndigo,
-                subText: mostViewed?.facilityFullName ?? ""
-            )
-        } else {
-            rootView.mostViewedCard.isHidden = true
-        }
-        
-        // 공연 기록 리스트 데이터 설정
-        self.performancesWithRecords = Array(uniquePerformances).sorted(by: { p1, p2 in
-            let latestDate1 = diaries.filter { $0.performance == p1 }.map { $0.viewedAt }.max() ?? Date.distantPast
-            let latestDate2 = diaries.filter { $0.performance == p2 }.map { $0.viewedAt }.max() ?? Date.distantPast
-            return latestDate1 > latestDate2
-        })
-        
-        rootView.collectionView.reloadData()
-        // 데이터 로드 후 높이를 업데이트 하기 위해 호출
-        DispatchQueue.main.async {
-            self.rootView.updateCollectionViewHeight()
-        }
-    }
-    
     private func bind() {
         let input = PerformanceRecordViewModel.Input(
             updateDiaries: diariesUpdateTrigger.asObservable(),
@@ -114,14 +59,55 @@ class PerformanceRecordViewController: UIViewController {
         let output = viewModel.transform(input: input)
         
         output.allDiaries
+            .debug()
             .observe(on: MainScheduler.instance)
             .bind(
                 with: self,
                 onNext: { owner, diaries in
                     owner.diaries = diaries
                     owner.rootView.collectionView.reloadData()
-                    owner.configureData(diaries: diaries)
+                    let totalRecords = diaries.count
+                    let uniquePerformanceIDs = Set(diaries.map { $0.performanceID })
+                    let averageRating = diaries.isEmpty ? 0 : diaries.map { $0.rating }.reduce(0, +) / Double(diaries.count)
+                    let thisYearCount = 0// diaries.filter { Calendar.current.isDateInThisYear($0.viewedAt) }.count
+                    let photoCount = diaries.flatMap { $0.diaryImageUUIDs }.count
+                    owner.rootView.configureStats(
+                        totalCount: totalRecords,
+                        performanceCount: uniquePerformanceIDs.count,
+                        averageRating: averageRating,
+                        thisYearCount: thisYearCount,
+                        photoCount: photoCount
+                    )
                 })
+            .disposed(by: disposeBag)
+        
+        output.recentRecord
+            .debug()
+            .observe(on: MainScheduler.instance)
+            .bind(with: self) { owner, data in
+                let (recentRecord, performance) = data
+                owner.rootView.configureRecentRecord(recentRecord: recentRecord, performance: performance)
+            }
+            .disposed(by: disposeBag)
+        
+        output.mostViewedPerformance
+            .debug()
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, performance in
+                owner.rootView.configureMostViewed(mostViewedPerformance: performance)
+            })
+            .disposed(by: disposeBag)
+        
+        output.performancesWithRecord
+            .debug()
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, performancesWithRecords in
+                owner.performancesWithRecords = performancesWithRecords
+                owner.rootView.collectionView.reloadData()
+                DispatchQueue.main.async {
+                    owner.rootView.updateCollectionViewHeight()
+                }
+            })
             .disposed(by: disposeBag)
         
         output.showAddRecordView
@@ -133,8 +119,13 @@ class PerformanceRecordViewController: UIViewController {
                 }
             )
             .disposed(by: disposeBag)
+        
+        output.errorRelay
+            .bind {
+                print($0.localizedDescription)
+            }
+            .disposed(by: disposeBag)
     }
-    
     
 }
 
@@ -150,7 +141,7 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         let performance = performancesWithRecords[indexPath.item]
-        let relatedRecords = diaries.filter { $0.performance?.id == performance.id }
+        let relatedRecords = diaries.filter { $0.performanceID == performance.id }
         cell.configure(performance: performance, records: relatedRecords)
         return cell
     }
@@ -183,6 +174,7 @@ private extension PerformanceRecordViewController {
             genre: .musical,
             openRun: false,
             state: .completed,
+            records: [],
             detail: nil
         )
         let p2 = Performance(
@@ -196,6 +188,7 @@ private extension PerformanceRecordViewController {
             genre: .popularMusic,
             openRun: false,
             state: .completed,
+            records: [],
             detail: nil
         )
         
@@ -203,9 +196,33 @@ private extension PerformanceRecordViewController {
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         return [
-            Diary(performance: p1, createdAt: Date(), viewedAt: dateFormatter.date(from: "2024-06-20")!, rating: 4.5, reviewText: "두 번째 관람이었는데 첫 번째만큼 감동적이지는 않았지만 여전히 좋았다. 다른 배우들의 연기를 볼 수 있어서 좋았다.", diaryImageUUIDs: []),
-            Diary(performance: p2, createdAt: Date(), viewedAt: dateFormatter.date(from: "2024-10-01")!, rating: 5.0, reviewText: "평생 잊지 못할 경험! 아미들과 함께 떼창하는 순간이 최고였다. 무대 연출도 정말 화려했다.", diaryImageUUIDs: []),
-            Diary(performance: p1, createdAt: Date(), viewedAt: dateFormatter.date(from: "2024-03-15")!, rating: 5.0, reviewText: "정말 감동적이었다. 장발장 역의 연기가 특히 인상적이었고, 마지막 장면에서 눈물이 났다.", diaryImageUUIDs: [])
+            Diary(
+                id: UUID().uuidString,
+                performanceID: p1.id,
+                createdAt: Date(),
+                viewedAt: dateFormatter.date(from: "2024-06-20")!,
+                rating: 4.5,
+                reviewText: "두 번째 관람이었는데 첫 번째만큼 감동적이지는 않았지만 여전히 좋았다. 다른 배우들의 연기를 볼 수 있어서 좋았다.",
+                diaryImageUUIDs: []
+            ),
+            Diary(
+                id: UUID().uuidString,
+                performanceID: p2.id,
+                createdAt: Date(),
+                viewedAt: dateFormatter.date(from: "2024-10-01")!,
+                rating: 5.0,
+                reviewText: "평생 잊지 못할 경험! 아미들과 함께 떼창하는 순간이 최고였다. 무대 연출도 정말 화려했다.",
+                diaryImageUUIDs: []
+            ),
+            Diary(
+                id: UUID().uuidString,
+                performanceID: p1.id,
+                createdAt: Date(),
+                viewedAt: dateFormatter.date(from: "2024-03-15")!,
+                rating: 5.0,
+                reviewText: "정말 감동적이었다. 장발장 역의 연기가 특히 인상적이었고, 마지막 장면에서 눈물이 났다.",
+                diaryImageUUIDs: []
+            )
         ]
     }
     
