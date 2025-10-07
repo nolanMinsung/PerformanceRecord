@@ -13,13 +13,12 @@ class RecordDetailViewController: UIViewController {
 
     // MARK: - Properties
     private let recordDetailView = RecordDetailView()
-    private var dataSource: UICollectionViewDiffableDataSource<Section, Diary>!
+    private var dataSource: UICollectionViewDiffableDataSource<Section, Record>!
     
     // 예시 데이터
-    private var performance: Performance!
-    private var diaries: [Diary] = []
-
-    // CollectionView의 Section을 정의
+    private var performance: Performance
+    private var diaries: [Record] = []
+    
     enum Section {
         case main
     }
@@ -80,7 +79,7 @@ class RecordDetailViewController: UIViewController {
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         diaries = [
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
                 createdAt: Date(),
@@ -89,7 +88,7 @@ class RecordDetailViewController: UIViewController {
                 reviewText: "",
                 diaryImageUUIDs: ["0"]
             ),
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
                 createdAt: Date(),
@@ -98,7 +97,7 @@ class RecordDetailViewController: UIViewController {
                 reviewText: "평생 잊지 못할 경험! 아미들과 함께 떼창하는 순간이 최고였다. 무대 연출도 정말 화려했다.",
                 diaryImageUUIDs: []
             ),
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
                 createdAt: Date(),
@@ -107,7 +106,7 @@ class RecordDetailViewController: UIViewController {
                 reviewText: "정말 감동적이었다. 장발장 역의 연기가 특히 인상적이었고, 마지막 장면에서 눈물이 났다.",
                 diaryImageUUIDs: ["0", "1", "2", "3", "4"]
             ),
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
                 createdAt: Date(),
@@ -124,7 +123,7 @@ class RecordDetailViewController: UIViewController {
 extension RecordDetailViewController {
     
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<RecordCell, Diary> { cell, indexPath, diary in
+        let cellRegistration = UICollectionView.CellRegistration<RecordCell, Record> { cell, indexPath, diary in
             cell.configure(with: diary)
             
             // 사진 셀 탭 핸들러 설정
@@ -138,8 +137,8 @@ extension RecordDetailViewController {
             }
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Section, Diary>(collectionView: recordDetailView.collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: Diary) -> UICollectionViewCell? in
+        dataSource = UICollectionViewDiffableDataSource<Section, Record>(collectionView: recordDetailView.collectionView) {
+            (collectionView: UICollectionView, indexPath: IndexPath, identifier: Record) -> UICollectionViewCell? in
             return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
         }
 
@@ -156,7 +155,7 @@ extension RecordDetailViewController {
     }
     
     private func applySnapshot() {
-        var snapshot = NSDiffableDataSourceSnapshot<Section, Diary>()
+        var snapshot = NSDiffableDataSourceSnapshot<Section, Record>()
         snapshot.appendSections([.main])
         snapshot.appendItems(diaries)
         dataSource.apply(snapshot, animatingDifferences: true)

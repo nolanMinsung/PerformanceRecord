@@ -34,7 +34,7 @@ class PerformanceRecordViewController: UIViewController {
     
     // MARK: - Properties
     private let diariesUpdateTrigger = PublishRelay<Void>()
-    private var diaries: [Diary] = []
+    private var diaries: [Record] = []
     private var performancesWithRecords: [Performance] = []
     
     override func loadView() {
@@ -161,7 +161,7 @@ extension PerformanceRecordViewController: UICollectionViewDelegate {
 
 private extension PerformanceRecordViewController {
     
-    func loadSampleData() -> [Diary] {
+    func loadSampleData() -> [Record] {
         // React 코드의 샘플 데이터를 Swift 모델로 변환
         let p1 = Performance(
             id: "perf_1",
@@ -196,7 +196,7 @@ private extension PerformanceRecordViewController {
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
         return [
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
                 createdAt: Date(),
@@ -205,7 +205,7 @@ private extension PerformanceRecordViewController {
                 reviewText: "두 번째 관람이었는데 첫 번째만큼 감동적이지는 않았지만 여전히 좋았다. 다른 배우들의 연기를 볼 수 있어서 좋았다.",
                 diaryImageUUIDs: []
             ),
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p2.id,
                 createdAt: Date(),
@@ -214,7 +214,7 @@ private extension PerformanceRecordViewController {
                 reviewText: "평생 잊지 못할 경험! 아미들과 함께 떼창하는 순간이 최고였다. 무대 연출도 정말 화려했다.",
                 diaryImageUUIDs: []
             ),
-            Diary(
+            Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
                 createdAt: Date(),

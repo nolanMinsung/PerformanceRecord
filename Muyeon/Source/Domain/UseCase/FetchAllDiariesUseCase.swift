@@ -6,7 +6,7 @@
 //
 
 protocol FetchAllDiariesUseCase {
-    func execute() async throws -> [Diary]
+    func execute() async throws -> [Record]
 }
 
 
@@ -18,7 +18,7 @@ final class DefaultFetchAllDiariesUseCase: FetchAllDiariesUseCase {
         self.diaryRepository = diaryRepository
     }
     
-    func execute() async throws -> [Diary] {
+    func execute() async throws -> [Record] {
         try await diaryRepository.fetchAllDiaries()
     }
 }

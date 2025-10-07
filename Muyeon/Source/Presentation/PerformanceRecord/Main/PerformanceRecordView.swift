@@ -171,7 +171,7 @@ extension PerformanceRecordView {
         )
     }
     
-    func configureRecentRecord(recentRecord: Diary?, performance: Performance) {
+    func configureRecentRecord(recentRecord: Record?, performance: Performance) {
         defer { setNeedsLayout() }
         if let recentRecord {
             let dateFormatter = DateFormatter()

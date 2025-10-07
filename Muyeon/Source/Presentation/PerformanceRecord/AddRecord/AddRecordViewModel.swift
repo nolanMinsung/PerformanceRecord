@@ -29,7 +29,7 @@ final class AddRecordViewModel {
     
     private let performance: Performance
     private let createDiaryUseCase: any CreateDiaryUseCase
-    private let diaryContent = PublishRelay<Diary>()
+    private let diaryContent = PublishRelay<Record>()
     private let disposeBag = DisposeBag()
     
     init(performance: Performance, createDiaryUseCase: any CreateDiaryUseCase) {
@@ -69,7 +69,7 @@ final class AddRecordViewModel {
         .withUnretained(self)
         .map { owner, data in
             let (viewedDate, rating, reviewText) = data
-            return Diary(
+            return Record(
                 id: UUID().uuidString,
                 performanceID: owner.performance.id,
                 createdAt: .now,

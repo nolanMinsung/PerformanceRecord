@@ -149,7 +149,7 @@ class PerformanceRecordCell: UICollectionViewCell {
         }
     }
 
-    func configure(performance: Performance, records: [Diary]) {
+    func configure(performance: Performance, records: [Record]) {
         guard let latestRecord = records.sorted(by: { $0.viewedAt > $1.viewedAt }).first else { return }
 
         titleLabel.text = performance.name

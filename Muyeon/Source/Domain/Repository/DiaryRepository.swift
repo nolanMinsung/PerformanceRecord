@@ -8,7 +8,7 @@
 import Foundation
 
 protocol DiaryRepository {
-    func createDiary(_ diary: Diary, images imageData: [ImageDataForSaving]) async throws
-    func fetchDiaries(of performance: Performance) async throws -> [Diary]
-    func fetchAllDiaries() async throws -> [Diary]
+    func createDiary(_ diary: Record, images imageData: [ImageDataForSaving]) async throws
+    func fetchDiaries(of performance: Performance) async throws -> [Record]
+    func fetchAllDiaries() async throws -> [Record]
 }

@@ -98,7 +98,7 @@ class RecordCell: UICollectionViewCell {
     }
     
     // MARK: - Public Methods
-    func configure(with diary: Diary) {
+    func configure(with diary: Record) {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 M월 d일"
         dateLabel.text = formatter.string(from: diary.viewedAt)

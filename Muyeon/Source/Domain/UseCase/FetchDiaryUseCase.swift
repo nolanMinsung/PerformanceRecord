@@ -8,7 +8,7 @@
 import Foundation
 
 protocol FetchDiariesUseCase {
-    func execute(performance: Performance) async throws -> [Diary]
+    func execute(performance: Performance) async throws -> [Record]
 }
 
 
@@ -20,7 +20,7 @@ final class DefaultFetchDiariesUseCase: FetchDiariesUseCase {
         self.diaryRepository = diaryRepository
     }
     
-    func execute(performance: Performance) async throws -> [Diary] {
+    func execute(performance: Performance) async throws -> [Record] {
         try await diaryRepository.fetchDiaries(of: performance)
     }
     

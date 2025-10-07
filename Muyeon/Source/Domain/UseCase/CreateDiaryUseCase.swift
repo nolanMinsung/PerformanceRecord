@@ -8,7 +8,7 @@
 import Foundation
 
 protocol CreateDiaryUseCase {
-    func execute(diary: Diary, imageData: [ImageDataForSaving]) async throws
+    func execute(diary: Record, imageData: [ImageDataForSaving]) async throws
 }
 
 
@@ -20,7 +20,7 @@ final class DefaultCreateDiaryUseCase: CreateDiaryUseCase {
         self.diaryRepository = diaryRepository
     }
     
-    func execute(diary: Diary, imageData: [ImageDataForSaving]) async throws {
+    func execute(diary: Record, imageData: [ImageDataForSaving]) async throws {
         try await diaryRepository.createDiary(diary, images: imageData)
     }
 }

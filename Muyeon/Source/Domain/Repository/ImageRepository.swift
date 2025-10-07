@@ -17,7 +17,7 @@ protocol ImageRepository {
     /// 로컬 저장소에서 이미지를 가져와 반환
     func loadImage(with id: String, in: ImageCategory) async throws -> UIImage
     
-    func loadImages(in: Diary) async throws -> [UIImage]
+    func loadImages(in: Record) async throws -> [UIImage]
     
     func deleteImage(with id: String, in: ImageCategory) async throws
     

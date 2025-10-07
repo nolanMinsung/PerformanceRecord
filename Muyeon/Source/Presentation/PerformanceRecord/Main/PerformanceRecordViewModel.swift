@@ -18,8 +18,8 @@ final class PerformanceRecordViewModel {
     }
     
     struct Output {
-        let allDiaries: Observable<[Diary]>
-        let recentRecord: Observable<(record: Diary?, performance: Performance)>
+        let allDiaries: Observable<[Record]>
+        let recentRecord: Observable<(record: Record?, performance: Performance)>
         let mostViewedPerformance: Observable<Performance>
         let performancesWithRecord: Observable<[Performance]>
         let showAddRecordView: Observable<[Performance]>
@@ -48,8 +48,8 @@ final class PerformanceRecordViewModel {
     }
     
     func transform(input: Input) -> Output {
-        let allRecordsRelay = PublishRelay<[Diary]>()
-        let recentRecordRelay = PublishRelay<(record: Diary?, performance: Performance)>()
+        let allRecordsRelay = PublishRelay<[Record]>()
+        let recentRecordRelay = PublishRelay<(record: Record?, performance: Performance)>()
         let mostViewedPerformanceRelay = PublishRelay<Performance>()
         let performancesWithRecordsRelay = PublishRelay<[Performance]>()
         let likePerformanceListRelay = PublishRelay<[Performance]>()

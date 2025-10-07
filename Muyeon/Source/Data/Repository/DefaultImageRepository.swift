@@ -39,7 +39,7 @@ final class DefaultImageRepository: ImageRepository {
         try await localDataSource.load(imageID: id, category: category)
     }
     
-    func loadImages(in diary: Diary) async throws -> [UIImage] {
+    func loadImages(in diary: Record) async throws -> [UIImage] {
         let imageIDs = diary.diaryImageUUIDs
         
         return try await withThrowingTaskGroup(

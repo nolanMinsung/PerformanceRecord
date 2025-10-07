@@ -23,7 +23,7 @@ actor DefaultDiaryRepository: DiaryRepository {
         self.imageRepository = imageRepository
     }
     
-    func createDiary(_ diary: Diary, images imageData: [ImageDataForSaving]) async throws {
+    func createDiary(_ diary: Record, images imageData: [ImageDataForSaving]) async throws {
         // 플로우
         // ---- 트랜잭션 1 시작 ----
         // - 기록할 performanceObject 먼저 찾기
@@ -80,7 +80,7 @@ actor DefaultDiaryRepository: DiaryRepository {
         
     }
     
-    func fetchDiaries(of performance: Performance) async throws -> [Diary] {
+    func fetchDiaries(of performance: Performance) async throws -> [Record] {
         return try await Task.detached {
             let realm = try Realm()
             return try realm.objects(RecordObject.self)
@@ -89,7 +89,7 @@ actor DefaultDiaryRepository: DiaryRepository {
         }.value
     }
     
-    func fetchAllDiaries() async throws -> [Diary] {
+    func fetchAllDiaries() async throws -> [Record] {
         return try await Task.detached {
             let realm = try Realm()
             return try realm.objects(RecordObject.self)
