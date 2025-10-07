@@ -63,6 +63,7 @@ class PerformanceRecordView: UIView {
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.backgroundColor = .clear
         collectionView.isScrollEnabled = false
+        collectionView.contentInset = .zero
         collectionView.register(PerformanceRecordCell.self, forCellWithReuseIdentifier: PerformanceRecordCell.reuseIdentifier)
         return collectionView
     }()
@@ -106,7 +107,7 @@ class PerformanceRecordView: UIView {
         scrollView.addSubview(mainStackView)
         
         scrollView.snp.makeConstraints { make in
-            make.verticalEdges.equalTo(safeAreaLayoutGuide)
+            make.verticalEdges.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
         }
         
@@ -121,7 +122,7 @@ class PerformanceRecordView: UIView {
             make.height.equalTo(36)
         }
         
-        collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: 30)
+        collectionViewHeightConstraint = collectionView.heightAnchor.constraint(equalToConstant: 50)
         collectionViewHeightConstraint?.isActive = true
     }
     

@@ -13,18 +13,22 @@ enum DefaultPerformanceRepositoryError: LocalizedError {
     case performanceObjectNotFound
 }
 
-@MainActor
-final class DefaultPerformanceRepository: PerformanceRepository {
+
+actor DefaultPerformanceRepository: PerformanceRepository {
     
-    let imageRepository: any ImageRepository
-    let realm = try! Realm()
+    static let shared = DefaultPerformanceRepository(
+        imageRepository: DefaultImageRepository.shared
+    )
     
-    @UserDefault(key: .likePerformanceIDs, defaultValue: [])
-    var likePerformancesID: [String]
+    private let imageRepository: any ImageRepository
     
-    init(imageRepository: some ImageRepository) {
+    private init(imageRepository: some ImageRepository) {
         self.imageRepository = imageRepository
-        print(realm.configuration.fileURL ?? "⚠️에러!! realm 주소 확인 불가")
+        if let fileURL = try? Realm().configuration.fileURL?.absoluteString {
+            print(fileURL)
+        } else {
+            print("⚠️에러!! realm 주소 확인 불가")
+        }
     }
     
     func fetchDetailFromRemote(id: String) async throws -> Performance {
@@ -38,13 +42,18 @@ final class DefaultPerformanceRepository: PerformanceRepository {
     }
     
     func fetchLikeFromLocal() async throws -> [Performance] {
-        realm.objects(PerformanceObject.self)
-            .map { $0.toDomain() }
-            .filter { likePerformancesID.contains($0.id) }
+        @UserDefault(key: .likePerformanceIDs, defaultValue: [])
+        var likePerformancesID: [String]
+        
+        return try await Task.detached {
+            let realm = try Realm()
+            return realm.objects(PerformanceObject.self)
+                .map { $0.toDomain() }
+                .filter { likePerformancesID.contains($0.id) }
+        }.value
     }
     
     func save(performance: Performance) async throws {
-        
         // 포스터 이미지 저장 후 포스터 ID 상수에 저장
         let posterID = try await imageRepository.saveImage(urlString: performance.posterURL, category: .performance(id: performance.id))
         let detailImageUUIDs = try await withThrowingTaskGroup(
@@ -81,32 +90,38 @@ final class DefaultPerformanceRepository: PerformanceRepository {
             posterUUID: posterID,
             detailImageUUIDs: detailImageUUIDs
         )
-        try realm.write {
-            realm.add(performanceObject, update: .modified)
-        }
         
+        try await Task.detached {
+            let realm = try Realm()
+            try realm.write {
+                realm.add(performanceObject, update: .modified)
+            }
+        }.value
     }
     
     func delete(performance: Performance) async throws {
-        // Realm Object 부터 가져오자
-        guard let performanceObject = realm.objects(PerformanceObject.self)
-                .filter({ $0.id == performance.id })
-                .first
-        else {
-            return
-        }
         // 이미지 먼저 삭제 - 포스터, 상세 이미지 모두
-        try imageRepository.deleteAllImages(of: performance, category: .performance(id: performance.id))
-        
+        try await imageRepository.deleteAllImages(of: performance, category: .performance(id: performance.id))
         // --- 이미지 삭제 완료 ---
         
-        // RelatedLinkObject 삭제
-        
-        // Realm Object 삭제
-        try realm.write {
-            realm.delete(performanceObject.relatedLinks)
-            realm.delete(performanceObject)
-        }
+        try await Task.detached {
+            let realm = try Realm()
+            
+            // Realm Object 부터 가져오자
+            guard let performanceObject = realm.objects(PerformanceObject.self)
+                .filter({ $0.id == performance.id })
+                .first
+            else {
+                return
+            }
+            
+            try realm.write {
+                // RelatedLinkObject 삭제
+                realm.delete(performanceObject.relatedLinks)
+                // Realm Object 삭제
+                realm.delete(performanceObject)
+            }
+        }.value
     }
     
 }

@@ -7,8 +7,8 @@
 
 import Foundation
 
-@MainActor
 protocol DiaryRepository {
     func createDiary(_ diary: Diary, images imageData: [ImageDataForSaving]) async throws
-    func fetchDiaries(of performance: Performance) throws -> [Diary]
+    func fetchDiaries(of performance: Performance) async throws -> [Diary]
+    func fetchAllDiaries() async throws -> [Diary]
 }

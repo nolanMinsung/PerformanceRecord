@@ -28,18 +28,15 @@ class AddRecordViewController: ModalCardViewController {
     
     private let disposeBag = DisposeBag()
     
+    var onDiaryDataChanged: (() -> Void)?
+    
     init(performance: Performance) {
         self.performance = performance
         self.rootView = AddRecordView(performance: performance)
         self.viewModel = AddRecordViewModel(
             performance: performance,
             createDiaryUseCase: DefaultCreateDiaryUseCase(
-                diaryRepository: DefaultDiaryRepository(
-                    imageRepository: DefaultImageRepository(
-                        remoteDataSource: DefaultRemoteImageDataSource(),
-                        localDataSource: DefaultLocalImageDataSource()
-                    )
-                )
+                diaryRepository: DefaultDiaryRepository.shared
             )
         )
         super.init(nibName: nil, bundle: nil)
@@ -91,6 +88,7 @@ class AddRecordViewController: ModalCardViewController {
         output.successCreateDiary
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, _ in
+                owner.onDiaryDataChanged?()
                 owner.dismiss(animated: true)
             })
             .disposed(by: disposeBag)

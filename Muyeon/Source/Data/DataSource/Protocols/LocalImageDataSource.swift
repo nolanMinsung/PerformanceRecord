@@ -8,8 +8,8 @@
 import UIKit
 
 protocol LocalImageDataSource {
-    func save(imageData: ImageDataForSaving, imageID: String, category: ImageCategory) throws
-    func load(imageID: String, category: ImageCategory) throws -> UIImage
-    func delete(imageID: String, category: ImageCategory) throws
-    func deleteAllImages(of performance: Performance, category: ImageCategory) throws
+    func save(imageData: ImageDataForSaving, imageID: String, category: ImageCategory) async throws
+    func load(imageID: String, category: ImageCategory) async throws -> UIImage
+    func delete(imageID: String, category: ImageCategory) async throws
+    func deleteAllImages(of performance: Performance, category: ImageCategory) async throws
 }

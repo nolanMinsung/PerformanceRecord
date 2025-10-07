@@ -9,13 +9,12 @@ import UIKit
 import ImageIO
 import UniformTypeIdentifiers
 
-final class DefaultLocalImageDataSource: LocalImageDataSource {
+actor DefaultLocalImageDataSource: LocalImageDataSource {
     
-    func save(imageData: ImageDataForSaving, imageID: String, category: ImageCategory) throws {
-//        guard let fileExtension = self.imageFileExtension(from: imageData) else {
-//            throw NSError(domain: "ImageSaveError", code: 0, userInfo: [NSLocalizedDescriptionKey: "Invalid image data."])
-//        }
-        
+    static let shared = DefaultLocalImageDataSource()
+    private init() { }
+    
+    func save(imageData: ImageDataForSaving, imageID: String, category: ImageCategory) async throws {
         let fileManager = FileManager.default
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
             throw NSError(domain: "ImageSaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
@@ -35,7 +34,7 @@ final class DefaultLocalImageDataSource: LocalImageDataSource {
         print("이미지 저장 성공: \(fileURL.path)")
     }
     
-    func load(imageID: String, category: ImageCategory) throws -> UIImage {
+    func load(imageID: String, category: ImageCategory) async throws -> UIImage {
         let fileManager = FileManager.default
         
         // Documents 디렉토리 경로 가져오기
@@ -60,7 +59,7 @@ final class DefaultLocalImageDataSource: LocalImageDataSource {
         return image
     }
     
-    func delete(imageID: String, category: ImageCategory) throws {
+    func delete(imageID: String, category: ImageCategory) async throws {
         let fileManager = FileManager.default
         
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
@@ -80,7 +79,7 @@ final class DefaultLocalImageDataSource: LocalImageDataSource {
         try fileManager.removeItem(at: fileURL)
     }
     
-    func deleteAllImages(of performance: Performance, category: ImageCategory) throws {
+    func deleteAllImages(of performance: Performance, category: ImageCategory) async throws {
         let fileManager = FileManager.default
         
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {

@@ -9,7 +9,10 @@ import UIKit
 
 import Kingfisher
 
-final class DefaultRemoteImageDataSource: RemoteImageDataSource {
+actor DefaultRemoteImageDataSource: RemoteImageDataSource {
+    
+    static let shared = DefaultRemoteImageDataSource()
+    private init() { }
     
     func download(from url: String) async throws -> ImageDataForSaving {
         guard let url = URL(string: url) else {

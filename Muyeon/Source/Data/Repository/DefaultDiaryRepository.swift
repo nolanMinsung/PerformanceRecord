@@ -13,12 +13,13 @@ enum DefaultDiaryRepositoryError: LocalizedError {
     case diaryNotHavingPerformance
 }
 
-final class DefaultDiaryRepository: DiaryRepository {
+actor DefaultDiaryRepository: DiaryRepository {
     
-    let imageRepository: any ImageRepository
-    let realm = try! Realm()
-    
-    init(imageRepository: any ImageRepository) {
+    static let shared = DefaultDiaryRepository(
+        imageRepository: DefaultImageRepository.shared
+    )
+    private let imageRepository: any ImageRepository
+    private init(imageRepository: any ImageRepository) {
         self.imageRepository = imageRepository
     }
     
@@ -39,8 +40,8 @@ final class DefaultDiaryRepository: DiaryRepository {
         // - 저장한 이미지들의 ID 배열을 추가한 DiaryObject의 diaryImageUUIDs 속성에 추가하기
         // ---- 트랜잭션 2 끝 ----
         
-        var createdDiaryID: String = ""
-        try realm.write {
+        let createdDiaryID = try await Task.detached {
+            let realm = try Realm()
             guard diary.performance != nil else {
                 throw DefaultDiaryRepositoryError.diaryNotHavingPerformance
             }
@@ -50,37 +51,51 @@ final class DefaultDiaryRepository: DiaryRepository {
             else {
                 throw DefaultPerformanceRepositoryError.performanceObjectNotFound
             }
-            
             let diaryObject = DiaryObject.create(
                 performance: performanceObject,
                 viewedAt: diary.viewedAt,
                 rating: diary.rating,
                 reviewText: diary.reviewText
             )
-            realm.add(diaryObject, update: .modified)
-            createdDiaryID = diaryObject.id
-        }
+            try realm.write {
+                realm.add(diaryObject, update: .modified)
+            }
+            return diaryObject.id
+        }.value
         
-        // 이미지 저장
+        // 생성한 DiaryObject의 id를 이용해 폴더를 만들고 그 폴더에 이미지 저장(폴더의 이름이 일기의 ID)
         let savedDiaryImageIDs = try await saveImagesToFileManager(diaryID: createdDiaryID, imageData: imageData)
         
         // FileManager에 저장한 이미지 ID 가져와서 Realm에 반영
-        try realm.write {
-            guard let diaryObject = realm.objects(DiaryObject.self)
-                .filter({ $0.id == createdDiaryID })
-                .first
-            else {
-                fatalError()
+        try await Task.detached {
+            let realm = try Realm()
+            try realm.write {
+                guard let diaryObject = realm.objects(DiaryObject.self)
+                    .filter({ $0.id == createdDiaryID })
+                    .first
+                else {
+                    fatalError()
+                }
+                diaryObject.diaryImageUUIDs.append(objectsIn: savedDiaryImageIDs)
             }
-            diaryObject.diaryImageUUIDs.append(objectsIn: savedDiaryImageIDs)
-        }
+        }.value
         
     }
     
-    func fetchDiaries(of performance: Performance) throws -> [Diary] {
-        return realm.objects(DiaryObject.self)
-            .filter({$0.performance?.id == performance.id})
-            .map { $0.toDomain() }
+    func fetchDiaries(of performance: Performance) async throws -> [Diary] {
+        return try await Task.detached {
+            let realm = try Realm()
+            return realm.objects(DiaryObject.self)
+                .filter({$0.performance?.id == performance.id})
+                .map { $0.toDomain() }
+        }.value
+    }
+    
+    func fetchAllDiaries() async throws -> [Diary] {
+        return try await Task.detached {
+            let realm = try Realm()
+            return realm.objects(DiaryObject.self).map { $0.toDomain() }
+        }.value
     }
     
 }
