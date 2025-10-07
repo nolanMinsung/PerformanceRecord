@@ -99,9 +99,9 @@ actor DefaultPerformanceRepository: PerformanceRepository {
         }.value
     }
     
-    func delete(performance: Performance) async throws {
+    func delete(performanceID: String) async throws {
         // 이미지 먼저 삭제 - 포스터, 상세 이미지 모두
-        try await imageRepository.deleteAllImages(of: performance, category: .performance(id: performance.id))
+        try await imageRepository.deleteAllImages(of: .performance(id: performanceID))
         // --- 이미지 삭제 완료 ---
         
         try await Task.detached {
@@ -109,7 +109,7 @@ actor DefaultPerformanceRepository: PerformanceRepository {
             
             // Realm Object 부터 가져오자
             guard let performanceObject = realm.objects(PerformanceObject.self)
-                .filter({ $0.id == performance.id })
+                .filter({ $0.id == performanceID })
                 .first
             else {
                 return

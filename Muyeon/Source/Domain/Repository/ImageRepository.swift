@@ -19,5 +19,5 @@ protocol ImageRepository {
     
     func deleteImage(with id: String, category: ImageCategory) async throws
     
-    func deleteAllImages(of performance: Performance, category: ImageCategory) async throws
+    func deleteAllImages(of category: ImageCategory) async throws
 }

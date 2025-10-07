@@ -69,7 +69,7 @@ final class PerformanceDetailViewModel {
                         if newLikeStatus {
                             try await self.savePerformanceUseCase.execute(performance: performance)
                         } else {
-                            try await self.deletePerformanceUseCase.execute(performance: performance)
+                            try await self.deletePerformanceUseCase.execute(performanceID: performance.id)
                         }
                         likeButtonStatusRelay.accept(newLikeStatus)
                     } catch {

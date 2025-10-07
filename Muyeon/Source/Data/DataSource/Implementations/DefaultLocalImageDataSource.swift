@@ -79,7 +79,7 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         try fileManager.removeItem(at: fileURL)
     }
     
-    func deleteAllImages(of performance: Performance, category: ImageCategory) async throws {
+    func deleteAllImages(in imageCategory: ImageCategory) async throws {
         let fileManager = FileManager.default
         
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
@@ -87,7 +87,7 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         }
         
         // 이미지 폴더의 전체 경로 생성
-        let folderURL = documentsURL.appendingPathComponent(category.subpath)
+        let folderURL = documentsURL.appendingPathComponent(imageCategory.subpath)
         
         guard documentsURL.isFileURL else {
             print("삭제를 시도하려는 경로가 folder가 아닙니다.")

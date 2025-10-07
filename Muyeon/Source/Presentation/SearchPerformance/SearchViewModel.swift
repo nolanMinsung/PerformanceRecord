@@ -29,14 +29,25 @@ final class SearchViewModel {
     }
     
     let fetchPerformanceListUseCase: any FetchPerformanceListUseCase
+    let fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase
+    let savePerformanceUseCase: any SavePerformanceUseCase
+    let deletePerformanceUseCase: any DeletePerformanceUseCase
     let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
     
     private let disposeBag = DisposeBag()
     
-    init(fetchPerformanceListUseCase: some FetchPerformanceListUseCase,
-         togglePerformanceLikeUseCase: some TogglePerformanceLikeUseCase) {
+    init(
+        fetchPerformanceListUseCase: any FetchPerformanceListUseCase,
+        fetchPerformanceDetailUseCase: any FetchPerformanceDetailUseCase,
+        savePerformanceUseCase: any SavePerformanceUseCase,
+        deletePerformanceUseCase: any DeletePerformanceUseCase,
+        togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
+    ) {
         self.fetchPerformanceListUseCase = fetchPerformanceListUseCase
+        self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
+        self.savePerformanceUseCase = savePerformanceUseCase
         self.togglePerformanceLikeUseCase = togglePerformanceLikeUseCase
+        self.deletePerformanceUseCase = deletePerformanceUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -88,8 +99,20 @@ final class SearchViewModel {
         input.likeButtonTapped
             .bind(with: self, onNext: { owner, values in
                 let (indexPath, performanceID) = values
-                let newLikseStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: performanceID)
-                likeStatusUpdated.accept((indexPath, newLikseStatus))
+                Task {
+                    do {
+                        let newLikseStatus = owner.togglePerformanceLikeUseCase.execute(performanceID: performanceID)
+                        if newLikseStatus {
+                            let detailPerformance = try await owner.fetchPerformanceDetailUseCase.execute(performanceID: performanceID)
+                            try await owner.savePerformanceUseCase.execute(performance: detailPerformance)
+                        } else {
+                            try await owner.deletePerformanceUseCase.execute(performanceID: performanceID)
+                        }
+                        likeStatusUpdated.accept((indexPath, newLikseStatus))
+                    } catch {
+                        errorRelay.accept(error)
+                    }
+                }
             })
             .disposed(by: disposeBag)
         

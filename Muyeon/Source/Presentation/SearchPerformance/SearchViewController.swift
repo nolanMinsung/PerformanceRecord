@@ -27,7 +27,10 @@ class SearchViewController: UIViewController {
     private let rootView = SearchView()
     private let viewModel = SearchViewModel(
         fetchPerformanceListUseCase: DefaultFetchPerformanceListUseCase(),
-        togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase()
+        fetchPerformanceDetailUseCase: DefaultFetchPerformanceDetailUseCase(),
+        savePerformanceUseCase: DefaultStorePerformanceUseCase(repository: DefaultPerformanceRepository.shared),
+        deletePerformanceUseCase: DefaultDeletePerformanceUseCase(performanceRepository: DefaultPerformanceRepository.shared),
+        togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(),
     )
     
     private let likeButtonTapped = PublishRelay<(IndexPath,String)>()

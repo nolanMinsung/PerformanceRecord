@@ -43,7 +43,7 @@ final class DefaultImageRepository: ImageRepository {
         try await localDataSource.delete(imageID: id, category: category)
     }
     
-    func deleteAllImages(of performance: Performance, category: ImageCategory) async throws {
-        try await localDataSource.deleteAllImages(of: performance, category: category)
+    func deleteAllImages(of category: ImageCategory) async throws {
+        try await localDataSource.deleteAllImages(in: category)
     }
 }

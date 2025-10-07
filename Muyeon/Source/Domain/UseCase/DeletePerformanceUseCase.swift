@@ -8,7 +8,7 @@
 import Foundation
 
 protocol DeletePerformanceUseCase {
-    func execute(performance: Performance) async throws
+    func execute(performanceID: String) async throws
 }
 
 
@@ -20,8 +20,8 @@ final class DefaultDeletePerformanceUseCase: DeletePerformanceUseCase {
         self.performanceRepository = performanceRepository
     }
     
-    func execute(performance: Performance) async throws {
-        try await performanceRepository.delete(performance: performance)
+    func execute(performanceID: String) async throws {
+        try await performanceRepository.delete(performanceID: performanceID)
     }
     
 }
