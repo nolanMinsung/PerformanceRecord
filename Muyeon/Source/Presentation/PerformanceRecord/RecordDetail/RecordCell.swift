@@ -59,6 +59,8 @@ class RecordCell: UICollectionViewCell {
         return stackView
     }()
     
+    private var record: Record? = nil
+    
     // MARK: - Properties
     private var photoUUIDs: [String] = []
     var onPhotoTapped: ((UIImage?) -> Void)? // 사진 탭 이벤트를 전달할 클로저
@@ -75,6 +77,12 @@ class RecordCell: UICollectionViewCell {
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        record = nil
     }
     
     // MARK: - Setup
@@ -98,15 +106,17 @@ class RecordCell: UICollectionViewCell {
     }
     
     // MARK: - Public Methods
-    func configure(with diary: Record) {
+    func configure(with record: Record) {
+        self.record = record
+        
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 M월 d일"
-        dateLabel.text = formatter.string(from: diary.viewedAt)
+        dateLabel.text = formatter.string(from: record.viewedAt)
         
-        ratingLabel.text = "⭐️ \(diary.rating)"
+        ratingLabel.text = "⭐️ \(record.rating)"
         
         // 메모가 있으면 표시하고, 없으면 숨김
-        let reviewText = diary.reviewText
+        let reviewText = record.reviewText
         if !reviewText.isEmpty {
             memoLabel.text = reviewText
             memoLabel.isHidden = false
@@ -115,16 +125,13 @@ class RecordCell: UICollectionViewCell {
         }
         
         // 사진이 있으면 표시하고, 없으면 숨김
-        let uuids = diary.diaryImageUUIDs
+        let uuids = record.diaryImageUUIDs
+        photoTitleLabel.isHidden = uuids.isEmpty
+        photoCollectionView.isHidden = uuids.isEmpty
         if !uuids.isEmpty {
-            self.photoUUIDs = uuids
+            photoUUIDs = uuids
             photoTitleLabel.text = "📷 사진 (\(uuids.count))"
-            photoTitleLabel.isHidden = false
-            photoCollectionView.isHidden = false
             photoCollectionView.reloadData()
-        } else {
-            photoTitleLabel.isHidden = true
-            photoCollectionView.isHidden = true
         }
     }
 }
@@ -139,11 +146,19 @@ extension RecordCell: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as? PhotoCell else {
             return UICollectionViewCell()
         }
-        // TODO: UUID를 이용해 실제 이미지 로드
-        // For now, setting a placeholder color to differentiate cells
-        let colors: [UIColor] = [.systemRed, .systemBlue, .systemGreen, .systemYellow, .systemPurple]
-        cell.imageView.backgroundColor = colors[indexPath.item % colors.count]
-        cell.imageView.image = UIImage(systemName: ["house", "pencil", "person", "photo.tv"].randomElement()!)
+        
+        let imageID = photoUUIDs[indexPath.item]
+        Task {
+            do {
+                guard let recordID = record?.id else {
+                    return
+                }
+                let image = try await DefaultLocalImageDataSource.shared.load(imageID: imageID, category: .diary(id: recordID))
+                cell.imageView.image = image
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
         return cell
     }
 }

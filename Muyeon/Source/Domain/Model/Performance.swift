@@ -14,6 +14,7 @@ struct Performance: Identifiable, Hashable {
     let endDate: Date // prfpdto(공연종료일)
     let facilityFullName: String // fcltynm(공연시설명(공연장명))
     let posterURL: String // poster(포스터이미지경로)
+    let posterImageID: String?
     let area: Constant.AdminAreaCode // area(공연지역)
     let genre: Constant.Genre // genrenm(공연)
     let openRun: Bool // openrun(오픈런)
@@ -45,6 +46,7 @@ struct PerformanceDetail: Hashable {
     let facilityID: String // mt10id는 Facility의 ID이므로 여기에 두는 것이 적절
     let detailDateGuidance: String // dtguidance (상세 일정)
     let detailImageURLs: [String] // styurls (소개 이미지)
+    let detailImageIDs: [String]
     let relatedLinks: [RelatedLink] // relates (예매처 목록)
 }
 

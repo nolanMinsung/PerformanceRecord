@@ -151,7 +151,13 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
 extension PerformanceRecordViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let vc = RecordDetailViewController()
+        let performance = performancesWithRecords[indexPath.item]
+        let vc = RecordDetailViewController(
+            fetchLocalPosterUseCase: DefaultFetchLocalPosterUseCase(
+                imageRepository: DefaultImageRepository.shared
+            ),
+            performance: performance
+        )
         vc.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(vc, animated: true)
     }
@@ -170,6 +176,7 @@ private extension PerformanceRecordViewController {
             endDate: .now.addingDay(-4),
             facilityFullName: "샤롯데씨어터",
             posterURL: "",
+            posterImageID: nil,
             area: .seoul,
             genre: .musical,
             openRun: false,
@@ -184,6 +191,7 @@ private extension PerformanceRecordViewController {
             endDate: .now.addingDay(-1),
             facilityFullName: "잠실종합운동장",
             posterURL: "",
+            posterImageID: nil,
             area: .seoul,
             genre: .popularMusic,
             openRun: false,

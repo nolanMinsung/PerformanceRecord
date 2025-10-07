@@ -96,7 +96,7 @@ class PerformanceHeaderView: UIView {
     }
     
     // MARK: - Public Methods
-    func configure(with performance: Performance) {
+    func configure(with performance: Performance, poster: UIImage?) {
         titleLabel.text = performance.name
         venueLabel.text = performance.facilityFullName
         
@@ -105,16 +105,8 @@ class PerformanceHeaderView: UIView {
         let startDateString = formatter.string(from: performance.startDate)
         let endDateString = formatter.string(from: performance.endDate)
         dateLabel.text = "\(startDateString) - \(endDateString)"
-
-//        if let url = URL(string: performance.posterUrl) {
-//            DispatchQueue.global().async {
-//                if let data = try? Data(contentsOf: url) {
-//                    DispatchQueue.main.async {
-//                        self.posterImageView.image = UIImage(data: data)
-//                    }
-//                }
-//            }
-//        }
+        posterImageView.image = poster
     }
+    
 }
 

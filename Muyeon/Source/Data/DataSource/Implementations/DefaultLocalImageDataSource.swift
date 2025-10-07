@@ -29,12 +29,15 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         }
         
         // 최종 파일 URL 결정 후 저장
-        let fileURL = folderURL.appendingPathComponent(imageID).appendingPathExtension(imageData.type.identifier)
+        let fileURL = folderURL.appendingPathComponent(imageID).appendingPathExtension(imageData.type.preferredFilenameExtension ?? "jpeg")
         try imageData.data.write(to: fileURL)
-        print("이미지 저장 성공: \(fileURL.path)")
+        print("이미지 저장 성공: \(fileURL)")
     }
     
     func load(imageID: String, category: ImageCategory) async throws -> UIImage {
+        let possibleImageType: [UTType] = [.jpeg, .png, .heic, .heif, .gif, .tiff, .webP, .bmp]
+        let possibleExtensions: [String] = possibleImageType.compactMap { $0.preferredFilenameExtension } + ["jpg"]
+        
         let fileManager = FileManager.default
         
         // Documents 디렉토리 경로 가져오기
@@ -42,21 +45,24 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
             throw NSError(domain: "ImageLoadingError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
         }
         
-        // 저장된 이미지의 전체 경로 생성
-        let fileURL = documentsURL.appendingPathComponent(category.subpath)
-            .appendingPathComponent(imageID)
-            .appendingPathExtension("jpeg")
-        
-        // 해당 경로에 파일이 실제로 존재하는지 확인
-        guard fileManager.fileExists(atPath: fileURL.path) else {
-            throw NSError(domain: "ImageNotFound", code: 2, userInfo: [NSLocalizedDescriptionKey: "Image File not found."])
+        // 예상되는 이미지 확장자를 순회하며 파일의 확장자 유추
+        for extensionString in possibleExtensions {
+            // 저장된 이미지의 전체 경로 생성
+            let fileURL = documentsURL.appendingPathComponent(category.subpath)
+                .appendingPathComponent(imageID)
+                .appendingPathExtension(extensionString)
+            
+            // 해당 경로에 파일이 실제로 존재하는지 확인
+            if fileManager.fileExists(atPath: fileURL.path) {
+                // 경로로부터 UIImage 객체 생성
+                guard let image = UIImage(contentsOfFile: fileURL.path) else {
+                    // 파일은 있지만, 이미지로 변환이 실패한 경우
+                    throw NSError(domain: "FaileToConvertToUIImage", code: 3, userInfo: [NSLocalizedDescriptionKey: "Converting File to UIImage Failed."])
+                }
+                return image
+            }
         }
-        
-        // 경로로부터 UIImage 객체 생성
-        guard let image = UIImage(contentsOfFile: fileURL.path) else {
-            throw NSError(domain: "FaileToConvertToUIImage", code: 3, userInfo: [NSLocalizedDescriptionKey: "Converting File to UIImage Failed."])
-        }
-        return image
+        throw NSError(domain: "ImageNotFound", code: 2, userInfo: [NSLocalizedDescriptionKey: "Image File not found."])
     }
     
     func delete(imageID: String, category: ImageCategory) async throws {

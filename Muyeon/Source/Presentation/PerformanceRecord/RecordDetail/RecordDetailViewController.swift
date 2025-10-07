@@ -10,19 +10,38 @@ import UIKit
 import SnapKit
 
 class RecordDetailViewController: UIViewController {
-
+    
+    typealias DiffableDataSource = UICollectionViewDiffableDataSource<Section, Record>
+    typealias CellProvider = DiffableDataSource.CellProvider
+    typealias SupplementaryRegistration = UICollectionView.SupplementaryRegistration<RecordSectionHeaderView>
+    
+    
+    // MARK: - UseCase
+    private let fetchLocalPosterUseCase: any FetchLocalPosterUseCase
+    
     // MARK: - Properties
     private let recordDetailView = RecordDetailView()
-    private var dataSource: UICollectionViewDiffableDataSource<Section, Record>!
+    private var dataSource: DiffableDataSource!
     
     // 예시 데이터
     private var performance: Performance
-    private var diaries: [Record] = []
+    private var records: [Record] = []
     
     enum Section {
         case main
     }
-
+    
+    init(fetchLocalPosterUseCase: any FetchLocalPosterUseCase,
+         performance: Performance) {
+        self.fetchLocalPosterUseCase = fetchLocalPosterUseCase
+        self.performance = performance
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     // MARK: - Lifecycle
     override func loadView() {
         self.view = recordDetailView
@@ -30,17 +49,28 @@ class RecordDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupSampleData()
+        setupData()
         configureUI()
         configureDataSource()
         applySnapshot()
+    }
+    
+    private func setupData() {
+        self.records = performance.records
     }
     
     // MARK: - Setup
     private func configureUI() {
         self.view.backgroundColor = .systemGroupedBackground
         self.title = "공연 기록"
-        recordDetailView.configureHeader(with: performance)
+        Task {
+            do {
+                let image = try await fetchLocalPosterUseCase.execute(performance: performance)
+                recordDetailView.configureHeader(with: performance, poster: image)
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
     }
     
     // 예시 데이터 설정
@@ -53,6 +83,7 @@ class RecordDetailViewController: UIViewController {
             endDate: .now.addingDay(-4),
             facilityFullName: "샤롯데씨어터",
             posterURL: "",
+            posterImageID: nil,
             area: .seoul,
             genre: .musical,
             openRun: false,
@@ -78,7 +109,7 @@ class RecordDetailViewController: UIViewController {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "yyyy-MM-dd"
 
-        diaries = [
+        records = [
             Record(
                 id: UUID().uuidString,
                 performanceID: p1.id,
@@ -123,9 +154,8 @@ class RecordDetailViewController: UIViewController {
 extension RecordDetailViewController {
     
     private func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<RecordCell, Record> { cell, indexPath, diary in
-            cell.configure(with: diary)
-            
+        let cellRegistration = UICollectionView.CellRegistration<RecordCell, Record> { cell, indexPath, record in
+            cell.configure(with: record)
             // 사진 셀 탭 핸들러 설정
             cell.onPhotoTapped = { [weak self] image in
                 guard let self else { return }
@@ -137,27 +167,39 @@ extension RecordDetailViewController {
             }
         }
         
-        dataSource = UICollectionViewDiffableDataSource<Section, Record>(collectionView: recordDetailView.collectionView) {
-            (collectionView: UICollectionView, indexPath: IndexPath, identifier: Record) -> UICollectionViewCell? in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: identifier)
+        let cellProvider: CellProvider = { (collectionView, indexPath, itemIdentifier) -> UICollectionViewCell? in
+            return collectionView.dequeueConfiguredReusableCell(
+                using: cellRegistration,
+                for: indexPath,
+                item: itemIdentifier
+            )
         }
+        
+        dataSource = DiffableDataSource(
+            collectionView: recordDetailView.collectionView,
+            cellProvider: cellProvider
+        )
 
         // 헤더 설정
-        let headerRegistration = UICollectionView.SupplementaryRegistration<RecordSectionHeaderView>(elementKind: UICollectionView.elementKindSectionHeader) {
+        let headerRegistration = SupplementaryRegistration(
+            elementKind: UICollectionView.elementKindSectionHeader
+        ) {
             (headerView, string, indexPath) in
-            headerView.configure(count: self.diaries.count)
+            headerView.configure(count: self.records.count)
         }
 
         dataSource.supplementaryViewProvider = { (view, kind, index) in
             return self.recordDetailView.collectionView.dequeueConfiguredReusableSupplementary(
-                using: headerRegistration, for: index)
+                using: headerRegistration,
+                for: index
+            )
         }
     }
     
     private func applySnapshot() {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Record>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(diaries)
+        snapshot.appendItems(records)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
 }

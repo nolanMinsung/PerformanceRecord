@@ -110,6 +110,7 @@ extension PerformanceDetailListResponse {
             endDate: dateFormatter.date(from: detailPerformance.prfpdto)!,
             facilityFullName: detailPerformance.fcltynm,
             posterURL: detailPerformance.poster.convertURLToHTTPS(),
+            posterImageID: nil,
             area: Constant.AdminAreaCode.findBy(name: detailPerformance.area),
             genre: Constant.Genre.findBy(name: detailPerformance.genrenm),
             openRun: (detailPerformance.openrun == "Y"),
@@ -137,6 +138,7 @@ extension PerformanceDetailListResponse {
                 facilityID: detailPerformance.mt10id,
                 detailDateGuidance: detailPerformance.dtguidance,
                 detailImageURLs: detailPerformance.styurls.styurl.map { $0.convertURLToHTTPS() },
+                detailImageIDs: [],
                 relatedLinks: detailPerformance.relates.relate.map {
                     RelatedLink(name: $0.relatenm, url: $0.relateurl)
                 }

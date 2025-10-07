@@ -12,6 +12,17 @@ import RxSwift
 import RxCocoa
 import SnapKit
 
+enum AddRecordError: LocalizedError {
+    case unsupportedImageExtension
+    
+    var errorDescription: String? {
+        switch self {
+        case .unsupportedImageExtension:
+            return "지원하지 않는 이미지 확장자 파일입니다."
+        }
+    }
+}
+
 class AddRecordViewController: ModalCardViewController {
     
     private let rootView: AddRecordView
@@ -170,15 +181,15 @@ extension AddRecordViewController: PHPickerViewControllerDelegate {
     }
     
     private func prepareImageData(from provider: NSItemProvider) async throws -> ImageDataForSaving {
-        if let heicData = try? await provider.loadDataRepresentation(for: .heic) {
-            return .init(data: heicData, type: .heic)
-        } else if let jpegData = try? await provider.loadDataRepresentation(for: .jpeg) {
-            return .init(data: jpegData, type: .jpeg)
-        } else {
-            fatalError()
+        let supportedTypes: [UTType] = [.heic, .jpeg, .png, .tiff, .gif, .webP, .bmp]
+        guard let supportedType = supportedTypes.first(
+            where: { type in provider.hasItemConformingToTypeIdentifier(type.identifier)}
+        ) else {
+            throw AddRecordError.unsupportedImageExtension
         }
+        let data = try await provider.loadDataRepresentation(for: supportedType)
+        return ImageDataForSaving(data: data, type: supportedType)
     }
-    
     
 }
 

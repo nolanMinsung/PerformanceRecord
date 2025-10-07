@@ -115,6 +115,7 @@ extension PerformanceObject {
                 facilityID: facilityID,
                 detailDateGuidance: self.detailDateGuidance ?? "",
                 detailImageURLs: [], // URL을 알 수 없으므로 비워둠.
+                detailImageIDs: Array(detailImageUUIDs),
                 relatedLinks: domainRelatedLinks
             )
         } else {
@@ -129,6 +130,7 @@ extension PerformanceObject {
             endDate: self.endDate,
             facilityFullName: self.facilityFullName,
             posterURL: "", // UUID만 있으므로 URL은 비워둠.
+            posterImageID: posterImageUUID,
             area: Constant.AdminAreaCode(rawValue: self.area) ?? .unknown,
             genre: Constant.Genre(rawValue: self.genre) ?? .unknown,
             openRun: self.openRun,

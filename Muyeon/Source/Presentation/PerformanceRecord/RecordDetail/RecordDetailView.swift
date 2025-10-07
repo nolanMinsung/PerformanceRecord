@@ -51,8 +51,8 @@ class RecordDetailView: UIView {
     }
     
     // MARK: - Public Methods
-    func configureHeader(with performance: Performance) {
-        performanceHeaderView.configure(with: performance)
+    func configureHeader(with performance: Performance, poster: UIImage?) {
+        performanceHeaderView.configure(with: performance, poster: poster)
     }
     
     // MARK: - Compositional Layout

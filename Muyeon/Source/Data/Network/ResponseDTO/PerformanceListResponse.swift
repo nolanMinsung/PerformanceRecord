@@ -67,6 +67,7 @@ extension PerformanceListResponse {
                 endDate: dateFormmater.date(from: $0.prfpdto)!,
                 facilityFullName: $0.fcltynm,
                 posterURL: $0.poster.convertURLToHTTPS(),
+                posterImageID: nil,
                 area: Constant.AdminAreaCode.findBy(name: $0.area),
                 genre: Constant.Genre.findBy(name: $0.genrenm),
                 openRun: ($0.openrun == "Y"),
