@@ -45,7 +45,7 @@ class RecordDetailView: UIView {
         }
         
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(performanceHeaderView.snp.bottom)
+            $0.top.equalTo(performanceHeaderView.snp.bottom).offset(16)
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
@@ -59,7 +59,7 @@ class RecordDetailView: UIView {
     private func createLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
-            heightDimension: .estimated(150) // 높이를 동적으로 조절하기 위해 estimated 사용
+            heightDimension: .estimated(150)
         )
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         

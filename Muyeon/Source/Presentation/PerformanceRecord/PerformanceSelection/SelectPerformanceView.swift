@@ -33,7 +33,7 @@ class SelectPerformanceView: UIView {
     
     let continueButton: UIButton = {
         var config = UIButton.Configuration.filled()
-        config.title = "선택한 공연으로 계속"
+        config.title = "이 공연을 봤어요"
         config.baseBackgroundColor = .label
         config.baseForegroundColor = .systemBackground
         let button = UIButton(configuration: config)
@@ -53,7 +53,7 @@ class SelectPerformanceView: UIView {
     private func setupLayout() {
         // UI 컴포넌트 생성
         let titleLabel = UILabel()
-        titleLabel.text = "새 관람 기록 추가"
+        titleLabel.text = "공연 검색하기"
         titleLabel.font = .systemFont(ofSize: 22, weight: .bold)
         
         let subtitleLabel = UILabel()

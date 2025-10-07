@@ -10,7 +10,7 @@ import SnapKit
 
 class AddRecordView: UIView {
     
-    // MARK: - UI Components (ViewController에서 접근 필요)
+    // MARK: - UI Components
     let memoTextView = UITextView()
     let imagesCollectionView: UICollectionView
     let saveButton = UIButton()
@@ -63,7 +63,10 @@ class AddRecordView: UIView {
         imagesCollectionView.reloadData()
         
         // 이미지 추가 박스의 레이블 업데이트
-        if let label = imageAddBox.subviews.compactMap({ $0 as? UIStackView }).first?.arrangedSubviews.compactMap({ $0 as? UILabel }).first {
+        if let label = imageAddBox.subviews
+            .compactMap({ $0 as? UIStackView })
+            .first?.arrangedSubviews
+            .compactMap({ $0 as? UILabel }).first {
             label.text = "이미지 추가 (\(imageCount)/5)"
         }
     }
@@ -72,6 +75,7 @@ class AddRecordView: UIView {
     private func setupLayout(with performance: Performance) {
         let scrollView = UIScrollView()
         scrollView.showsVerticalScrollIndicator = false
+        scrollView.keyboardDismissMode = .onDrag
         let contentStackView = UIStackView()
         contentStackView.axis = .vertical
         contentStackView.spacing = 24

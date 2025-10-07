@@ -56,7 +56,7 @@ class RecordDetailViewController: UIViewController {
     }
     
     private func setupData() {
-        self.records = performance.records
+        self.records = performance.records.sorted(by: { $0.viewedAt > $1.viewedAt })
     }
     
     // MARK: - Setup

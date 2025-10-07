@@ -21,7 +21,8 @@ class PerformanceRecordCell: UICollectionViewCell {
     
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 18, weight: .bold)
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.numberOfLines = 0
         return label
     }()
     
@@ -45,6 +46,7 @@ class PerformanceRecordCell: UICollectionViewCell {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
         label.textColor = .secondaryLabel
+        label.numberOfLines = 0
         return label
     }()
     
@@ -106,31 +108,36 @@ class PerformanceRecordCell: UICollectionViewCell {
         contentView.addSubview(containerView)
         
         countLabelContainer.addSubview(countLabel)
+        countLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
         let titleStack = UIStackView(arrangedSubviews: [titleLabel, countLabelContainer])
         titleStack.spacing = 8
         titleStack.alignment = .center
 
         genreTagLabelContainer.addSubview(genreTagLabel)
-        let facilityStack = UIStackView(arrangedSubviews: [facilityLabel, genreTagLabelContainer, ratingLabel])
-        facilityStack.spacing = 8
-        facilityStack.alignment = .center
+        genreTagLabel.snp.contentCompressionResistanceHorizontalPriority = 800
+        genreTagLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
+        let performanceInfoStack = UIStackView(arrangedSubviews: [genreTagLabelContainer, ratingLabel])
+        performanceInfoStack.axis = .horizontal
+        performanceInfoStack.spacing = 8
+        performanceInfoStack.alignment = .center
         
         let vStack = UIStackView(arrangedSubviews: [
             titleStack,
-            facilityStack,
+            facilityLabel,
+            performanceInfoStack,
             lastViewedDateLabel,
             memoLabel,
             seeMoreButton
         ])
         vStack.axis = .vertical
         vStack.spacing = 8
-        vStack.setCustomSpacing(12, after: facilityStack)
+        vStack.setCustomSpacing(24, after: performanceInfoStack)
         vStack.alignment = .leading
         
         containerView.addSubview(vStack)
         
         containerView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview().inset(8)
+            make.verticalEdges.equalToSuperview()
             make.horizontalEdges.equalToSuperview()
         }
         
@@ -154,7 +161,7 @@ class PerformanceRecordCell: UICollectionViewCell {
 
         titleLabel.text = performance.name
         countLabel.text = "\(records.count)회 관람"
-        facilityLabel.text = "📍 \(performance.facilityFullName)"
+        facilityLabel.text = "\(performance.facilityFullName)"
         genreTagLabel.text = performance.genre.description
         
         let starAttachment = NSTextAttachment()

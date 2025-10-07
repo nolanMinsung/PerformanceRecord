@@ -12,6 +12,14 @@ import RxCocoa
 
 class PerformanceRecordViewController: UIViewController {
     
+    private struct HeaderData {
+        var stats: (totalCount: Int, performanceCount: Int, averageRating: Double, thisYearCount: Int, photoCount: Int)?
+        var recentRecord: (record: Record?, performance: Performance)?
+        var mostViewed: Performance?
+    }
+    
+    private var headerData = HeaderData()
+    
     private let rootView = PerformanceRecordView()
     private let viewModel = PerformanceRecordViewModel(
         fetchLikePerformanceListUseCase: DefaultFetchLikePerformanceListUseCase(
@@ -30,7 +38,8 @@ class PerformanceRecordViewController: UIViewController {
             diaryRepository: DefaultDiaryRepository.shared
         )
     )
-    let disposeBag = DisposeBag()
+    private let addRecordButtonTap = PublishSubject<Void>()
+    private let disposeBag = DisposeBag()
     
     // MARK: - Properties
     private let diariesUpdateTrigger = PublishRelay<Void>()
@@ -46,14 +55,16 @@ class PerformanceRecordViewController: UIViewController {
         
         rootView.collectionView.dataSource = self
         rootView.collectionView.delegate = self
+        navigationController?.navigationBar.isHidden = true
         bind()
         diariesUpdateTrigger.accept(())
     }
     
     private func bind() {
+        
         let input = PerformanceRecordViewModel.Input(
             updateDiaries: diariesUpdateTrigger.asObservable(),
-            addRecordButtonTapped: rootView.addRecordButton.rx.tap.asObservable()
+            addRecordButtonTapped: addRecordButtonTap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -65,19 +76,14 @@ class PerformanceRecordViewController: UIViewController {
                 with: self,
                 onNext: { owner, diaries in
                     owner.diaries = diaries
-                    owner.rootView.collectionView.reloadData()
                     let totalRecords = diaries.count
                     let uniquePerformanceIDs = Set(diaries.map { $0.performanceID })
                     let averageRating = diaries.isEmpty ? 0 : diaries.map { $0.rating }.reduce(0, +) / Double(diaries.count)
                     let thisYearCount = 0// diaries.filter { Calendar.current.isDateInThisYear($0.viewedAt) }.count
                     let photoCount = diaries.flatMap { $0.diaryImageUUIDs }.count
-                    owner.rootView.configureStats(
-                        totalCount: totalRecords,
-                        performanceCount: uniquePerformanceIDs.count,
-                        averageRating: averageRating,
-                        thisYearCount: thisYearCount,
-                        photoCount: photoCount
-                    )
+                    
+                    owner.headerData.stats = (totalRecords, uniquePerformanceIDs.count, averageRating, thisYearCount, photoCount)
+                    owner.rootView.collectionView.reloadData()
                 })
             .disposed(by: disposeBag)
         
@@ -86,7 +92,7 @@ class PerformanceRecordViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, data in
                 let (recentRecord, performance) = data
-                owner.rootView.configureRecentRecord(recentRecord: recentRecord, performance: performance)
+                owner.headerData.recentRecord = (recentRecord, performance)
             }
             .disposed(by: disposeBag)
         
@@ -94,7 +100,7 @@ class PerformanceRecordViewController: UIViewController {
             .debug()
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, performance in
-                owner.rootView.configureMostViewed(mostViewedPerformance: performance)
+                owner.headerData.mostViewed = performance
             })
             .disposed(by: disposeBag)
         
@@ -104,9 +110,6 @@ class PerformanceRecordViewController: UIViewController {
             .bind(with: self, onNext: { owner, performancesWithRecords in
                 owner.performancesWithRecords = performancesWithRecords
                 owner.rootView.collectionView.reloadData()
-                DispatchQueue.main.async {
-                    owner.rootView.updateCollectionViewHeight()
-                }
             })
             .disposed(by: disposeBag)
         
@@ -127,6 +130,12 @@ class PerformanceRecordViewController: UIViewController {
             .disposed(by: disposeBag)
     }
     
+    private func reloadHeader() {
+        DispatchQueue.main.async {
+            self.rootView.collectionView.reloadSections(IndexSet(integer: 0))
+        }
+    }
+    
 }
 
 
@@ -144,6 +153,43 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
         let relatedRecords = diaries.filter { $0.performanceID == performance.id }
         cell.configure(performance: performance, records: relatedRecords)
         return cell
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        guard kind == UICollectionView.elementKindSectionHeader else {
+            fatalError()
+        }
+        guard let header = collectionView.dequeueReusableSupplementaryView(
+            ofKind: kind,
+            withReuseIdentifier: PerformanceRecordHeaderView.reuseIdentifier,
+            for: indexPath
+        ) as? PerformanceRecordHeaderView else {
+            fatalError()
+        }
+        
+        if let stats = headerData.stats {
+            header.configureStats(
+                totalCount: stats.totalCount,
+                performanceCount: stats.performanceCount,
+                averageRating: stats.averageRating,
+                thisYearCount: stats.thisYearCount,
+                photoCount: stats.photoCount
+            )
+        }
+        
+        if let recentData = headerData.recentRecord {
+            header.configureRecentRecord(recentRecord: recentData.record, performance: recentData.performance)
+        }
+        
+        if let mostViewed = headerData.mostViewed {
+            header.configureMostViewed(mostViewedPerformance: mostViewed)
+        }
+        
+        header.addRecordButton.rx.tap
+            .bind(to: addRecordButtonTap)
+            .disposed(by: header.disposeBag)
+        
+        return header
     }
 }
 

@@ -14,13 +14,13 @@ class RecordCell: UICollectionViewCell {
     // MARK: - UI Components
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
+        label.font = .systemFont(ofSize: 17, weight: .semibold)
         return label
     }()
     
     private let ratingLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: 16)
         return label
     }()
     
@@ -33,7 +33,7 @@ class RecordCell: UICollectionViewCell {
     
     private let photoTitleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14, weight: .semibold)
+        label.font = .systemFont(ofSize: 15, weight: .semibold)
         label.textColor = .secondaryLabel
         return label
     }()

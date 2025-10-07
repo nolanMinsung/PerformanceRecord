@@ -75,13 +75,15 @@ class PerformanceSelectionCell: UICollectionViewCell {
             make.leading.verticalEdges.equalToSuperview().inset(16)
         }
         
-        titleLabel.snp.contentCompressionResistanceVerticalPriority = 1000
+        titleLabel.snp.contentCompressionResistanceVerticalPriority = 900
+        titleLabel.snp.contentCompressionResistanceHorizontalPriority = 900
         titleLabel.snp.contentHuggingVerticalPriority = 1000
         venueLabel.snp.contentCompressionResistanceVerticalPriority = 1000
         venueLabel.snp.contentHuggingVerticalPriority = 1000
         
         genreTagLabelContainer.snp.contentHuggingHorizontalPriority = 800
-        genreTagLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
+        genreTagLabel.snp.contentCompressionResistanceHorizontalPriority = 1000
+        genreTagLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 1000
         genreTagLabelContainer.snp.makeConstraints { make in
             make.centerY.equalTo(infoStack)
             make.leading.equalTo(infoStack.snp.trailing).offset(12)

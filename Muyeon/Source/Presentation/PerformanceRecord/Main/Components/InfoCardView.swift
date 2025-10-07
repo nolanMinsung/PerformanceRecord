@@ -28,6 +28,7 @@ class InfoCardView: UIView {
     private let mainContentLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.numberOfLines = 0
         return label
     }()
     

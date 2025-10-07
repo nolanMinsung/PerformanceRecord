@@ -23,21 +23,22 @@ class PerformanceHeaderView: UIView {
 
     private let titleLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 20, weight: .bold)
+        label.font = .systemFont(ofSize: 16, weight: .bold)
         label.textColor = .label
+        label.numberOfLines = 0
         return label
     }()
 
     private let venueLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: 13)
         label.textColor = .secondaryLabel
         return label
     }()
     
     private let dateLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
+        label.font = .systemFont(ofSize: 13)
         label.textColor = .secondaryLabel
         return label
     }()
@@ -85,13 +86,13 @@ class PerformanceHeaderView: UIView {
     }
 
     private func setupLayout() {
-        posterImageView.snp.makeConstraints {
-            $0.width.equalTo(60)
-            $0.height.equalTo(posterImageView.snp.width).multipliedBy(1.4)
+        posterImageView.snp.makeConstraints { make in
+            make.width.equalTo(60)
+            make.height.equalTo(posterImageView.snp.width).multipliedBy(1.4)
         }
         
-        mainStackView.snp.makeConstraints {
-            $0.edges.equalToSuperview().inset(16)
+        mainStackView.snp.makeConstraints { make in
+            make.edges.equalToSuperview().inset(8)
         }
     }
     
