@@ -37,6 +37,7 @@ class PerformanceRecordViewController: UIViewController {
         super.viewDidLoad()
         
         rootView.collectionView.dataSource = self
+        rootView.collectionView.delegate = self
         bind()
         diariesUpdateTrigger.accept(())
     }
@@ -153,6 +154,17 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
         cell.configure(performance: performance, records: relatedRecords)
         return cell
     }
+}
+
+
+extension PerformanceRecordViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let vc = RecordDetailViewController()
+        vc.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
 }
 
 
