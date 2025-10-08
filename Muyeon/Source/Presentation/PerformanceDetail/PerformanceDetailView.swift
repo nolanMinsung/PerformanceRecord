@@ -141,7 +141,25 @@ final class PerformanceDetailView: UIView {
     
     private let periodLabel: UILabel = {
         let label = UILabel()
-//        label.text = "2025.10.25 - 2025.11.09"
+        label.text = ""
+        label.font = .systemFont(ofSize: 15, weight: .semibold)
+        label.textColor = .label
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    // --- 시간 정보 ---
+    private let timeGuidanceContainerView = UIView()
+    private let timeGuidanceTitleLabel: UILabel = {
+        let label = UILabel()
+        label.text = "시간"
+        label.font = .systemFont(ofSize: 16, weight: .bold)
+        label.textColor = .systemGray
+        return label
+    }()
+    
+    private let timeGuidanceLabel: UILabel = {
+        let label = UILabel()
         label.text = ""
         label.font = .systemFont(ofSize: 15, weight: .semibold)
         label.textColor = .label
@@ -192,6 +210,12 @@ final class PerformanceDetailView: UIView {
     
     private func setupUIProperties() {
         scrollView.contentInsetAdjustmentBehavior = .never
+        detailsStackView.isHidden = true
+        venueContainerView.isHidden = true
+        periodContainerView.isHidden = true
+        timeGuidanceContainerView.isHidden = true
+        storyTitleLabel.isHidden = true
+        storyBodyLabel.isHidden = true
     }
     
     private func setupHierarchy() {
@@ -210,6 +234,9 @@ final class PerformanceDetailView: UIView {
         infoStackView.addArrangedSubview(detailsStackView)
         infoStackView.addArrangedSubview(venueContainerView)
         infoStackView.addArrangedSubview(periodContainerView)
+        infoStackView.addArrangedSubview(timeGuidanceContainerView)
+        infoStackView.addArrangedSubview(storyTitleLabel)
+        infoStackView.addArrangedSubview(storyBodyLabel)
         
         // 가로 상세 정보 스택 뷰
         let dotLabel1 = createDotLabel()
@@ -224,6 +251,9 @@ final class PerformanceDetailView: UIView {
         
         periodContainerView.addSubview(periodTitleLabel)
         periodContainerView.addSubview(periodLabel)
+        
+        timeGuidanceContainerView.addSubview(timeGuidanceTitleLabel)
+        timeGuidanceContainerView.addSubview(timeGuidanceLabel)
     }
     
     private func setupLayoutConstraints() {
@@ -277,28 +307,26 @@ final class PerformanceDetailView: UIView {
             make.verticalEdges.trailing.equalToSuperview()
         }
         
-        // 기간 뷰
         periodTitleLabel.snp.makeConstraints { make in
             make.leading.centerY.equalToSuperview()
-            make.width.equalTo(35) // "장소", "기간" 너비 고정
+            make.width.equalTo(35) // "장소", "기간", "시간" 너비 고정
         }
         
-        // 상연 기간
         periodLabel.snp.makeConstraints { make in
             make.leading.equalTo(periodTitleLabel.snp.trailing).offset(8)
             make.verticalEdges.trailing.equalToSuperview()
         }
         
-        // 줄거리 제목
-        storyTitleLabel.snp.makeConstraints { make in
-            make.top.equalTo(infoStackView.snp.bottom).offset(30)
-            make.horizontalEdges.equalTo(scrollView.frameLayoutGuide).inset(20)
+        // 기간 뷰
+        timeGuidanceTitleLabel.snp.makeConstraints { make in
+            make.leading.centerY.equalToSuperview()
+            make.width.equalTo(35) // "장소", "기간", "시간" 너비 고정
         }
         
-        // 줄거리 내용
-        storyBodyLabel.snp.makeConstraints { make in
-            make.top.equalTo(storyTitleLabel.snp.bottom).offset(12)
-            make.horizontalEdges.equalTo(storyTitleLabel)
+        // 상연 기간
+        timeGuidanceLabel.snp.makeConstraints { make in
+            make.leading.equalTo(timeGuidanceTitleLabel.snp.trailing).offset(8)
+            make.verticalEdges.trailing.equalToSuperview()
         }
         
         additionalImageStackView.snp.makeConstraints { make in
@@ -331,10 +359,12 @@ extension PerformanceDetailView {
         titleLabel.text = performance.name
         likeButton.isEnabled = true
         likeButton.isSelected = likePerformanceIDs.contains(performance.id)
+        
         genreLabel.text = performance.genre.description
         durationLabel.text = performance.detail?.runtime ?? "-시간"
         ageRatingLabel.text = performance.detail?.ageLimit
-        storyBodyLabel.text = performance.detail?.story
+        detailsStackView.isHidden = false
+        
         if #available(iOS 16.0, *) {
             let (placeName, placeDetail) = performance.facilityFullName.parsePlaceAndDetail()!
             facilityButton.configuration?.title = placeName
@@ -342,7 +372,24 @@ extension PerformanceDetailView {
         } else {
             facilityButton.configuration?.title = performance.facilityFullName
         }
-        periodLabel.text = performance.detail?.detailDateGuidance.replacingOccurrences(of: ", ", with: "\n")
+        venueContainerView.isHidden = false
+        
+        let periodStartDate = performance.startDate.formatted(date: .abbreviated, time: .omitted)
+        let periodEndDate = performance.endDate.formatted(date: .abbreviated, time: .omitted)
+        periodLabel.text = "\(periodStartDate) ~ \(periodEndDate)"
+        periodContainerView.isHidden = false
+        
+        timeGuidanceLabel.text = performance.detail?.detailDateGuidance.replacingOccurrences(of: ", ", with: "\n")
+        timeGuidanceContainerView.isHidden = false
+        
+        if let story = performance.detail?.story, !story.isEmpty {
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = 4
+            let attributedString = NSAttributedString(string: story, attributes: [.paragraphStyle: paragraphStyle])
+            storyBodyLabel.attributedText = attributedString
+            storyBodyLabel.isHidden = false
+            storyTitleLabel.isHidden = false
+        }
         
         updateAdditionalImages(urls: performance.detail?.detailImageURLs ?? [])
     }
