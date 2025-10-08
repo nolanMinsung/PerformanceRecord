@@ -46,7 +46,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
         button.setTitle("즐겨찾기한 공연", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
         button.backgroundColor = .Main.primary
-        button.setTitleColor(.systemBackground, for: .normal)
+        button.setTitleColor(.white, for: .normal)
         button.layer.cornerRadius = 10
         button.contentEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
         return button

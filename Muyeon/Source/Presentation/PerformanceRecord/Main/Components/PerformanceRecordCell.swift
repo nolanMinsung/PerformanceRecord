@@ -36,7 +36,7 @@ class PerformanceRecordCell: UICollectionViewCell {
     
     private let countLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = .systemFont(ofSize: 13, weight: .medium)
         label.textColor = .Main.primary
         label.textAlignment = .center
         return label
@@ -60,7 +60,7 @@ class PerformanceRecordCell: UICollectionViewCell {
     
     private let genreTagLabel: UILabel = {
         let label = UILabel()
-        label.font = .systemFont(ofSize: 12, weight: .medium)
+        label.font = .systemFont(ofSize: 13, weight: .medium)
         label.textColor = .Main.primary
         label.textAlignment = .center
         return label
@@ -95,13 +95,14 @@ class PerformanceRecordCell: UICollectionViewCell {
     private let lastViewedDateLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
-        label.textColor = .tertiaryLabel
+        label.textColor = .label
         return label
     }()
     
     private let ratingLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
+        label.textColor = .secondaryLabel
         return label
     }()
     
@@ -206,7 +207,7 @@ class PerformanceRecordCell: UICollectionViewCell {
         spacer.snp.contentHuggingHorizontalPriority = 100
         let performanceTagStack = UIStackView(arrangedSubviews: [genreTagLabelContainer, countLabelContainer, spacer])
         performanceTagStack.axis = .horizontal
-        performanceTagStack.spacing = 8
+        performanceTagStack.spacing = 6
         performanceTagStack.alignment = .fill
         vStack.addArrangedSubview(performanceTagStack)
         

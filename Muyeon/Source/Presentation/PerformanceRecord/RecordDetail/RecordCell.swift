@@ -121,7 +121,10 @@ class RecordCell: SwipableCell {
         // 메모가 있으면 표시하고, 없으면 숨김
         let reviewText = record.reviewText
         if !reviewText.isEmpty {
-            memoLabel.text = reviewText
+            let paragraphStyle = NSMutableParagraphStyle()
+            paragraphStyle.lineSpacing = 4
+            let attributedString = NSAttributedString(string: reviewText, attributes: [.paragraphStyle: paragraphStyle])
+            memoLabel.attributedText = attributedString
             memoLabel.isHidden = false
         } else {
             memoLabel.isHidden = true

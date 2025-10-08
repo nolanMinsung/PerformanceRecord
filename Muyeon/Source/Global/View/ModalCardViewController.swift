@@ -41,7 +41,7 @@ class ModalCardViewController: UIViewController {
     private func setupConstraints() {
         containerView.snp.makeConstraints { make in
             make.centerY.equalToSuperview()
-            make.leading.trailing.equalToSuperview().inset(20)
+            make.leading.trailing.equalToSuperview().inset(12)
             make.height.lessThanOrEqualTo(view.safeAreaLayoutGuide).inset(20)
         }
         

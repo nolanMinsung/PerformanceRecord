@@ -32,7 +32,6 @@ class AddRecordViewController: ModalCardViewController {
     private let performance: Performance
     private var selectedDate: Date = Date()
     private var rating: Double = 5.0
-//    private var currentSelectedImage: [ImageRecord] = []
     private var addedImageData = PublishRelay<[(ImageDataForSaving, UIImage)]>()
     private var deleteImageData = PublishRelay<IndexPath>()
     private var currentSelectedImage: [UIImage] = []

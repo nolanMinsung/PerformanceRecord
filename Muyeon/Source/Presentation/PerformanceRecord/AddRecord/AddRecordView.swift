@@ -37,6 +37,13 @@ class AddRecordView: UIView {
         viewedDatePicker.preferredDatePickerStyle = .compact
         viewedDatePicker.locale = Locale(identifier: "ko_KR")
         
+        var saveButtonConfig = UIButton.Configuration.filled()
+        saveButtonConfig.title = "새 기록 만들기"
+        saveButtonConfig.baseBackgroundColor = .Main.primary
+        saveButtonConfig.baseForegroundColor = .white
+        saveButtonConfig.cornerStyle = .large
+        saveButton.configuration = saveButtonConfig
+        
         ratingView.setRating(5.0)
         
         super.init(frame: .zero)
@@ -80,10 +87,8 @@ class AddRecordView: UIView {
         contentStackView.axis = .vertical
         contentStackView.spacing = 24
         
-        let bottomButtonStack = createBottomButtons()
-        
         addSubview(scrollView)
-        addSubview(bottomButtonStack)
+        addSubview(saveButton)
         scrollView.addSubview(contentStackView)
         
         scrollView.snp.makeConstraints { make in
@@ -92,7 +97,7 @@ class AddRecordView: UIView {
             make.height.equalTo(400)
         }
         
-        bottomButtonStack.snp.makeConstraints { make in
+        saveButton.snp.makeConstraints { make in
             make.top.equalTo(scrollView.snp.bottom).offset(16)
             make.leading.trailing.bottom.equalToSuperview().inset(24)
             make.height.equalTo(50)
@@ -197,25 +202,8 @@ class AddRecordView: UIView {
             make.height.equalTo(100)
         }
     }
-    private func createBottomButtons() -> UIView {
-        let backButton = UIButton()
-        backButton.setTitle("뒤로", for: .normal)
-        backButton.backgroundColor = .systemGray5
-        backButton.setTitleColor(.label, for: .normal)
-        backButton.layer.cornerRadius = 10
-        
-        saveButton.setTitle("기록 저장", for: .normal)
-        saveButton.backgroundColor = .label
-        saveButton.setTitleColor(.systemBackground, for: .normal)
-        saveButton.layer.cornerRadius = 10
-
-        let stack = UIStackView(arrangedSubviews: [backButton, saveButton])
-        stack.distribution = .fillEqually
-        stack.spacing = 8
-        return stack
-    }
     
     // MARK: - Actions
     @objc private func addImageTapped() { onAddImageTapped?() }
-//    @objc private func saveButtonTapped() { onSaveButtonTapped?() }
+    
 }

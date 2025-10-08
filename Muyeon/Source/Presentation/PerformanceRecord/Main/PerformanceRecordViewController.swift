@@ -293,8 +293,9 @@ extension PerformanceRecordViewController: SelectPerformanceDelegate {
     func showAddRecordFlow(performances: [Performance]) {
         let selectVC = SelectPerformanceViewController(performances: performances)
         selectVC.delegate = self
-        selectVC.modalPresentationStyle = .overFullScreen
-        selectVC.modalTransitionStyle = .crossDissolve
+        selectVC.sheetPresentationController?.detents = [.medium(), .large()]
+        selectVC.sheetPresentationController?.prefersGrabberVisible = true
+        selectVC.sheetPresentationController?.preferredCornerRadius = 25
         present(selectVC, animated: true)
     }
     

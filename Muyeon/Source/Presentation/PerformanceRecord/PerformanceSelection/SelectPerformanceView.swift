@@ -49,6 +49,7 @@ class SelectPerformanceView: UIView {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
+        backgroundColor = .systemBackground
         setupLayout()
     }
     
@@ -68,39 +69,29 @@ class SelectPerformanceView: UIView {
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         
-//        let addNewPerformanceButton: UIButton = {
-//            var config = UIButton.Configuration.filled()
-//            config.title = "새 공연 추가"
-//            config.image = UIImage(systemName: "plus")
-//            config.baseBackgroundColor = .systemGray5
-//            config.baseForegroundColor = .label
-//            config.imagePadding = 6
-//            return UIButton(configuration: config)
-//        }()
+        let titleStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel])
+        titleStack.axis = .vertical
+        titleStack.spacing = 16
         
-        // 레이아웃 구성
-//        let buttonStack = UIStackView(arrangedSubviews: [addNewPerformanceButton, continueButton])
-//        buttonStack.axis = .horizontal
-//        buttonStack.spacing = 8
-//        buttonStack.distribution = .fillEqually
+        addSubview(titleStack)
+        addSubview(collectionView)
+        addSubview(addRecordButton)
         
-        let mainStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, collectionView, addRecordButton])
-        mainStack.axis = .vertical
-        mainStack.spacing = 16
-        
-        addSubview(mainStack)
-        
-        addRecordButton.snp.makeConstraints { make in
-            make.height.equalTo(45)
-        }
-        
-        mainStack.snp.makeConstraints { make in
-            make.top.equalToSuperview()
-            make.leading.trailing.bottom.equalToSuperview().inset(24)
+        titleStack.snp.makeConstraints { make in
+            make.top.equalTo(safeAreaLayoutGuide).inset(24)
+            make.horizontalEdges.equalToSuperview().inset(24)
         }
         
         collectionView.snp.makeConstraints { make in
-            make.height.equalTo(300)
+            make.top.equalTo(titleStack.snp.bottom).offset(16)
+            make.horizontalEdges.equalTo(titleStack)
+        }
+        
+        addRecordButton.snp.makeConstraints { make in
+            make.top.equalTo(collectionView.snp.bottom).offset(16)
+            make.horizontalEdges.equalTo(titleStack)
+            make.bottom.equalTo(safeAreaLayoutGuide).inset(10)
+            make.height.equalTo(50)
         }
     }
 }

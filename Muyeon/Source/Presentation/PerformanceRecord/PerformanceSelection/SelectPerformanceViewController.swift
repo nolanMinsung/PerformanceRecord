@@ -12,9 +12,8 @@ protocol SelectPerformanceDelegate: AnyObject {
     func didSelectPerformance(_ performance: Performance)
 }
 
-class SelectPerformanceViewController: ModalCardViewController {
+class SelectPerformanceViewController: UIViewController {
     
-    // View를 rootView 상수로 선언
     private let rootView = SelectPerformanceView()
     
     weak var delegate: SelectPerformanceDelegate?
@@ -30,14 +29,13 @@ class SelectPerformanceViewController: ModalCardViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func loadView() {
+        view = rootView
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        containerView.addSubview(rootView)
-        rootView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(46)
-            make.horizontalEdges.bottom.equalToSuperview()
-        }
         rootView.collectionView.dataSource = self
         rootView.collectionView.delegate = self
         rootView.addRecordButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
@@ -51,6 +49,7 @@ class SelectPerformanceViewController: ModalCardViewController {
             self?.delegate?.didSelectPerformance(selectedPerformance)
         }
     }
+    
 }
 
 extension SelectPerformanceViewController: UICollectionViewDataSource {
