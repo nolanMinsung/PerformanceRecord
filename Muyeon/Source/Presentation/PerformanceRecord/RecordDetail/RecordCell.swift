@@ -68,8 +68,10 @@ class RecordCell: SwipableCell {
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-//        contentView.backgroundColor = .systemBackground
-//        contentView.layer.cornerRadius = 12
+        
+        isLeftSwipeEnable = true
+        isRightSwipeEnable = false
+        
         setupUI()
         setupLayout()
         photoCollectionView.delegate = self // 델리게이트 설정

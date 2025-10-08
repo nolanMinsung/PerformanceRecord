@@ -16,12 +16,10 @@ class HomeTopTenHeaderView: UICollectionReusableView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        backgroundColor = .systemGray6
-        
         titleLabel.font = .systemFont(ofSize: 32, weight: .bold)
         titleLabel.text = "TOP 10"
         dateLabel.font = .systemFont(ofSize: 17, weight: .semibold)
-        dateLabel.text = "9월 22일"
+        dateLabel.text = Date.now.addingDay(-2).formatted(date: .abbreviated, time: .omitted)
         
         addSubview(titleLabel)
         addSubview(dateLabel)

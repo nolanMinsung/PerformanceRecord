@@ -165,6 +165,10 @@ extension RecordDetailViewController {
                 photoVC.modalTransitionStyle = .crossDissolve
                 self.present(photoVC, animated: true)
             }
+            
+            cell.leftSwipeAction = {
+                print("left Swipe Action!!")
+            }
         }
         
         let cellProvider: CellProvider = { (collectionView, indexPath, itemIdentifier) -> UICollectionViewCell? in

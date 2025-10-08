@@ -18,6 +18,11 @@ class SwipableCell: UICollectionViewCell {
     private var isBlueCircleFilled: Bool = false
     private var isRedCircleFilled: Bool = false
     
+    var isLeftSwipeEnable: Bool = true
+    var isRightSwipeEnable: Bool = true
+    var leftSwipeAction: (() -> Void)?
+    var rightSwipeAction: (() -> Void)?
+    
     private let panGestureRecognizer: UIPanGestureRecognizer = {
         let panGestureRecognizer = UIPanGestureRecognizer()
         panGestureRecognizer.maximumNumberOfTouches = 1
@@ -36,9 +41,9 @@ class SwipableCell: UICollectionViewCell {
      bludView UI Components
      */
     
-    let blueViewLabel: UILabel = {
+    private let blueViewLabel: UILabel = {
         let label = UILabel()
-        label.text = "OO 목록에\n추가"
+        label.text = "OO 목록에\n추가" // 임시 문구
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .systemBackground
         label.numberOfLines = 2
@@ -46,7 +51,7 @@ class SwipableCell: UICollectionViewCell {
         return label
     }()
     
-    let circleViewForAddInteraction: UIImageView = {
+    private let circleViewForAddInteraction: UIImageView = {
         let view = UIImageView()
         view.backgroundColor = .clear
         view.clipsToBounds = true
@@ -54,9 +59,9 @@ class SwipableCell: UICollectionViewCell {
         return view
     }()
     
-    var blueCirclePathLayer = CAShapeLayer()
+    private var blueCirclePathLayer = CAShapeLayer()
     
-    let addIconImageViewForBlueView: UIImageView = {
+    private let addIconImageViewForBlueView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "plus")?
             .withTintColor(
                 .systemBackground.withAlphaComponent(1),
@@ -67,7 +72,7 @@ class SwipableCell: UICollectionViewCell {
         return imageView
     }()
     
-    let blueViewToAddCompare: UIView = {
+    private let blueViewToAddCompare: UIView = {
         let view = UIView()
         view.backgroundColor = .systemBlue
         view.clipsToBounds = true
@@ -84,9 +89,9 @@ class SwipableCell: UICollectionViewCell {
      redView UI Components
      */
     
-    let redViewLabel: UILabel = {
+    private let redViewLabel: UILabel = {
         let label = UILabel()
-        label.text = "목록에서\n삭제"
+        label.text = "삭제하기"
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .systemBackground
         label.numberOfLines = 2
@@ -94,7 +99,7 @@ class SwipableCell: UICollectionViewCell {
         return label
     }()
     
-    let circleViewForDeleteInteraction: UIImageView = {
+    private let circleViewForDeleteInteraction: UIImageView = {
         let view = UIImageView()
         view.backgroundColor = .clear
         view.clipsToBounds = true
@@ -102,9 +107,9 @@ class SwipableCell: UICollectionViewCell {
         return view
     }()
     
-    var redCirclePathLayer = CAShapeLayer()
+    private var redCirclePathLayer = CAShapeLayer()
     
-    let deleteIconImageViewForRedView: UIImageView = {
+    private let deleteIconImageViewForRedView: UIImageView = {
         let imageView = UIImageView(image: UIImage(systemName: "trash")?
             .withTintColor(
                 .systemBackground,
@@ -115,7 +120,7 @@ class SwipableCell: UICollectionViewCell {
         return imageView
     }()
     
-    let redViewToDeleteFromCompare: UIView = {
+    private let redViewToDeleteFromCompare: UIView = {
         let view = UIView()
         view.backgroundColor = UIColor.systemRed
         view.clipsToBounds = true
@@ -220,6 +225,12 @@ class SwipableCell: UICollectionViewCell {
     @objc private func handlePanGesture(sender: UIPanGestureRecognizer) {
         switch sender.state {
         case .possible, .began:
+            let xVelocity = sender.velocity(in: swipeableView).x
+            guard (xVelocity < 0 && isLeftSwipeEnable) || (xVelocity > 0 && isRightSwipeEnable) else {
+                sender.state = .ended
+                return
+            }
+            feedbackGenerator.prepare()
             return
         case .changed:
             if swipeableView.frame.origin.x > 0 {
@@ -236,12 +247,14 @@ class SwipableCell: UICollectionViewCell {
             let addIconScaleProportion = 1 + 0.5 * (abs(swipeableView.frame.origin.x) / (bounds.width * 0.55))
             
             if translatedLocation.x > 0 {
-                swipeableView.frame.origin.x = min(translatedLocation.x, bounds.width * 0.55)
+                let maxPosition = isRightSwipeEnable ? bounds.width * 0.55 : 0.0
+                swipeableView.frame.origin.x = min(translatedLocation.x, maxPosition)
                 drawCircleAtBlueView(circlePercentage: (swipeableView.frame.origin.x) / (bounds.width * 0.55))
                 circleViewForAddInteraction.transform = .init(scaleX: circleScaleProportion, y: circleScaleProportion)
                 addIconImageViewForBlueView.transform = .init(scaleX: addIconScaleProportion, y: addIconScaleProportion)
             } else if translatedLocation.x < 0 {
-                swipeableView.frame.origin.x = max(translatedLocation.x, -bounds.width * 0.55)
+                let minPosition = isLeftSwipeEnable ? -bounds.width * 0.55 : 0.0
+                swipeableView.frame.origin.x = max(translatedLocation.x, minPosition)
                 drawCircleAtRedView(circlePercentage: (swipeableView.frame.origin.x) / (bounds.width * 0.55))
                 circleViewForDeleteInteraction.transform = .init(scaleX: circleScaleProportion, y: circleScaleProportion)
                 deleteIconImageViewForRedView.transform = .init(scaleX: addIconScaleProportion, y: addIconScaleProportion)
@@ -343,7 +356,7 @@ class SwipableCell: UICollectionViewCell {
     private func fillBlueCircle(completion: (() -> Void)? = nil) {
         feedbackGenerator.notificationOccurred(.success)
         isBlueCircleFilled = true
-        // 실행할 동작...
+        rightSwipeAction?()
         
         let animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
         animator.addAnimations { [weak self] in
@@ -375,7 +388,7 @@ class SwipableCell: UICollectionViewCell {
     private func fillRedCircle(completion: (() -> Void)? = nil) {
         feedbackGenerator.notificationOccurred(.success)
         isRedCircleFilled = true
-        // 실행할 동작...
+        leftSwipeAction?()
         
         let animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
         animator.addAnimations { [weak self] in
