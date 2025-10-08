@@ -7,6 +7,8 @@
 
 import UIKit
 
+import RxSwift
+import RxCocoa
 import SnapKit
 
 class RecordDetailViewController: UIViewController {
@@ -22,8 +24,9 @@ class RecordDetailViewController: UIViewController {
     private let deleteRecordUseCase: any DeleteRecordUseCase
     
     // MARK: - Properties
-    private let recordDetailView = RecordDetailView()
+    private let rootView = RecordDetailView()
     private var dataSource: DiffableDataSource!
+    private let disposeBag = DisposeBag()
     
     private var performance: Performance
     private var records: [Record] = []
@@ -51,7 +54,7 @@ class RecordDetailViewController: UIViewController {
     
     // MARK: - Lifecycle
     override func loadView() {
-        self.view = recordDetailView
+        self.view = rootView
     }
 
     override func viewDidLoad() {
@@ -60,6 +63,7 @@ class RecordDetailViewController: UIViewController {
         configureUI()
         configureDataSource()
         applySnapshot(records: records)
+        bind()
     }
     
     private func setupData() {
@@ -69,11 +73,10 @@ class RecordDetailViewController: UIViewController {
     // MARK: - Setup
     private func configureUI() {
         self.view.backgroundColor = .systemGroupedBackground
-        self.title = "공연 기록"
         Task {
             do {
                 let image = try await fetchLocalPosterUseCase.execute(performance: performance)
-                recordDetailView.configureHeader(with: performance, poster: image)
+                rootView.configureHeader(with: performance, poster: image)
             } catch {
                 print(error.localizedDescription)
             }
@@ -196,7 +199,7 @@ extension RecordDetailViewController {
         }
         
         dataSource = DiffableDataSource(
-            collectionView: recordDetailView.collectionView,
+            collectionView: rootView.collectionView,
             cellProvider: cellProvider
         )
 
@@ -209,11 +212,25 @@ extension RecordDetailViewController {
         }
 
         dataSource.supplementaryViewProvider = { (view, kind, index) in
-            return self.recordDetailView.collectionView.dequeueConfiguredReusableSupplementary(
+            return self.rootView.collectionView.dequeueConfiguredReusableSupplementary(
                 using: headerRegistration,
                 for: index
             )
         }
+    }
+    
+    private func bind() {
+        rootView.addRecordButton.rx.tap
+            .bind(
+                with: self,
+                onNext: { owner, _ in
+                    let addRecordVC = AddRecordViewController(performance: owner.performance)
+                    addRecordVC.modalPresentationStyle = .overFullScreen
+                    addRecordVC.modalTransitionStyle = .crossDissolve
+                    owner.present(addRecordVC, animated: true)
+                }
+            )
+            .disposed(by: disposeBag)
     }
     
     private func applySnapshot(records: [Record]) {

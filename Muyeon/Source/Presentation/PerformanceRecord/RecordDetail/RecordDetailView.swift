@@ -12,7 +12,22 @@ import SnapKit
 class RecordDetailView: UIView {
     
     // MARK: - UI Components
-    private let performanceHeaderView = PerformanceHeaderView()
+    private let performanceInfoView = PerformanceHeaderView()
+    
+    let addRecordButton: UIButton = {
+        var config = UIButton.Configuration.filled()
+        config.title = "공연 기록 남기기"
+        config.baseBackgroundColor = .Main.primary.withAlphaComponent(0.1)
+        config.baseForegroundColor = .Main.primary
+        config.cornerStyle = .large
+        config.titleTextAttributesTransformer = .init({ incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+            return outgoing
+        })
+        let button = UIButton(configuration: config)
+        return button
+    }()
     
     lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
@@ -34,25 +49,32 @@ class RecordDetailView: UIView {
     
     // MARK: - Setup
     private func setupUI() {
-        addSubview(performanceHeaderView)
+        addSubview(performanceInfoView)
+        addSubview(addRecordButton)
         addSubview(collectionView)
     }
     
     private func setupLayout() {
-        performanceHeaderView.snp.makeConstraints {
+        performanceInfoView.snp.makeConstraints {
             $0.top.equalTo(self.safeAreaLayoutGuide).inset(30)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
+        addRecordButton.snp.makeConstraints { make in
+            make.top.equalTo(performanceInfoView.snp.bottom).offset(16)
+            make.horizontalEdges.equalTo(performanceInfoView)
+            make.height.equalTo(50)
+        }
+        
         collectionView.snp.makeConstraints {
-            $0.top.equalTo(performanceHeaderView.snp.bottom).offset(16)
+            $0.top.equalTo(addRecordButton.snp.bottom).offset(16)
             $0.leading.trailing.bottom.equalToSuperview()
         }
     }
     
     // MARK: - Public Methods
     func configureHeader(with performance: Performance, poster: UIImage?) {
-        performanceHeaderView.configure(with: performance, poster: poster)
+        performanceInfoView.configure(with: performance, poster: poster)
     }
     
     // MARK: - Compositional Layout

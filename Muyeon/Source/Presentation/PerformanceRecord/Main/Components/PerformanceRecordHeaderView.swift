@@ -48,6 +48,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
         button.backgroundColor = .label
         button.setTitleColor(.systemBackground, for: .normal)
         button.layer.cornerRadius = 10
+        button.contentEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
         return button
     }()
     
@@ -104,7 +105,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
         }
         
         addRecordButton.snp.makeConstraints { make in
-            make.width.equalTo(90)
+//            make.width.equalTo(90)
             make.height.equalTo(36)
         }
     }

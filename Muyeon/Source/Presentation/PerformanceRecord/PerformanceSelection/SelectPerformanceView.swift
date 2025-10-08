@@ -31,11 +31,16 @@ class SelectPerformanceView: UIView {
         return collectionView
     }()
     
-    let continueButton: UIButton = {
+    let addRecordButton: UIButton = {
         var config = UIButton.Configuration.filled()
-        config.title = "이 공연을 봤어요"
-        config.baseBackgroundColor = .label
-        config.baseForegroundColor = .systemBackground
+        config.title = "공연 기록 남기기"
+        config.baseBackgroundColor = .Main.primary.withAlphaComponent(0.1)
+        config.baseForegroundColor = .Main.primary
+        config.titleTextAttributesTransformer = .init({ incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.systemFont(ofSize: 15, weight: .bold)
+            return outgoing
+        })
         let button = UIButton(configuration: config)
         button.isEnabled = false
         return button
@@ -53,36 +58,40 @@ class SelectPerformanceView: UIView {
     private func setupLayout() {
         // UI 컴포넌트 생성
         let titleLabel = UILabel()
-        titleLabel.text = "공연 검색하기"
+        titleLabel.text = "즐겨찾기한 공연 목록이에요."
         titleLabel.font = .systemFont(ofSize: 22, weight: .bold)
         
         let subtitleLabel = UILabel()
-        subtitleLabel.text = "어떤 공연을 관람하셨나요?\n이전에 기록한 공연이라면 목록에서 선택하세요."
+        subtitleLabel.text = "다음 중 관람하신 공연이 있나요?\n나만의 기록을 작성해 보세요."
         subtitleLabel.font = .systemFont(ofSize: 15)
         subtitleLabel.textColor = .secondaryLabel
         subtitleLabel.numberOfLines = 0
         
-        let addNewPerformanceButton: UIButton = {
-            var config = UIButton.Configuration.filled()
-            config.title = "새 공연 추가"
-            config.image = UIImage(systemName: "plus")
-            config.baseBackgroundColor = .systemGray5
-            config.baseForegroundColor = .label
-            config.imagePadding = 6
-            return UIButton(configuration: config)
-        }()
+//        let addNewPerformanceButton: UIButton = {
+//            var config = UIButton.Configuration.filled()
+//            config.title = "새 공연 추가"
+//            config.image = UIImage(systemName: "plus")
+//            config.baseBackgroundColor = .systemGray5
+//            config.baseForegroundColor = .label
+//            config.imagePadding = 6
+//            return UIButton(configuration: config)
+//        }()
         
         // 레이아웃 구성
-        let buttonStack = UIStackView(arrangedSubviews: [addNewPerformanceButton, continueButton])
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 8
-        buttonStack.distribution = .fillEqually
+//        let buttonStack = UIStackView(arrangedSubviews: [addNewPerformanceButton, continueButton])
+//        buttonStack.axis = .horizontal
+//        buttonStack.spacing = 8
+//        buttonStack.distribution = .fillEqually
         
-        let mainStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, collectionView, buttonStack])
+        let mainStack = UIStackView(arrangedSubviews: [titleLabel, subtitleLabel, collectionView, addRecordButton])
         mainStack.axis = .vertical
         mainStack.spacing = 16
         
         addSubview(mainStack)
+        
+        addRecordButton.snp.makeConstraints { make in
+            make.height.equalTo(45)
+        }
         
         mainStack.snp.makeConstraints { make in
             make.top.equalToSuperview()

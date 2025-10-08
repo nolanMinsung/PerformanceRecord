@@ -40,7 +40,7 @@ class SelectPerformanceViewController: ModalCardViewController {
         }
         rootView.collectionView.dataSource = self
         rootView.collectionView.delegate = self
-        rootView.continueButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
+        rootView.addRecordButton.addTarget(self, action: #selector(continueButtonTapped), for: .touchUpInside)
         
         rootView.collectionView.reloadData()
     }
@@ -71,6 +71,6 @@ extension SelectPerformanceViewController: UICollectionViewDataSource {
 extension SelectPerformanceViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         selectedPerformance = performances[indexPath.row]
-        rootView.continueButton.isEnabled = true
+        rootView.addRecordButton.isEnabled = true
     }
 }
