@@ -13,12 +13,12 @@ import RxCocoa
 final class PerformanceRecordViewModel {
     
     struct Input {
-        let updateDiaries: Observable<Void>
+        let updateRecords: Observable<Void>
         let addRecordButtonTapped: Observable<Void>
     }
     
     struct Output {
-        let allDiaries: Observable<[Record]>
+        let allRecords: Observable<[Record]>
         let recentRecord: Observable<(record: Record?, performance: Performance)>
         let mostViewedPerformance: Observable<Performance>
         let performancesWithRecord: Observable<[Performance]>
@@ -55,7 +55,7 @@ final class PerformanceRecordViewModel {
         let likePerformanceListRelay = PublishRelay<[Performance]>()
         let errorRelay = PublishRelay<any Error>()
         
-        input.updateDiaries
+        input.updateRecords
             .bind { _ in
                 Task {
                     do {
@@ -102,7 +102,7 @@ final class PerformanceRecordViewModel {
             .disposed(by: disposeBag)
             
         return .init(
-            allDiaries: allRecordsRelay.asObservable(),
+            allRecords: allRecordsRelay.asObservable(),
             recentRecord: recentRecordRelay.asObservable(),
             mostViewedPerformance: mostViewedPerformanceRelay.asObservable(),
             performancesWithRecord: performancesWithRecordsRelay.asObservable(),

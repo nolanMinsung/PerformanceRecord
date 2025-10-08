@@ -61,15 +61,18 @@ class PerformanceRecordViewController: UIViewController {
     }
     
     private func bind() {
+        DefaultRecordRepository.shared.recordUpdated
+            .bind(to: diariesUpdateTrigger)
+            .disposed(by: disposeBag)
         
         let input = PerformanceRecordViewModel.Input(
-            updateDiaries: diariesUpdateTrigger.asObservable(),
+            updateRecords: diariesUpdateTrigger.asObservable(),
             addRecordButtonTapped: addRecordButtonTap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
         
-        output.allDiaries
+        output.allRecords
             .debug()
             .observe(on: MainScheduler.instance)
             .bind(
@@ -201,6 +204,12 @@ extension PerformanceRecordViewController: UICollectionViewDelegate {
         let vc = RecordDetailViewController(
             fetchLocalPosterUseCase: DefaultFetchLocalPosterUseCase(
                 imageRepository: DefaultImageRepository.shared
+            ),
+            fetchLocalPerformanceDetailUseCase: DefaultFetchLocalPerformanceDetailUseCase(
+                performanceRepository: DefaultPerformanceRepository.shared
+            ),
+            deleteRecordUseCase: DefaultDeleteRecordUseCase(
+                recordRepository: DefaultRecordRepository.shared
             ),
             performance: performance
         )

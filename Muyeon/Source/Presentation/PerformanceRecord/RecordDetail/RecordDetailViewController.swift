@@ -18,12 +18,13 @@ class RecordDetailViewController: UIViewController {
     
     // MARK: - UseCase
     private let fetchLocalPosterUseCase: any FetchLocalPosterUseCase
+    private let fetchLocalPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase
+    private let deleteRecordUseCase: any DeleteRecordUseCase
     
     // MARK: - Properties
     private let recordDetailView = RecordDetailView()
     private var dataSource: DiffableDataSource!
     
-    // 예시 데이터
     private var performance: Performance
     private var records: [Record] = []
     
@@ -31,9 +32,15 @@ class RecordDetailViewController: UIViewController {
         case main
     }
     
-    init(fetchLocalPosterUseCase: any FetchLocalPosterUseCase,
-         performance: Performance) {
+    init(
+        fetchLocalPosterUseCase: any FetchLocalPosterUseCase,
+        fetchLocalPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase,
+        deleteRecordUseCase: any DeleteRecordUseCase,
+        performance: Performance
+    ) {
         self.fetchLocalPosterUseCase = fetchLocalPosterUseCase
+        self.fetchLocalPerformanceDetailUseCase = fetchLocalPerformanceDetailUseCase
+        self.deleteRecordUseCase = deleteRecordUseCase
         self.performance = performance
         super.init(nibName: nil, bundle: nil)
     }
@@ -52,7 +59,7 @@ class RecordDetailViewController: UIViewController {
         setupData()
         configureUI()
         configureDataSource()
-        applySnapshot()
+        applySnapshot(records: records)
     }
     
     private func setupData() {
@@ -166,8 +173,17 @@ extension RecordDetailViewController {
                 self.present(photoVC, animated: true)
             }
             
-            cell.leftSwipeAction = {
-                print("left Swipe Action!!")
+            cell.leftSwipeAction = { [weak self] in
+                guard let self else { return }
+                Task {
+                    do {
+                        try await self.deleteRecordUseCase.execute(record: record)
+                        let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: self.performance.id)
+                        self.applySnapshot(records: detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt }))
+                    } catch {
+                        print(error.localizedDescription)
+                    }
+                }
             }
         }
         
@@ -200,7 +216,7 @@ extension RecordDetailViewController {
         }
     }
     
-    private func applySnapshot() {
+    private func applySnapshot(records: [Record]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Record>()
         snapshot.appendSections([.main])
         snapshot.appendItems(records)

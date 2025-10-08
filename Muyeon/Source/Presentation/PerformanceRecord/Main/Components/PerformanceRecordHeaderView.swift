@@ -43,7 +43,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
     
     let addRecordButton: UIButton = {
         let button = UIButton(type: .system)
-        button.setTitle("새 기록 추가", for: .normal)
+        button.setTitle("즐겨찾기한 공연", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
         button.backgroundColor = .label
         button.setTitleColor(.systemBackground, for: .normal)
