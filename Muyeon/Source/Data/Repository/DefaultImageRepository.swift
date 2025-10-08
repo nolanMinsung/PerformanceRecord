@@ -48,7 +48,7 @@ final class DefaultImageRepository: ImageRepository {
             body: { group in
                 for item in imageIDs.enumerated() {
                     group.addTask {
-                        let image = try await self.localDataSource.load(imageID: item.element, category: .diary(id: diary.id))
+                        let image = try await self.localDataSource.load(imageID: item.element, category: .record(id: diary.id))
                         return (item.offset, image)
                     }
                 }

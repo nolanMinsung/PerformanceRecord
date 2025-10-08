@@ -154,7 +154,7 @@ extension RecordCell: UICollectionViewDataSource {
                 guard let recordID = record?.id else {
                     return
                 }
-                let image = try await DefaultLocalImageDataSource.shared.load(imageID: imageID, category: .diary(id: recordID))
+                let image = try await DefaultLocalImageDataSource.shared.load(imageID: imageID, category: .record(id: recordID))
                 cell.imageView.image = image
             } catch {
                 print(error.localizedDescription)

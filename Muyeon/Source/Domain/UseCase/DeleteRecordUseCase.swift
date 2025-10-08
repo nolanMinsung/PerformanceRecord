@@ -19,6 +19,7 @@ final class DefaultDeleteRecordUseCase: DeleteRecordUseCase {
     }
     
     func execute(record: Record) async throws {
-//        recordRepository.
+        try await recordRepository.deleteRecord(record)
     }
+    
 }

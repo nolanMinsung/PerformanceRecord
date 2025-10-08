@@ -97,6 +97,27 @@ actor DefaultRecordRepository: RecordRepository {
         }.value
     }
     
+    func deleteRecord(_ record: Record) async throws {
+        // 이미지 먼저 삭제
+        try await imageRepository.deleteAllImages(of: .record(id: record.id))
+        print("Record 이미지 삭제 완료")
+        Task.detached {
+            let realm = try Realm()
+            let recordObject = realm.objects(RecordObject.self).filter({ $0.id == record.id })
+            realm.delete(recordObject)
+            print("DB에서 Record 삭제 완료")
+            #if DEBUG
+            guard let performance = realm.objects(PerformanceObject.self)
+                .filter({ $0.id == record.performanceID })
+                .first
+            else {
+                return
+            }
+            assert(performance.records.filter({ $0.id == record.id }).isEmpty, "삭제 안된듯?")
+            #endif
+        }
+    }
+    
 }
 
 
@@ -109,7 +130,7 @@ private extension DefaultRecordRepository {
             body: { group in
                 for (index, dataForSaving) in imageData.enumerated() {
                     group.addTask {
-                        let imageUUID = try await self.imageRepository.saveImage(data: dataForSaving, to: .diary(id: diaryID))
+                        let imageUUID = try await self.imageRepository.saveImage(data: dataForSaving, to: .record(id: diaryID))
                         return (index, imageUUID)
                     }
                 }
