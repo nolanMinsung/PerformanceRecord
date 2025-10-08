@@ -1,0 +1,428 @@
+//
+//  SwipableCell.swift
+//  Muyeon
+//
+//  Created by 김민성 on 10/8/25.
+//
+
+import UIKit
+
+import SnapKit
+
+class SwipableCell: UICollectionViewCell {
+    
+    private let feedbackGenerator = UINotificationFeedbackGenerator()
+    
+    private var accommodationID: Int = 0
+    private var roomID: Int = 0
+    private var isBlueCircleFilled: Bool = false
+    private var isRedCircleFilled: Bool = false
+    
+    private let panGestureRecognizer: UIPanGestureRecognizer = {
+        let panGestureRecognizer = UIPanGestureRecognizer()
+        panGestureRecognizer.maximumNumberOfTouches = 1
+        return panGestureRecognizer
+    }()
+    
+    let swipeableView: UIView = {
+        let view = UIView()
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 18
+        view.backgroundColor = .systemGray5
+        return view
+    }()
+    
+    /*
+     bludView UI Components
+     */
+    
+    let blueViewLabel: UILabel = {
+        let label = UILabel()
+        label.text = "OO 목록에\n추가"
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = .systemBackground
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        return label
+    }()
+    
+    let circleViewForAddInteraction: UIImageView = {
+        let view = UIImageView()
+        view.backgroundColor = .clear
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 30
+        return view
+    }()
+    
+    var blueCirclePathLayer = CAShapeLayer()
+    
+    let addIconImageViewForBlueView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "plus")?
+            .withTintColor(
+                .systemBackground.withAlphaComponent(1),
+                renderingMode: .alwaysOriginal
+            )
+        )
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
+    let blueViewToAddCompare: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBlue
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 19
+        view.layer.cornerCurve = .continuous
+        return view
+    }()
+    
+    /*
+     blueView UIComponents 끝
+     */
+    
+    /*
+     redView UI Components
+     */
+    
+    let redViewLabel: UILabel = {
+        let label = UILabel()
+        label.text = "목록에서\n삭제"
+        label.font = UIFont.systemFont(ofSize: 14)
+        label.textColor = .systemBackground
+        label.numberOfLines = 2
+        label.textAlignment = .center
+        return label
+    }()
+    
+    let circleViewForDeleteInteraction: UIImageView = {
+        let view = UIImageView()
+        view.backgroundColor = .clear
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 30
+        return view
+    }()
+    
+    var redCirclePathLayer = CAShapeLayer()
+    
+    let deleteIconImageViewForRedView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: "trash")?
+            .withTintColor(
+                .systemBackground,
+                renderingMode: .alwaysOriginal
+            )
+        )
+        imageView.contentMode = .scaleAspectFit
+        return imageView
+    }()
+    
+    let redViewToDeleteFromCompare: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.systemRed
+        view.clipsToBounds = true
+        view.layer.cornerRadius = 19
+        view.layer.cornerCurve = .continuous
+        return view
+    }()
+    
+    /*
+     redView UI Components 끝
+     */
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        
+        setUI()
+        configureViewHierarchy()
+        setConstraints()
+        setGestureRecognizers()
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    private func setUI() {
+        contentView.backgroundColor = .clear
+        contentView.clipsToBounds = false
+        contentView.layer.cornerRadius = 18
+        
+    }
+    
+    private func configureViewHierarchy() {
+        circleViewForAddInteraction.addSubview(addIconImageViewForBlueView)
+        circleViewForDeleteInteraction.addSubview(deleteIconImageViewForRedView)
+        
+        blueViewToAddCompare.addSubview(blueViewLabel)
+        blueViewToAddCompare.addSubview(circleViewForAddInteraction)
+        redViewToDeleteFromCompare.addSubview(redViewLabel)
+        redViewToDeleteFromCompare.addSubview(circleViewForDeleteInteraction)
+        
+        contentView.addSubview(blueViewToAddCompare)
+        contentView.addSubview(redViewToDeleteFromCompare)
+        contentView.addSubview(swipeableView)
+    }
+    
+    private func setConstraints() {
+        blueViewToAddCompare.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        blueViewLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.leading.equalToSuperview().inset(17)
+        }
+        
+        circleViewForAddInteraction.snp.makeConstraints { make in
+            make.centerY.equalTo(blueViewLabel)
+            make.leading.equalTo(blueViewLabel.snp.trailing).offset(30)
+            make.width.equalTo(60)
+            make.height.equalTo(60)
+        }
+        
+        addIconImageViewForBlueView.snp.makeConstraints { make in
+            make.centerX.centerY.equalToSuperview()
+            make.width.height.equalTo(23)
+        }
+        
+        redViewToDeleteFromCompare.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        redViewLabel.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalToSuperview().inset(17)
+        }
+        
+        circleViewForDeleteInteraction.snp.makeConstraints { make in
+            make.centerY.equalToSuperview()
+            make.trailing.equalTo(redViewLabel.snp.leading).offset(-30)
+            make.width.equalTo(60)
+            make.height.equalTo(60)
+        }
+        
+        deleteIconImageViewForRedView.snp.makeConstraints { make in
+            make.centerX.centerY.equalToSuperview()
+            make.width.height.equalTo(18)
+        }
+        
+        swipeableView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+    }
+    
+    func setGestureRecognizers() {
+        panGestureRecognizer.allowedScrollTypesMask = [.continuous]
+        swipeableView.addGestureRecognizer(panGestureRecognizer)
+        panGestureRecognizer.delegate = self
+        panGestureRecognizer.addTarget(self, action: #selector(handlePanGesture(sender:)))
+    }
+    
+    @objc private func handlePanGesture(sender: UIPanGestureRecognizer) {
+        switch sender.state {
+        case .possible, .began:
+            return
+        case .changed:
+            if swipeableView.frame.origin.x > 0 {
+                blueViewToAddCompare.isHidden = false
+                redViewToDeleteFromCompare.isHidden = true
+            } else if swipeableView.frame.origin.x < 0 {
+                blueViewToAddCompare.isHidden = true
+                redViewToDeleteFromCompare.isHidden = false
+            }
+            
+            let translatedLocation = sender.translation(in: contentView)
+            
+            let circleScaleProportion = 1 + 0.3 * (abs(swipeableView.frame.origin.x) / (bounds.width * 0.55))
+            let addIconScaleProportion = 1 + 0.5 * (abs(swipeableView.frame.origin.x) / (bounds.width * 0.55))
+            
+            if translatedLocation.x > 0 {
+                swipeableView.frame.origin.x = min(translatedLocation.x, bounds.width * 0.55)
+                drawCircleAtBlueView(circlePercentage: (swipeableView.frame.origin.x) / (bounds.width * 0.55))
+                circleViewForAddInteraction.transform = .init(scaleX: circleScaleProportion, y: circleScaleProportion)
+                addIconImageViewForBlueView.transform = .init(scaleX: addIconScaleProportion, y: addIconScaleProportion)
+            } else if translatedLocation.x < 0 {
+                swipeableView.frame.origin.x = max(translatedLocation.x, -bounds.width * 0.55)
+                drawCircleAtRedView(circlePercentage: (swipeableView.frame.origin.x) / (bounds.width * 0.55))
+                circleViewForDeleteInteraction.transform = .init(scaleX: circleScaleProportion, y: circleScaleProportion)
+                deleteIconImageViewForRedView.transform = .init(scaleX: addIconScaleProportion, y: addIconScaleProportion)
+            }
+            
+            /*
+             셀 너비의 55%이상 끌어왔을 때 시뮬레이터에서 동작하지 않는 경우가 있음.
+             */
+            if swipeableView.frame.origin.x >= bounds.width * 0.54 {
+                if !isBlueCircleFilled {
+                    fillBlueCircle() { [weak self] in
+                        guard let self else { return }
+                        panGestureRecognizer.state = .ended
+                    }
+                }
+                
+            } else if swipeableView.frame.origin.x < -bounds.width * 0.54 {
+                if !isRedCircleFilled {
+                    fillRedCircle() { [weak self] in
+                        guard let self else { return }
+                        panGestureRecognizer.state = .ended
+                    }
+                }
+            }
+        case .ended:
+            setSwipeableViewToInitialLocaion()
+        case .cancelled, .failed:
+            return
+        @unknown default:
+            return
+        }
+    }
+    
+    private func setSwipeableViewToInitialLocaion() {
+        let animator = UIViewPropertyAnimator(duration: 0.4, dampingRatio: 1)
+        animator.addAnimations { [weak self] in
+            guard let self else { return }
+            self.swipeableView.frame = .zero
+            self.circleViewForAddInteraction.transform = CGAffineTransform.identity
+            self.circleViewForDeleteInteraction.transform = CGAffineTransform.identity
+            self.contentView.layoutIfNeeded()
+        }
+
+        animator.addCompletion { [weak self] position in
+            guard let self else { return }
+            self.emptyBlueCircle()
+            self.emptyRedCircle()
+        }
+        animator.startAnimation()
+    }
+    
+    /// 원에 해당하는 UIBezierPath를 layer로 추가해주는 함수
+    /// - Parameters:
+    ///   - circlePercentage: 원이 그려질 비율 %를 100으로 나눈 값. 0.0 ~ 1.0
+    private func drawCircleAtBlueView(circlePercentage: CGFloat) {
+        blueCirclePathLayer.removeFromSuperlayer()
+        
+        let path: UIBezierPath = getPath(percentage: circlePercentage)
+        let shape = CAShapeLayer()
+        shape.lineWidth = 4
+        shape.path = path.cgPath
+        shape.strokeColor = UIColor.systemBackground.cgColor
+        shape.fillColor = UIColor.clear.cgColor
+        
+        blueCirclePathLayer = shape
+        circleViewForAddInteraction.layer.addSublayer(blueCirclePathLayer)
+    }
+    
+    private func drawCircleAtRedView(circlePercentage: CGFloat) {
+        redCirclePathLayer.removeFromSuperlayer()
+        
+        let path: UIBezierPath = getPath(percentage: circlePercentage, clockwise: false)
+        let shape = CAShapeLayer()
+        shape.lineWidth = 4
+        shape.path = path.cgPath
+        shape.strokeColor = UIColor.systemBackground.cgColor
+        shape.fillColor = UIColor.clear.cgColor
+        
+        redCirclePathLayer = shape
+        circleViewForDeleteInteraction.layer.addSublayer(redCirclePathLayer)
+    }
+        
+    /// 특정 각도만큼의 호에 해당하는 UIBezierPath를 반환하는 함수
+    /// - Parameter percentage: 원이 몇 % 그려졌는지를 입력. %를 100으로 나눈 값(0.0 ~ 1.0)을 입력.
+    /// - Returns: 그려진 호에 해당하는 UIBezierPath
+    private func getPath(percentage: CGFloat, clockwise: Bool = true) -> UIBezierPath {
+        let path: UIBezierPath = UIBezierPath()
+        let radius = circleViewForAddInteraction.bounds.width / 2
+        //let radius: CGFloat = 50
+        
+        path.move(to: CGPoint(x: radius, y: 0))
+        path.addArc(withCenter: CGPoint(x: radius, y: radius), radius: radius, startAngle: -.pi * 0.5, endAngle: -(.pi * 0.5) + (2 * .pi * percentage), clockwise: clockwise)
+        
+        return path
+    }
+        
+    /// 파란색 원을 채우는 함수. 애니메이션을 실행시킴. (비동기)
+    /// - Parameter completion: 애니메이션이 끝나고 호출될 함수
+    private func fillBlueCircle(completion: (() -> Void)? = nil) {
+        feedbackGenerator.notificationOccurred(.success)
+        isBlueCircleFilled = true
+        // 실행할 동작...
+        
+        let animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
+        animator.addAnimations { [weak self] in
+            guard let self else { return }
+            circleViewForAddInteraction.backgroundColor = .systemBackground
+            addIconImageViewForBlueView.image = UIImage(systemName: "plus")?.withTintColor(
+                UIColor.systemBlue,
+                renderingMode: .alwaysOriginal
+            )
+            layoutIfNeeded()
+        }
+        
+        animator.addCompletion { position in completion?() }
+        animator.startAnimation()
+    }
+    
+    /// 파란색 원을 비우는 함수. 애니메이션이 아님.
+    private func emptyBlueCircle() {
+        isBlueCircleFilled = false
+        circleViewForAddInteraction.backgroundColor = .clear
+        addIconImageViewForBlueView.image = UIImage(systemName: "plus")?.withTintColor(
+            UIColor.systemBackground,
+            renderingMode: .alwaysOriginal
+        )
+    }
+    
+    /// 빨간색 원을 채우는 함수. 애니메이션을 실행시킴. (비동기)
+    /// - Parameter completion: 애니메이션이 끝나고 호출될 함수
+    private func fillRedCircle(completion: (() -> Void)? = nil) {
+        feedbackGenerator.notificationOccurred(.success)
+        isRedCircleFilled = true
+        // 실행할 동작...
+        
+        let animator = UIViewPropertyAnimator(duration: 0.5, dampingRatio: 1)
+        animator.addAnimations { [weak self] in
+            guard let self else { return }
+            circleViewForDeleteInteraction.backgroundColor = .systemBackground
+            deleteIconImageViewForRedView.image = UIImage(systemName: "trash")?.withTintColor(
+                UIColor.systemRed,
+                renderingMode: .alwaysOriginal
+            )
+            layoutIfNeeded()
+        }
+        
+        animator.addCompletion { position in completion?() }
+        animator.startAnimation()
+    }
+    
+    /// 빨간색 원을 비우는 함수. 애니메이션이 아님.
+    private func emptyRedCircle() {
+        isRedCircleFilled = false
+        circleViewForDeleteInteraction.backgroundColor = .clear
+        deleteIconImageViewForRedView.image = UIImage(systemName: "trash")?.withTintColor(
+            UIColor.systemBackground,
+            renderingMode: .alwaysOriginal
+        )
+    }
+    
+}
+
+
+extension SwipableCell: UIGestureRecognizerDelegate {
+    
+    override func gestureRecognizerShouldBegin(_ gestureRecognizer: UIGestureRecognizer) -> Bool {
+        guard let panGestureRecognizer = gestureRecognizer as? UIPanGestureRecognizer else { return false }
+        
+        let xVelocityAbs = abs(panGestureRecognizer.velocity(in: contentView).x)
+        let yVelocityAbs = abs(panGestureRecognizer.velocity(in: contentView).y)
+        let ratio = yVelocityAbs / xVelocityAbs
+        //if xVelocity > 30 || xVelocity < -30 {
+        if ratio < 1 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
+        return false
+    }
+    
+}
