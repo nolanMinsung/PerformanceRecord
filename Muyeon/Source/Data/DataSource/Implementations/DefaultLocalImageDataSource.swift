@@ -9,6 +9,47 @@ import UIKit
 import ImageIO
 import UniformTypeIdentifiers
 
+enum DefaultImageDataSourceError: LocalizedError {
+    
+    enum Reason: LocalizedError {
+        case documentDirectoryNotFound
+        case failedConvertingToImageFromFile
+        case imageFileNotFound
+        case imageFolderNotFound
+        case fileURLIsNotFolder
+        
+        var errorDescription: String? {
+            switch self {
+            case .documentDirectoryNotFound:
+                "document directory를 찾을 수 없습니다."
+            case .failedConvertingToImageFromFile:
+                "file을 이미지 파일로 변환하는 데 실패했습니다."
+            case .imageFileNotFound:
+                "경로에 이미지 파일이 존재하지 않습니다."
+            case .imageFolderNotFound:
+                "경로에 이미지 폴더가 존재하지 않습니다."
+            case .fileURLIsNotFolder:
+                "지정된 경로가 폴더가 아닙니다ㅏ."
+            }
+        }
+    }
+    
+    case imageSavingError(reason: Reason)
+    case imageLoadingError(reason: Reason)
+    case imageDeletingError(reason: Reason)
+    
+    var errorDescription: String? {
+        switch self {
+        case .imageSavingError(let reason):
+            return "이미지 저장 실패: \(reason.localizedDescription)"
+        case .imageLoadingError(let reason):
+            return "이미지 불러오기 실패: \(reason.localizedDescription)"
+        case .imageDeletingError(let reason):
+            return "이미지 삭제 실패: \(reason.localizedDescription)"
+        }
+    }
+}
+
 actor DefaultLocalImageDataSource: LocalImageDataSource {
     
     static let shared = DefaultLocalImageDataSource()
@@ -17,7 +58,7 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
     func save(imageData: ImageDataForSaving, imageID: String, category: ImageCategory) async throws {
         let fileManager = FileManager.default
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "ImageSaveError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+            throw DefaultImageDataSourceError.imageSavingError(reason: .documentDirectoryNotFound)
         }
         
         // 카테고리에 맞는 폴더 URL 생성
@@ -42,7 +83,7 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         
         // Documents 디렉토리 경로 가져오기
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "ImageLoadingError", code: 1, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+            throw DefaultImageDataSourceError.imageLoadingError(reason: .documentDirectoryNotFound)
         }
         
         // 예상되는 이미지 확장자를 순회하며 파일의 확장자 유추
@@ -57,19 +98,19 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
                 // 경로로부터 UIImage 객체 생성
                 guard let image = UIImage(contentsOfFile: fileURL.path) else {
                     // 파일은 있지만, 이미지로 변환이 실패한 경우
-                    throw NSError(domain: "FaileToConvertToUIImage", code: 3, userInfo: [NSLocalizedDescriptionKey: "Converting File to UIImage Failed."])
+                    throw DefaultImageDataSourceError.imageLoadingError(reason: .failedConvertingToImageFromFile)
                 }
                 return image
             }
         }
-        throw NSError(domain: "ImageNotFound", code: 2, userInfo: [NSLocalizedDescriptionKey: "Image File not found."])
+        throw DefaultImageDataSourceError.imageLoadingError(reason: .imageFileNotFound)
     }
     
     func delete(imageID: String, category: ImageCategory) async throws {
         let fileManager = FileManager.default
         
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "ImageLoadingError", code: 4, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+            throw DefaultImageDataSourceError.imageDeletingError(reason: .documentDirectoryNotFound)
         }
         
         // 저장된 이미지의 전체 경로 생성
@@ -79,7 +120,7 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         
         // 해당 경로에 파일이 실제로 존재하는지 확인
         guard fileManager.fileExists(atPath: fileURL.path) else {
-            throw NSError(domain: "ImageNotFound", code: 2, userInfo: [NSLocalizedDescriptionKey: "Image File not found."])
+            throw DefaultImageDataSourceError.imageDeletingError(reason: .imageFileNotFound)
         }
         
         try fileManager.removeItem(at: fileURL)
@@ -89,20 +130,19 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         let fileManager = FileManager.default
         
         guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw NSError(domain: "ImageLoadingError", code: 4, userInfo: [NSLocalizedDescriptionKey: "Documents directory not found."])
+            throw DefaultImageDataSourceError.imageDeletingError(reason: .documentDirectoryNotFound)
         }
         
         // 이미지 폴더의 전체 경로 생성
         let folderURL = documentsURL.appendingPathComponent(imageCategory.subpath)
         
         guard documentsURL.isFileURL else {
-            print("삭제를 시도하려는 경로가 folder가 아닙니다.")
-            return
+            throw DefaultImageDataSourceError.imageDeletingError(reason: .fileURLIsNotFolder)
         }
         
         // 해당 경로에 파일이 실제로 존재하는지 확인
         guard fileManager.fileExists(atPath: folderURL.path) else {
-            throw NSError(domain: "ImageFolderNotFound", code: 5, userInfo: [NSLocalizedDescriptionKey: "Image Folder not found."])
+            throw DefaultImageDataSourceError.imageDeletingError(reason: .imageFileNotFound)
         }
         // Performance의 이미지가 모두 들어있는 폴더 자체를 삭제
         try fileManager.removeItem(at: folderURL)

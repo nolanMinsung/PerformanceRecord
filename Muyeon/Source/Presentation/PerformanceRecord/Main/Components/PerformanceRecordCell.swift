@@ -108,6 +108,7 @@ class PerformanceRecordCell: UICollectionViewCell {
         contentView.addSubview(containerView)
         
         countLabelContainer.addSubview(countLabel)
+        countLabel.snp.contentCompressionResistanceHorizontalPriority = 800
         countLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
         let titleStack = UIStackView(arrangedSubviews: [titleLabel, countLabelContainer])
         titleStack.spacing = 8

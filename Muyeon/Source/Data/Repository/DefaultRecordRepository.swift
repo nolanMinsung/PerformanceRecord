@@ -8,6 +8,8 @@
 import Foundation
 
 import RealmSwift
+import RxSwift
+import RxRelay
 
 enum DefaultRecordRepositoryError: LocalizedError {
     case diaryNotHavingPerformance
@@ -18,6 +20,12 @@ actor DefaultRecordRepository: RecordRepository {
     static let shared = DefaultRecordRepository(
         imageRepository: DefaultImageRepository.shared
     )
+    
+    nonisolated private let recordUpdatedRelay = PublishRelay<Void>()
+    nonisolated var recordUpdated: Observable<Void> {
+        return recordUpdatedRelay.asObservable()
+    }
+    
     private let imageRepository: any ImageRepository
     private init(imageRepository: any ImageRepository) {
         self.imageRepository = imageRepository
@@ -77,7 +85,7 @@ actor DefaultRecordRepository: RecordRepository {
                 diaryObject.diaryImageUUIDs.append(objectsIn: savedDiaryImageIDs)
             }
         }.value
-        
+        recordUpdatedRelay.accept(())
     }
     
     func fetchDiaries(of performance: Performance) async throws -> [Record] {
@@ -98,13 +106,17 @@ actor DefaultRecordRepository: RecordRepository {
     }
     
     func deleteRecord(_ record: Record) async throws {
-        // 이미지 먼저 삭제
-        try await imageRepository.deleteAllImages(of: .record(id: record.id))
-        print("Record 이미지 삭제 완료")
-        Task.detached {
+        // 이미지가 있을 경우, 이미지 먼저 삭제
+        if !record.diaryImageUUIDs.isEmpty {
+            try await imageRepository.deleteAllImages(of: .record(id: record.id))
+            print("Record 이미지 삭제 완료")
+        }
+        try await Task.detached {
             let realm = try Realm()
             let recordObject = realm.objects(RecordObject.self).filter({ $0.id == record.id })
-            realm.delete(recordObject)
+            try realm.write {
+                realm.delete(recordObject)
+            }
             print("DB에서 Record 삭제 완료")
             #if DEBUG
             guard let performance = realm.objects(PerformanceObject.self)
@@ -114,8 +126,10 @@ actor DefaultRecordRepository: RecordRepository {
                 return
             }
             assert(performance.records.filter({ $0.id == record.id }).isEmpty, "삭제 안된듯?")
+            print("Debug Mode: Performance Object의 List에서 제거된 것 확인.")
             #endif
-        }
+        }.value
+        recordUpdatedRelay.accept(())
     }
     
 }

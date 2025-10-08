@@ -69,6 +69,18 @@ final class DefaultImageRepository: ImageRepository {
     }
     
     func deleteAllImages(of category: ImageCategory) async throws {
-        try await localDataSource.deleteAllImages(in: category)
+        do {
+            try await localDataSource.deleteAllImages(in: category)
+        } catch let error as DefaultImageDataSourceError {
+            if case .imageDeletingError(let reason) = error,
+               case .imageFolderNotFound = reason {
+                print("삭제하려는 이미지 폴더가 없습니다. 이미지 자체가 생성되지 않은 경우이거나, 에러일 수 있습니다.")
+                return
+            } else {
+                throw error
+            }
+        } catch {
+            throw error
+        }
     }
 }
