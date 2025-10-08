@@ -42,7 +42,7 @@ class SelectPerformanceView: UIView {
             outgoing.font = UIFont.systemFont(ofSize: 15, weight: .bold)
             return outgoing
         })
-        let button = UIButton(configuration: config)
+        let button = ShrinkableButton(configuration: config)
         button.isEnabled = false
         return button
     }()

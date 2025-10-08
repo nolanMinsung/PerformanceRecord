@@ -10,7 +10,7 @@ import UIKit
 import Kingfisher
 import SnapKit
 
-class HomeTopTenCell: UICollectionViewCell {
+class HomeTopTenCell: UICollectionViewCell, ViewShrinkable {
     
     let imageView = UIImageView()
     private let backGradientView = BottomGradientView(color: .label)
@@ -19,6 +19,16 @@ class HomeTopTenCell: UICollectionViewCell {
     private let datePeriodLabel = UILabel()
     private let placeNameLabel = UILabel()
     private lazy var infoStackView = UIStackView(arrangedSubviews: [titleLabel, datePeriodLabel, placeNameLabel])
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.95)
+            } else {
+                restore()
+            }
+        }
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)

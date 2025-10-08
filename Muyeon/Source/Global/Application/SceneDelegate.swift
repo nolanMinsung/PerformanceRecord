@@ -39,6 +39,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         mainTabBarCon.viewControllers = [homeNaviCon, searchNaviCon, performanceRecordNaviCon]
         window?.rootViewController = mainTabBarCon
         window?.makeKeyAndVisible()
+        
+        UIScrollView.appearance().delaysContentTouches = false
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

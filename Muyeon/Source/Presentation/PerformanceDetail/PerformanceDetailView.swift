@@ -124,7 +124,7 @@ final class PerformanceDetailView: UIView {
             outgoing.font = .systemFont(ofSize: 16, weight: .semibold)
             return outgoing
         }
-        let button = UIButton(configuration: config)
+        let button = ShrinkableButton(configuration: config)
         button.isEnabled = false
         return button
     }()

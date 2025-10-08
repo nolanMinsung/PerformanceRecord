@@ -87,15 +87,15 @@ private extension HomeViewController {
         
         rootView.homeCollectionView.rx.itemSelected
             .bind(with: self, onNext: { owner, indexPath in
-                let currentSection = indexPath.section
-                guard let selectedIndexPaths = owner.rootView.homeCollectionView.indexPathsForSelectedItems else { return }
-                let selectedSameSection = selectedIndexPaths.filter {
-                    $0.section == currentSection && $0 != indexPath
+                if indexPath.section == 1 {
+                    guard let selectedIndexPaths = owner.rootView.homeCollectionView.indexPathsForSelectedItems else { return }
+                    let oldSelectedGenreIndexPath = selectedIndexPaths.filter { $0.section == 1 && $0 != indexPath }
+                    for oldIndexPath in oldSelectedGenreIndexPath {
+                        owner.rootView.homeCollectionView.deselectItem(at: oldIndexPath, animated: true)
+                    }
+                } else {
+                    owner.rootView.homeCollectionView.deselectItem(at: indexPath, animated: false)
                 }
-                for oldIndexPath in selectedSameSection {
-                    owner.rootView.homeCollectionView.deselectItem(at: oldIndexPath, animated: true)
-                }
-                
             })
             .disposed(by: disposeBag)
         
@@ -248,6 +248,14 @@ extension HomeViewController: UICollectionViewDelegate {
         }
         return true
     }
-    
+        
+    func collectionView(_ collectionView: UICollectionView, shouldDeselectItemAt indexPath: IndexPath) -> Bool {
+        if collectionView.indexPathsForSelectedItems?.contains(indexPath) == true,
+           indexPath.section == 1
+        {
+            return false
+        }
+        return true
+    }
     
 }

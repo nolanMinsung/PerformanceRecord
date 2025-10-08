@@ -7,9 +7,19 @@
 
 import UIKit
 
-class HomeBoxOfficeGenreCell: UICollectionViewCell {
+class HomeBoxOfficeGenreCell: UICollectionViewCell, ViewShrinkable {
     
     private let genreNameLabel = UILabel()
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.9)
+            } else {
+                restore()
+            }
+        }
+    }
     
     override var isSelected: Bool {
         didSet { setSelected(isSelected) }

@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 // MARK: - '공연 기록' CollectionView Cell
-class PerformanceRecordCell: UICollectionViewCell {
+class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
     
     private let containerView: UIView = {
         let view = UIView()
@@ -122,11 +122,21 @@ class PerformanceRecordCell: UICollectionViewCell {
         return stackView
     }()
     
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.97)
+            } else {
+                restore()
+            }
+        }
+    }
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
     }
-
+    
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

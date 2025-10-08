@@ -22,7 +22,7 @@ final class SearchView: UIView {
     let searchButton = UIButton()
     
     let genreLabel = UILabel()
-    let genreSelectionButton = UIButton(configuration: .filled())
+    let genreSelectionButton = ShrinkableButton(configuration: .filled())
     
     let datePickingLabel = UILabel()
     let fromDatePicker = UIDatePicker()

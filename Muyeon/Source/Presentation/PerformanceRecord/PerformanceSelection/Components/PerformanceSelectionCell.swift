@@ -8,7 +8,7 @@
 import UIKit
 import SnapKit
 
-class PerformanceSelectionCell: UICollectionViewCell {
+class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
     static let identifier = "PerformanceSelectionCell"
     
     private let containerView = UIView()
@@ -16,6 +16,16 @@ class PerformanceSelectionCell: UICollectionViewCell {
     private let venueLabel = UILabel()
     private let genreTagLabelContainer = UIView()
     private let genreTagLabel = UILabel()
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.95)
+            } else {
+                restore()
+            }
+        }
+    }
     
     override var isSelected: Bool {
         didSet {

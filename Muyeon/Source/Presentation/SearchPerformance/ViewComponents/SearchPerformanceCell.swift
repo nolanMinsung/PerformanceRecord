@@ -12,7 +12,7 @@ import RxCocoa
 import SnapKit
 import Kingfisher
 
-final class SearchPerformanceCell: UICollectionViewCell {
+final class SearchPerformanceCell: UICollectionViewCell, ViewShrinkable {
 
     // MARK: - UI Components
 
@@ -38,6 +38,16 @@ final class SearchPerformanceCell: UICollectionViewCell {
     // MARK: - Properties
     
     private(set) var disposeBag = DisposeBag()
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.97)
+            } else {
+                restore()
+            }
+        }
+    }
     
     // MARK: - Initialization
 

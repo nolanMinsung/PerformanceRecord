@@ -13,7 +13,7 @@ class AddRecordView: UIView {
     // MARK: - UI Components
     let memoTextView = UITextView()
     let imagesCollectionView: UICollectionView
-    let saveButton = UIButton()
+    let saveButton = ShrinkableButton()
     
     // MARK: - Actions (Closures)
     var onAddImageTapped: (() -> Void)?

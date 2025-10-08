@@ -25,7 +25,7 @@ class RecordDetailView: UIView {
             outgoing.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
             return outgoing
         })
-        let button = UIButton(configuration: config)
+        let button = ShrinkableButton(configuration: config)
         return button
     }()
     
