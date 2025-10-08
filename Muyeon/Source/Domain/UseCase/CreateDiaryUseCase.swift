@@ -14,9 +14,9 @@ protocol CreateDiaryUseCase {
 
 final class DefaultCreateDiaryUseCase: CreateDiaryUseCase {
     
-    let diaryRepository: any DiaryRepository
+    let diaryRepository: any RecordRepository
     
-    init(diaryRepository: any DiaryRepository) {
+    init(diaryRepository: any RecordRepository) {
         self.diaryRepository = diaryRepository
     }
     

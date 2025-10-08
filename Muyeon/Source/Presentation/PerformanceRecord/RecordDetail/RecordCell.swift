@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-class RecordCell: UICollectionViewCell {
+class RecordCell: SwipableCell {
     
     // MARK: - UI Components
     private let dateLabel: UILabel = {
@@ -68,8 +68,8 @@ class RecordCell: UICollectionViewCell {
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-        contentView.backgroundColor = .systemBackground
-        contentView.layer.cornerRadius = 12
+//        contentView.backgroundColor = .systemBackground
+//        contentView.layer.cornerRadius = 12
         setupUI()
         setupLayout()
         photoCollectionView.delegate = self // 델리게이트 설정
@@ -93,7 +93,8 @@ class RecordCell: UICollectionViewCell {
         mainStackView.addArrangedSubview(photoTitleLabel)
         mainStackView.addArrangedSubview(photoCollectionView)
         
-        contentView.addSubview(mainStackView)
+        swipeableView.backgroundColor = .systemBackground
+        swipeableView.addSubview(mainStackView)
     }
     
     private func setupLayout() {

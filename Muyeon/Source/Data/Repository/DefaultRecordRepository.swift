@@ -1,5 +1,5 @@
 //
-//  DefaultDiaryRepository.swift
+//  DefaultRecordRepository.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/6/25.
@@ -9,13 +9,13 @@ import Foundation
 
 import RealmSwift
 
-enum DefaultDiaryRepositoryError: LocalizedError {
+enum DefaultRecordRepositoryError: LocalizedError {
     case diaryNotHavingPerformance
 }
 
-actor DefaultDiaryRepository: DiaryRepository {
+actor DefaultRecordRepository: RecordRepository {
     
-    static let shared = DefaultDiaryRepository(
+    static let shared = DefaultRecordRepository(
         imageRepository: DefaultImageRepository.shared
     )
     private let imageRepository: any ImageRepository
@@ -100,7 +100,7 @@ actor DefaultDiaryRepository: DiaryRepository {
 }
 
 
-private extension DefaultDiaryRepository {
+private extension DefaultRecordRepository {
     
     func saveImagesToFileManager(diaryID: String, imageData: [ImageDataForSaving]) async throws -> [String] {
         let imageUUIDs = try await withThrowingTaskGroup(

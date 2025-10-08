@@ -67,7 +67,7 @@ extension RecordObject {
     
     func toDomain() throws -> Record {
         guard let performance = self.performance.first else {
-            throw DefaultDiaryRepositoryError.diaryNotHavingPerformance
+            throw DefaultRecordRepositoryError.diaryNotHavingPerformance
         }
         return Record(
             id: self.id,

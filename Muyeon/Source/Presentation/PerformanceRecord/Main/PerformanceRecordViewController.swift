@@ -35,7 +35,7 @@ class PerformanceRecordViewController: UIViewController {
             performanceRepository: DefaultPerformanceRepository.shared
         ),
         fetchAllDiariesUseCase: DefaultFetchAllDiariesUseCase(
-            diaryRepository: DefaultDiaryRepository.shared
+            diaryRepository: DefaultRecordRepository.shared
         )
     )
     private let addRecordButtonTap = PublishSubject<Void>()
