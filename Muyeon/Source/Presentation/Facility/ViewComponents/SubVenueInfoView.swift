@@ -220,7 +220,7 @@ class SubVenueInfoView: UIView {
         var disabledTags: [UIView] = []
         if let disabledSeats = venue.disabledSeatScale, disabledSeats > 0 {
             let text = "장애인 전용 관람석: \(disabledSeats)석"
-            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "figure.roll"), text: text, color: .systemBlue)
+            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "figure.roll"), text: text, color: .Main.primary)
             disabledTags.append(tag)
         }
         
@@ -234,7 +234,7 @@ class SubVenueInfoView: UIView {
         // 기타 섹션 태그 구성
         var otherTags: [UIView] = []
         if let stageArea = venue.stageArea {
-            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "ruler.fill"), text: "무대넓이: \(stageArea)", color: .systemBlue)
+            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "ruler.fill"), text: "무대넓이: \(stageArea)", color: .Main.primary)
             otherTags.append(tag)
         }
         

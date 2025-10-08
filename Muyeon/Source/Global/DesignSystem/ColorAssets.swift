@@ -12,7 +12,7 @@ extension UIColor {
     enum Main {
         static let primary = UIColor(hexLight: "0065F8")
         static let secondary = UIColor(hexLight: "87C4FF")
-        static let third = UIColor(hexLight: "dee7fa")
+        static let third = UIColor(hexLight: "e0ecfe")
     }
     
     

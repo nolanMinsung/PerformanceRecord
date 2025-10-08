@@ -19,8 +19,8 @@ class PerformanceSelectionCell: UICollectionViewCell {
     
     override var isSelected: Bool {
         didSet {
-            containerView.layer.borderColor = isSelected ? UIColor.systemBlue.cgColor : UIColor.systemGray5.cgColor
-            containerView.backgroundColor = isSelected ? .systemBlue.withAlphaComponent(0.05) : .clear
+            containerView.layer.borderColor = isSelected ? UIColor.Main.primary.cgColor : UIColor.systemGray5.cgColor
+            containerView.backgroundColor = isSelected ? .Main.primary.withAlphaComponent(0.05) : .clear
         }
     }
     
@@ -42,11 +42,11 @@ class PerformanceSelectionCell: UICollectionViewCell {
         venueLabel.textColor = .secondaryLabel
         venueLabel.numberOfLines = 2
         
-        genreTagLabelContainer.backgroundColor = .systemBlue.withAlphaComponent(0.1)
+        genreTagLabelContainer.backgroundColor = .Main.primary.withAlphaComponent(0.1)
         genreTagLabelContainer.layer.cornerRadius = 6
         genreTagLabelContainer.layer.masksToBounds = true
         genreTagLabel.font = .systemFont(ofSize: 12, weight: .medium)
-        genreTagLabel.textColor = .systemBlue
+        genreTagLabel.textColor = .Main.primary
         genreTagLabel.textAlignment = .center
         
         containerView.layer.cornerRadius = 12

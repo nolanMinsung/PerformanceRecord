@@ -28,7 +28,7 @@ class PerformanceRecordCell: UICollectionViewCell {
     
     private let countLabelContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue
+        view.backgroundColor = .Main.third
         view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         return view
@@ -37,7 +37,7 @@ class PerformanceRecordCell: UICollectionViewCell {
     private let countLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = .white
+        label.textColor = .Main.primary
         label.textAlignment = .center
         return label
     }()
@@ -52,8 +52,8 @@ class PerformanceRecordCell: UICollectionViewCell {
     
     private let genreTagLabelContainer: UIView = {
         let view = UIView()
-        view.backgroundColor = .systemBlue.withAlphaComponent(0.1)
-        view.layer.cornerRadius = 6
+        view.backgroundColor = .Main.third
+        view.layer.cornerRadius = 8
         view.layer.masksToBounds = true
         return view
     }()
@@ -61,24 +61,50 @@ class PerformanceRecordCell: UICollectionViewCell {
     private let genreTagLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 12, weight: .medium)
-        label.textColor = .systemBlue
+        label.textColor = .Main.primary
         label.textAlignment = .center
         return label
     }()
-
-    private let ratingLabel: UILabel = {
-        let label = UILabel()
-        label.font = .systemFont(ofSize: 14)
-        return label
+    
+    private let latestRecordZStack = UIView()
+    
+    private let latestRecordContentContainer: UIView = {
+        let view = UIView()
+        view.backgroundColor = .systemBackground
+        view.layer.cornerRadius = 10
+        view.clipsToBounds = true
+        return view
     }()
-
+    
+    private let latestRecordStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 6
+        stackView.alignment = .leading
+        return stackView
+    }()
+    
+    private let latestRecordHorizontalStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.spacing = 6
+        stackView.alignment = .center
+        return stackView
+    }()
+    
     private let lastViewedDateLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 13)
         label.textColor = .tertiaryLabel
         return label
     }()
-
+    
+    private let ratingLabel: UILabel = {
+        let label = UILabel()
+        label.font = .systemFont(ofSize: 14)
+        return label
+    }()
+    
     private let memoLabel: UILabel = {
         let label = UILabel()
         label.font = .systemFont(ofSize: 14)
@@ -86,15 +112,15 @@ class PerformanceRecordCell: UICollectionViewCell {
         label.numberOfLines = 2
         return label
     }()
-
-    private let seeMoreButton: UIButton = {
-        let button = UIButton(type: .system)
-        button.setTitle("자세히 보기 →", for: .normal)
-        button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-        button.tintColor = .label
-        return button
+    
+    private let vStack: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.spacing = 8
+        stackView.alignment = .fill
+        return stackView
     }()
-
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         setupUI()
@@ -110,60 +136,83 @@ class PerformanceRecordCell: UICollectionViewCell {
         countLabelContainer.addSubview(countLabel)
         countLabel.snp.contentCompressionResistanceHorizontalPriority = 800
         countLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
-        let titleStack = UIStackView(arrangedSubviews: [titleLabel, countLabelContainer])
-        titleStack.spacing = 8
-        titleStack.alignment = .center
-
+        
         genreTagLabelContainer.addSubview(genreTagLabel)
         genreTagLabel.snp.contentCompressionResistanceHorizontalPriority = 800
         genreTagLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
-        let performanceInfoStack = UIStackView(arrangedSubviews: [genreTagLabelContainer, ratingLabel])
-        performanceInfoStack.axis = .horizontal
-        performanceInfoStack.spacing = 8
-        performanceInfoStack.alignment = .center
         
-        let vStack = UIStackView(arrangedSubviews: [
-            titleStack,
-            facilityLabel,
-            performanceInfoStack,
-            lastViewedDateLabel,
-            memoLabel,
-            seeMoreButton
-        ])
-        vStack.axis = .vertical
-        vStack.spacing = 8
-        vStack.setCustomSpacing(24, after: performanceInfoStack)
-        vStack.alignment = .leading
+        latestRecordContentContainer.addSubview(latestRecordStackView)
+        
+        let zStack1 = UIView()
+        let zStack2 = UIView()
+        zStack1.backgroundColor = .systemGray4
+        zStack2.backgroundColor = .systemGray5
+        zStack1.layer.cornerRadius = 5
+        zStack2.layer.cornerRadius = 5
+        
+        latestRecordZStack.addSubview(zStack1)
+        latestRecordZStack.addSubview(zStack2)
+        latestRecordZStack.addSubview(latestRecordContentContainer)
         
         containerView.addSubview(vStack)
         
         containerView.snp.makeConstraints { make in
-            make.verticalEdges.equalToSuperview()
-            make.horizontalEdges.equalToSuperview()
+            make.edges.equalToSuperview()
         }
-        
         countLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(5)
             make.horizontalEdges.equalToSuperview().inset(6)
         }
-        
         genreTagLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(5)
             make.horizontalEdges.equalToSuperview().inset(6)
         }
-        
-        vStack.snp.makeConstraints { make in
+        latestRecordStackView.snp.makeConstraints { make in
             make.edges.equalToSuperview().inset(16)
+        }
+        zStack1.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(zStack2).inset(6)
+            make.verticalEdges.equalTo(zStack2).offset(8)
+            make.bottom.equalToSuperview()
+        }
+        zStack2.snp.makeConstraints { make in
+            make.horizontalEdges.equalTo(latestRecordContentContainer).inset(8)
+            make.verticalEdges.equalTo(latestRecordContentContainer).offset(8)
+        }
+        latestRecordContentContainer.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview()
+        }
+        vStack.snp.makeConstraints { make in
+            make.top.horizontalEdges.equalToSuperview().inset(16)
+            make.bottom.equalToSuperview().inset(16)
         }
     }
 
     func configure(performance: Performance, records: [Record]) {
         guard let latestRecord = records.sorted(by: { $0.viewedAt > $1.viewedAt }).first else { return }
-
+        
+        vStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        
         titleLabel.text = performance.name
-        countLabel.text = "\(records.count)회 관람"
+        vStack.addArrangedSubview(titleLabel)
+        
         facilityLabel.text = "\(performance.facilityFullName)"
+        vStack.addArrangedSubview(facilityLabel)
+        
+        countLabel.text = "\(records.count)회 관람"
         genreTagLabel.text = performance.genre.description
+        let spacer = UIView()
+        spacer.isUserInteractionEnabled = false
+        spacer.snp.contentHuggingHorizontalPriority = 100
+        let performanceTagStack = UIStackView(arrangedSubviews: [genreTagLabelContainer, countLabelContainer, spacer])
+        performanceTagStack.axis = .horizontal
+        performanceTagStack.spacing = 8
+        performanceTagStack.alignment = .fill
+        vStack.addArrangedSubview(performanceTagStack)
+        
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "yyyy. MM. dd."
+        lastViewedDateLabel.text = "최근 관람: \(dateFormatter.string(from: latestRecord.viewedAt))"
         
         let starAttachment = NSTextAttachment()
         starAttachment.image = UIImage(systemName: "star.fill")?.withTintColor(.systemYellow)
@@ -172,10 +221,17 @@ class PerformanceRecordCell: UICollectionViewCell {
         ratingString.append(NSAttributedString(string: " \(latestRecord.rating)"))
         ratingLabel.attributedText = ratingString
         
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "yyyy. MM. dd."
-        lastViewedDateLabel.text = "📅 최근 관람: \(dateFormatter.string(from: latestRecord.viewedAt))"
+        latestRecordHorizontalStack.addArrangedSubview(lastViewedDateLabel)
+        latestRecordHorizontalStack.addArrangedSubview(ratingLabel)
+        latestRecordStackView.addArrangedSubview(latestRecordHorizontalStack)
         
-        memoLabel.text = "💬 \(latestRecord.reviewText)"
+        if !latestRecord.reviewText.isEmpty {
+            memoLabel.text = "💬 \(latestRecord.reviewText)"
+            latestRecordStackView.addArrangedSubview(memoLabel)
+        }
+        
+        vStack.addArrangedSubview(latestRecordZStack)
+        vStack.setCustomSpacing(24, after: performanceTagStack)
     }
+    
 }

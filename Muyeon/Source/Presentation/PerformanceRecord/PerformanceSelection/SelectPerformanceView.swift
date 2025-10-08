@@ -24,6 +24,7 @@ class SelectPerformanceView: UIView {
         let section = NSCollectionLayoutSection(group: group)
         let layout = UICollectionViewCompositionalLayout(section: section)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(
             PerformanceSelectionCell.self,
             forCellWithReuseIdentifier: PerformanceSelectionCell.reuseIdentifier

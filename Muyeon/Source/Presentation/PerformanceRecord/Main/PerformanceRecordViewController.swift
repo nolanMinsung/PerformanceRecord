@@ -73,7 +73,6 @@ class PerformanceRecordViewController: UIViewController {
         let output = viewModel.transform(input: input)
         
         output.allRecords
-            .debug()
             .observe(on: MainScheduler.instance)
             .bind(
                 with: self,
@@ -91,7 +90,6 @@ class PerformanceRecordViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.recentRecord
-            .debug()
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, data in
                 let (recentRecord, performance) = data
@@ -100,7 +98,6 @@ class PerformanceRecordViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.mostViewedPerformance
-            .debug()
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, performance in
                 owner.headerData.mostViewed = performance
@@ -108,7 +105,6 @@ class PerformanceRecordViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.performancesWithRecord
-            .debug()
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, performancesWithRecords in
                 owner.performancesWithRecords = performancesWithRecords
