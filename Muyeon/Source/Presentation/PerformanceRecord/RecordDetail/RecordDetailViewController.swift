@@ -59,11 +59,14 @@ class RecordDetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupData()
+//        setupData()
         configureUI()
         configureDataSource()
-        applySnapshot(records: records)
+//        applySnapshot(records: records)
         bind()
+        Task {
+            try await self.updateContents()
+        }
     }
     
     private func setupData() {
@@ -181,8 +184,8 @@ extension RecordDetailViewController {
                 Task {
                     do {
                         try await self.deleteRecordUseCase.execute(record: record)
-                        let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: self.performance.id)
-                        self.applySnapshot(records: detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt }))
+//                        let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: self.performance.id)
+//                        self.applySnapshot(records: detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt }))
                     } catch {
                         print(error.localizedDescription)
                     }
@@ -220,6 +223,15 @@ extension RecordDetailViewController {
     }
     
     private func bind() {
+        DefaultRecordRepository.shared.recordUpdated
+            .bind(onNext: { [weak self] _ in
+                guard let self else { return }
+                Task {
+                    try await self.updateContents()
+                }
+            })
+            .disposed(by: disposeBag)
+        
         rootView.addRecordButton.rx.tap
             .bind(
                 with: self,
@@ -231,6 +243,12 @@ extension RecordDetailViewController {
                 }
             )
             .disposed(by: disposeBag)
+    }
+    
+    private func updateContents() async throws {
+        let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performance.id)
+        self.performance = detailPerformance
+        self.applySnapshot(records: detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt }))
     }
     
     private func applySnapshot(records: [Record]) {
