@@ -10,14 +10,21 @@ import UIKit
 import SnapKit
 
 // MARK: - '공연 기록' CollectionView Cell
-class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
+final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
     
-    private let containerView: UIView = {
-        let view = UIView()
-        view.backgroundColor = .systemGray6
-        view.layer.cornerRadius = 16
-        return view
-    }()
+    final class ContainerView: UIView, ORBRecommendationGradientStyle {
+        override init(frame: CGRect) {
+            super.init(frame: frame)
+            layer.cornerRadius = 25
+            applyGradientStyle()
+        }
+        
+        required init?(coder: NSCoder) {
+            fatalError("init(coder:) has not been implemented")
+        }
+        
+    }
+    private let containerView = ContainerView()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -72,7 +79,10 @@ class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
         let view = UIView()
         view.backgroundColor = .systemBackground
         view.layer.cornerRadius = 10
-        view.clipsToBounds = true
+        view.layer.shadowOffset = .zero
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOpacity = 0.07
+        view.layer.shadowRadius = 10
         return view
     }()
     
