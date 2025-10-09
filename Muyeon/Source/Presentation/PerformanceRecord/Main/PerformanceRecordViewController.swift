@@ -166,15 +166,13 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
             fatalError()
         }
         
-        if let stats = headerData.stats {
-            header.configureStats(
-                totalCount: stats.totalCount,
-                performanceCount: stats.performanceCount,
-                averageRating: stats.averageRating,
-                thisYearCount: stats.thisYearCount,
-                photoCount: stats.photoCount
-            )
-        }
+        header.configureStats(
+            totalCount: headerData.stats?.totalCount ?? 0,
+            performanceCount: headerData.stats?.performanceCount ?? 0,
+            averageRating: headerData.stats?.averageRating ?? 0.0,
+            thisYearCount: headerData.stats?.thisYearCount ?? 0,
+            photoCount: headerData.stats?.photoCount ?? 0
+        )
         
         if let recentData = headerData.recentRecord {
             header.configureRecentRecord(recentRecord: recentData.record, performance: recentData.performance)
