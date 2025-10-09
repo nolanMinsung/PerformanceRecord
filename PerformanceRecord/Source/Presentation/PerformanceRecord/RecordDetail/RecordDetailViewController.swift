@@ -248,12 +248,14 @@ extension RecordDetailViewController {
     private func updateContents() async throws {
         let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performance.id)
         self.performance = detailPerformance
-        self.applySnapshot(records: detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt }))
+        self.records = detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt })
+        self.applySnapshot(records: self.records)
     }
     
     private func applySnapshot(records: [Record]) {
         var snapshot = NSDiffableDataSourceSnapshot<Section, Record>()
         snapshot.appendSections([.main])
+        snapshot.reloadSections([.main])
         snapshot.appendItems(records)
         dataSource.apply(snapshot, animatingDifferences: true)
     }
