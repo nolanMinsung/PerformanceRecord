@@ -46,6 +46,7 @@ extension HomeView: BaseViewSettings {
         
         homeCollectionView = WispableCollectionView(frame: .zero, collectionViewLayout: createCompositionalLayout())
         homeCollectionView.allowsMultipleSelection = true
+        homeCollectionView.showsVerticalScrollIndicator = false
         
         trendingPerformanceTitleLabel.text = "지금 뜨는 공연"
         trendingPerformanceTitleLabel.font = .systemFont(ofSize: 25, weight: .bold)

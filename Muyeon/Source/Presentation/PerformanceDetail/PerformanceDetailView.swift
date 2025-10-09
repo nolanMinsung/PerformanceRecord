@@ -15,7 +15,11 @@ final class PerformanceDetailView: UIView {
     // MARK: - UI Components
     
     // --- 최상단 뷰 ---
-    private let scrollView = UIScrollView()
+    private let scrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.showsVerticalScrollIndicator = false
+        return scrollView
+    }()
 
     // --- 포스터 및 정보 섹션 ---
     private let posterImageView: UIImageView = {
@@ -210,6 +214,7 @@ final class PerformanceDetailView: UIView {
     
     private func setupUIProperties() {
         scrollView.contentInsetAdjustmentBehavior = .never
+        likeButton.isHidden = true
         detailsStackView.isHidden = true
         venueContainerView.isHidden = true
         periodContainerView.isHidden = true
@@ -258,7 +263,7 @@ final class PerformanceDetailView: UIView {
     
     private func setupLayoutConstraints() {
         scrollView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.edges.equalTo(safeAreaLayoutGuide)
         }
         
         // 포스터 이미지
@@ -357,8 +362,11 @@ extension PerformanceDetailView {
             updatePosterImageView(with: performance.posterURL)
         }
         titleLabel.text = performance.name
+        titleLabel.isHidden = false
+        
         likeButton.isEnabled = true
         likeButton.isSelected = likePerformanceIDs.contains(performance.id)
+        likeButton.isHidden = false
         
         genreLabel.text = performance.genre.description
         durationLabel.text = performance.detail?.runtime ?? "-시간"

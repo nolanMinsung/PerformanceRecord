@@ -18,9 +18,13 @@ class FacilityDetailView: UIView {
     private let nameLabel = UILabel()
     private let totalSeatsLabel = UILabel()
     private let addressLabel = UILabel()
+    private let infoSectionStackView = UIStackView()
+    
     private let mapView = MKMapView()
+    
     private let amenitySection = AmenitySectionView()
     private let subVenuesStackView = UIStackView()
+    private let subVenuesSectinoStackView = UIStackView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,6 +37,7 @@ class FacilityDetailView: UIView {
     }
 
     private func setupUI() {
+        scrollView.showsVerticalScrollIndicator = false
         mainStackView.axis = .vertical
         mainStackView.spacing = 20
         
@@ -48,10 +53,9 @@ class FacilityDetailView: UIView {
             make.horizontalEdges.equalTo(scrollView.frameLayoutGuide).inset(20)
         }
         
-        // --- Add components to stack view ---
         setupInfoSection()
         setupMapSection()
-        setupActionButtons()
+//        setupActionButtons()
         mainStackView.addArrangedSubview(amenitySection)
         setupSubVenueSection()
     }
@@ -62,40 +66,41 @@ class FacilityDetailView: UIView {
         totalSeatsLabel.font = .systemFont(ofSize: 16)
         totalSeatsLabel.textColor = .secondaryLabel
         addressLabel.font = .systemFont(ofSize: 16)
-
-        let infoStack = UIStackView(arrangedSubviews: [nameLabel, totalSeatsLabel, addressLabel])
-        infoStack.axis = .vertical
-        infoStack.spacing = 8
-        mainStackView.addArrangedSubview(infoStack)
+        
+        infoSectionStackView.addArrangedSubview(nameLabel)
+        infoSectionStackView.addArrangedSubview(totalSeatsLabel)
+        infoSectionStackView.addArrangedSubview(addressLabel)
+        
+        infoSectionStackView.axis = .vertical
+        infoSectionStackView.spacing = 8
     }
     
     private func setupMapSection() {
         mapView.heightAnchor.constraint(equalToConstant: 200).isActive = true
         mapView.layer.cornerRadius = 12
-        mainStackView.addArrangedSubview(mapView)
     }
     
-    private func setupActionButtons() {
-        let findRouteButton = UIButton(type: .system)
-        findRouteButton.setTitle("길찾기", for: .normal)
-        findRouteButton.backgroundColor = .label
-        findRouteButton.setTitleColor(.systemBackground, for: .normal)
-        findRouteButton.layer.cornerRadius = 8
-        
-        let shareButton = UIButton(type: .system)
-        shareButton.setTitle("공유하기", for: .normal)
-        shareButton.layer.borderColor = UIColor.systemGray3.cgColor
-        shareButton.layer.borderWidth = 1
-        shareButton.setTitleColor(.label, for: .normal)
-        shareButton.layer.cornerRadius = 8
-
-        let buttonStack = UIStackView(arrangedSubviews: [findRouteButton, shareButton])
-        buttonStack.axis = .horizontal
-        buttonStack.spacing = 12
-        buttonStack.distribution = .fillEqually
-        buttonStack.heightAnchor.constraint(equalToConstant: 50).isActive = true
-        mainStackView.addArrangedSubview(buttonStack)
-    }
+//    private func setupActionButtons() {
+//        let findRouteButton = UIButton(type: .system)
+//        findRouteButton.setTitle("길찾기", for: .normal)
+//        findRouteButton.backgroundColor = .label
+//        findRouteButton.setTitleColor(.systemBackground, for: .normal)
+//        findRouteButton.layer.cornerRadius = 8
+//        
+//        let shareButton = UIButton(type: .system)
+//        shareButton.setTitle("공유하기", for: .normal)
+//        shareButton.layer.borderColor = UIColor.systemGray3.cgColor
+//        shareButton.layer.borderWidth = 1
+//        shareButton.setTitleColor(.label, for: .normal)
+//        shareButton.layer.cornerRadius = 8
+//
+//        let buttonStack = UIStackView(arrangedSubviews: [findRouteButton, shareButton])
+//        buttonStack.axis = .horizontal
+//        buttonStack.spacing = 12
+//        buttonStack.distribution = .fillEqually
+//        buttonStack.heightAnchor.constraint(equalToConstant: 50).isActive = true
+//        mainStackView.addArrangedSubview(buttonStack)
+//    }
     
     private func setupSubVenueSection() {
         let titleLabel = UILabel()
@@ -105,43 +110,48 @@ class FacilityDetailView: UIView {
         subVenuesStackView.axis = .vertical
         subVenuesStackView.spacing = 16
         
-        let sectionStack = UIStackView(arrangedSubviews: [titleLabel, subVenuesStackView])
-        sectionStack.axis = .vertical
-        sectionStack.spacing = 16
-        mainStackView.addArrangedSubview(sectionStack)
+        subVenuesSectinoStackView.addArrangedSubview(titleLabel)
+        subVenuesSectinoStackView.addArrangedSubview(subVenuesStackView)
+        
+        subVenuesSectinoStackView.axis = .vertical
+        subVenuesSectinoStackView.spacing = 16
     }
 
     // 데이터 채우기
     public func configure(with facility: Facility) {
         nameLabel.text = facility.name
-        
-        if let detail = facility.detail {
-            totalSeatsLabel.text = "총 \(detail.totalSeatScale)석"
-            addressLabel.text = detail.address
-            
-            // 지도 위치 설정
-            if let latitude = detail.latitude, let longitude = detail.longitude {
-                let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-                let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
-                mapView.setRegion(region, animated: false)
-                
-                let annotation = MKPointAnnotation()
-                annotation.coordinate = coordinate
-                annotation.title = facility.name
-                mapView.addAnnotation(annotation)
-            }
-            
-            // 편의시설
-            amenitySection.configure(with: detail)
-            
-            // 상세 공연장 정보
-            subVenuesStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
-            detail.subVenues.forEach { subVenue in
-                let subVenueInfoView = SubVenueInfoView()
-                subVenueInfoView.configure(with: subVenue)
-                subVenuesStackView.addArrangedSubview(subVenueInfoView)
-            }
+        guard let detail = facility.detail else {
+            mainStackView.addArrangedSubview(infoSectionStackView)
+            return
         }
+        totalSeatsLabel.text = "총 \(detail.totalSeatScale)석"
+        addressLabel.text = detail.address
+        mainStackView.addArrangedSubview(infoSectionStackView)
         
+        // 지도 위치 설정
+        if let latitude = detail.latitude, let longitude = detail.longitude {
+            let coordinate = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let region = MKCoordinateRegion(center: coordinate, latitudinalMeters: 500, longitudinalMeters: 500)
+            mapView.setRegion(region, animated: false)
+            
+            let annotation = MKPointAnnotation()
+            annotation.coordinate = coordinate
+            annotation.title = facility.name
+            mapView.addAnnotation(annotation)
+        }
+        mainStackView.addArrangedSubview(mapView)
+        
+        // 편의시설
+        amenitySection.configure(with: detail)
+        mainStackView.addArrangedSubview(amenitySection)
+        
+        // 상세 공연장 정보
+        subVenuesStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        detail.subVenues.forEach { subVenue in
+            let subVenueInfoView = SubVenueInfoView()
+            subVenueInfoView.configure(with: subVenue)
+            subVenuesStackView.addArrangedSubview(subVenueInfoView)
+        }
+        mainStackView.addArrangedSubview(subVenuesSectinoStackView)
     }
 }

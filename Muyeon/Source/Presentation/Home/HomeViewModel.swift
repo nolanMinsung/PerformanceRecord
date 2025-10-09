@@ -40,7 +40,9 @@ final class HomeViewModel {
     
     func transform(input: Input) -> Output {
         let topTenContents = BehaviorRelay<[BoxOfficeItem]>(value: [])
-        let boxOfficeGenres = BehaviorRelay<[Constant.BoxOfficeGenre]>(value: Constant.BoxOfficeGenre.allCases)
+        let boxOfficeGenres = BehaviorRelay<[Constant.BoxOfficeGenre]>(
+            value: Constant.BoxOfficeGenre.allCases.filter({ $0 != .unknown })
+        )
         let trendingBoxOffice = BehaviorRelay<[BoxOfficeItem]>(value: [])
         let errorRelay = PublishRelay<any Error>()
         

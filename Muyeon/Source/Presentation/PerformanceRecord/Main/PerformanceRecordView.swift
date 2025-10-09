@@ -15,6 +15,7 @@ class PerformanceRecordView: UIView {
     private(set) lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         collectionView.backgroundColor = .clear
+        collectionView.showsVerticalScrollIndicator = false
         collectionView.register(PerformanceRecordCell.self, forCellWithReuseIdentifier: PerformanceRecordCell.reuseIdentifier)
         collectionView.register(
             PerformanceRecordHeaderView.self,
