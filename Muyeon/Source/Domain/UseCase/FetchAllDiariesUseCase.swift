@@ -12,7 +12,7 @@ protocol FetchAllDiariesUseCase {
 
 final class DefaultFetchAllDiariesUseCase: FetchAllDiariesUseCase {
     
-    let diaryRepository: any RecordRepository
+    private let diaryRepository: any RecordRepository
     
     init(diaryRepository: any RecordRepository) {
         self.diaryRepository = diaryRepository

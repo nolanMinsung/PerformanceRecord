@@ -11,7 +11,7 @@ protocol FetchLocalPerformanceListUseCase {
 
 
 final class DefaultFetchLocalPerformanceListUseCase: FetchLocalPerformanceListUseCase {
-    let performanceRepository: any PerformanceRepository
+    private let performanceRepository: any PerformanceRepository
     
     init(performanceRepository: any PerformanceRepository) {
         self.performanceRepository = performanceRepository

@@ -28,13 +28,13 @@ final class AddRecordViewModel {
     }
     
     private let performance: Performance
-    private let createDiaryUseCase: any CreateDiaryUseCase
+    private let createRecordUseCase: any CreateRecordUseCase
     private let diaryContent = PublishRelay<Record>()
     private let disposeBag = DisposeBag()
     
-    init(performance: Performance, createDiaryUseCase: any CreateDiaryUseCase) {
+    init(performance: Performance, createRecordUseCase: any CreateRecordUseCase) {
         self.performance = performance
-        self.createDiaryUseCase = createDiaryUseCase
+        self.createRecordUseCase = createRecordUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -95,7 +95,7 @@ final class AddRecordViewModel {
                     let (diary, imageDataList) = data
                     Task {
                         do {
-                            try await owner.createDiaryUseCase.execute(diary: diary, imageData: imageDataList.map(\.0))
+                            try await owner.createRecordUseCase.execute(record: diary, imageData: imageDataList.map(\.0))
                             successCreateDiary.accept(())
                         } catch {
                             errorRelay.accept(error)

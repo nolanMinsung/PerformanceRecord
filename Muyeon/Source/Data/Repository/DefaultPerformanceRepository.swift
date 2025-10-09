@@ -11,7 +11,6 @@ import RealmSwift
 
 enum DefaultPerformanceRepositoryError: LocalizedError {
     case performanceObjectNotFound
-    case performanceNotExist
 }
 
 
@@ -43,14 +42,10 @@ actor DefaultPerformanceRepository: PerformanceRepository {
     func fetchDetailFromLocal(id: String) async throws -> Performance {
         try await Task.detached {
             let realm = try Realm()
-            guard let performance = try realm.objects(PerformanceObject.self)
-                .filter({ $0.id == id })
-                .map({ try $0.toDomain() })
-                .first
-            else {
+            guard let performanceObject = realm.object(ofType: PerformanceObject.self, forPrimaryKey: id) else {
                 throw DefaultPerformanceRepositoryError.performanceObjectNotFound
             }
-            return performance
+            return try performanceObject.toDomain()
         }.value
     }
     
@@ -81,7 +76,7 @@ actor DefaultPerformanceRepository: PerformanceRepository {
             if let mostViewed {
                 return try mostViewed.toDomain()
             } else {
-                throw DefaultPerformanceRepositoryError.performanceNotExist
+                throw DefaultPerformanceRepositoryError.performanceObjectNotFound
             }
         }.value
     }
@@ -124,12 +119,35 @@ actor DefaultPerformanceRepository: PerformanceRepository {
             detailImageUUIDs: detailImageUUIDs
         )
         
+        // 이미지가 새로 저장되면 이미지 파일 ID도 업데이트됨.
+        // 이미지가 업데이트되면 기존 이미지들은 삭제해야 함.
+        // 이때 업데이트 후에도 삭제할 기존 이미지들 정보를 삭제 시 활용하기 위해서
+        // 기존 공연 정보가 있을 경우 이미지 ID들을 별도 변수에 보관.
+        var oldPosterIDToDelete: String? = nil
+        var oldDetailImageIDListToDelete: [String]? = nil
+        
         try await Task.detached {
             let realm = try Realm()
+            
+            // 기존에 공연이 있을 경우 이미지 정보들을 별도로 보관
+            if let oldPerformanceObject = realm.object(ofType: PerformanceObject.self, forPrimaryKey: performance.id) {
+                oldPosterIDToDelete = oldPerformanceObject.posterImageUUID
+                oldDetailImageIDListToDelete = Array(oldPerformanceObject.detailImageUUIDs)
+            }
             try realm.write {
                 realm.add(performanceObject, update: .modified)
             }
         }.value
+        
+        // 새 공연 정보로 업데이트가 끝나면 기존 이미지들 순차적으로 삭제
+        if let oldPosterIDToDelete {
+            try await self.imageRepository.deleteImage(with: oldPosterIDToDelete, in: .performance(id: performance.id))
+        }
+        if let oldDetailImageIDListToDelete {
+            for imageID in oldDetailImageIDListToDelete {
+                try await imageRepository.deleteImage(with: imageID, in: .performance(id: performance.id))
+            }
+        }
     }
     
     func delete(performanceID: String) async throws {

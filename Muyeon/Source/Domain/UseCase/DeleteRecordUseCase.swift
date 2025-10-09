@@ -12,7 +12,7 @@ protocol DeleteRecordUseCase {
 
 final class DefaultDeleteRecordUseCase: DeleteRecordUseCase {
     
-    let recordRepository: any RecordRepository
+    private let recordRepository: any RecordRepository
     
     init(recordRepository: any RecordRepository) {
         self.recordRepository = recordRepository

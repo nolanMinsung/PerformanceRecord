@@ -203,7 +203,15 @@ final class PerformanceDetailView: UIView {
             outgoing.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
             return outgoing
         })
+        
+        var disableConfig = config
+        disableConfig.title = "지금은 공연 기록을 추가할 수 없어요."
+        disableConfig.subtitle = "공연이 시작하면 관람 후 기록해보세요."
+        
         let button = ShrinkableButton(configuration: config)
+        button.configurationUpdateHandler = { button in
+            button.configuration = button.isEnabled ? config : disableConfig
+        }
         button.isEnabled = false
         button.isHidden = true
         return button
@@ -424,13 +432,17 @@ extension PerformanceDetailView {
             storyTitleLabel.isHidden = false
         }
         
-        let recordCount = performance.records.count
-        let titleText = (recordCount == 0) ? "이 공연을 관람했나요?" : "이 공연을 \(recordCount)회 관람했어요."
-        let subTitleText = (recordCount == 0) ? "공연 기록을 추가해보세요" : "n차 관람했다면 기록을 추가해보세요."
-        addRecordButton.configuration?.title = titleText
-        addRecordButton.configuration?.subtitle = subTitleText
+        let isPerformanceHasStart = Calendar(identifier: .gregorian)
+            .compare(performance.startDate, to: .now, toGranularity: .day) != .orderedDescending
+        if isPerformanceHasStart {
+            let recordCount = performance.records.count
+            let titleText = (recordCount == 0) ? "이 공연을 관람했나요?" : "이 공연을 \(recordCount)회 관람했어요."
+            let subTitleText = (recordCount == 0) ? "공연 기록을 추가해보세요" : "n차 관람했다면 기록을 추가해보세요."
+            addRecordButton.configuration?.title = titleText
+            addRecordButton.configuration?.subtitle = subTitleText
+        }
         addRecordButton.isHidden = false
-        addRecordButton.isEnabled = true
+        addRecordButton.isEnabled = isPerformanceHasStart
         
         updateAdditionalImages(urls: performance.detail?.detailImageURLs ?? [])
     }

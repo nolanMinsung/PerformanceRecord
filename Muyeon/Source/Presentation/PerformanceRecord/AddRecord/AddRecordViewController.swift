@@ -45,8 +45,9 @@ class AddRecordViewController: ModalCardViewController {
         self.rootView = AddRecordView(performance: performance)
         self.viewModel = AddRecordViewModel(
             performance: performance,
-            createDiaryUseCase: DefaultCreateDiaryUseCase(
-                diaryRepository: DefaultRecordRepository.shared
+            createRecordUseCase: DefaultCreateRecordUseCase(
+                performanceRepository: DefaultPerformanceRepository.shared,
+                recordRepository: DefaultRecordRepository.shared
             )
         )
         super.init(nibName: nil, bundle: nil)

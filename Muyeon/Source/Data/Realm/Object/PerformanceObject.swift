@@ -63,7 +63,7 @@ final class PerformanceObject: Object {
     // RelatedLink와의 1:N 관계: RelatedLinkObject들을 저장하는 List
     @Persisted var relatedLinks = RealmSwift.List<RelatedLinkObject>()
     
-    // Diary와의 1:N 관계
+    // Record와의 1:N 관계
     @Persisted var records = RealmSwift.List<RecordObject>()
 }
 

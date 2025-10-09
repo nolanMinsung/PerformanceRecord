@@ -18,7 +18,7 @@ final class DefaultFetchLocalPosterUseCase: FetchLocalPosterUseCase {
         case posterImageNotFound
     }
     
-    let imageRepository: any ImageRepository
+    private let imageRepository: any ImageRepository
     
     init(
         imageRepository: any ImageRepository
