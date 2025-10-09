@@ -35,6 +35,7 @@ class AddRecordView: UIView {
         viewedDatePicker.minimumDate = performance.startDate
         viewedDatePicker.maximumDate = min(performance.endDate, .now)
         viewedDatePicker.preferredDatePickerStyle = .compact
+        viewedDatePicker.calendar = Calendar(identifier: .gregorian)
         viewedDatePicker.locale = Locale(identifier: "ko_KR")
         
         var saveButtonConfig = UIButton.Configuration.filled()

@@ -87,12 +87,14 @@ final class SearchView: UIView {
         
         fromDatePicker.datePickerMode = .date
         fromDatePicker.preferredDatePickerStyle = .compact
+        fromDatePicker.calendar = Calendar(identifier: .gregorian)
         
         tildeLabel.text = "~"
         tildeLabel.font = .systemFont(ofSize: 17)
         
         toDatePicker.datePickerMode = .date
         toDatePicker.preferredDatePickerStyle = .compact
+        toDatePicker.calendar = Calendar(identifier: .gregorian)
         
         // CollectionView
         performanceCollectionView.backgroundColor = .clear

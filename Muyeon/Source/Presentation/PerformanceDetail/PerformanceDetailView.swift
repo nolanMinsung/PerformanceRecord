@@ -213,7 +213,6 @@ final class PerformanceDetailView: UIView {
     }
     
     private func setupUIProperties() {
-        scrollView.contentInsetAdjustmentBehavior = .never
         likeButton.isHidden = true
         detailsStackView.isHidden = true
         venueContainerView.isHidden = true
@@ -263,7 +262,7 @@ final class PerformanceDetailView: UIView {
     
     private func setupLayoutConstraints() {
         scrollView.snp.makeConstraints { make in
-            make.edges.equalTo(safeAreaLayoutGuide)
+            make.edges.equalToSuperview()
         }
         
         // 포스터 이미지
