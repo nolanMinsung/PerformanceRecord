@@ -157,7 +157,7 @@ class AddRecordView: UIView {
         memoTextView.layer.cornerRadius = 10
         memoTextView.isScrollEnabled = false
         memoTextView.snp.makeConstraints { make in
-            make.height.greaterThanOrEqualTo(100)
+            make.height.equalTo(100)
         }
         return memoTextView
     }

@@ -77,9 +77,9 @@ class AddRecordViewController: ModalCardViewController {
     
     private func bind() {
         let input = AddRecordViewModel.Input(
-            viewedDate: rootView.viewedDatePicker.rx.date.asObservable(),
-            ratingInput: rootView.ratingView.rating.asObservable(),
-            reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable(),
+            viewedDate: rootView.viewedDatePicker.rx.date.asObservable().startWith(.now),
+            ratingInput: rootView.ratingView.rating.asObservable().startWith(5.0),
+            reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable().startWith(""),
             addedImageData: addedImageData.asObservable(),
             deleteImageData: deleteImageData.asObservable(),
             saveButtonTapped: rootView.saveButton.rx.tap.asObservable(),
@@ -106,7 +106,7 @@ class AddRecordViewController: ModalCardViewController {
     }
     
     private func setupActions() {
-        rootView.memoTextView.delegate = self
+//        rootView.memoTextView.delegate = self
         rootView.imagesCollectionView.dataSource = self
         rootView.onAddImageTapped = { [weak self] in
             self?.presentImagePicker()
