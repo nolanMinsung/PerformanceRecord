@@ -60,8 +60,9 @@ class SelectPerformanceView: UIView {
     private func setupLayout() {
         // UI 컴포넌트 생성
         let titleLabel = UILabel()
-        titleLabel.text = "즐겨찾기한 공연 목록이에요."
-        titleLabel.font = .systemFont(ofSize: 22, weight: .bold)
+        titleLabel.text = "즐겨찾기한 공연 중\n기록이 가능한 공연 목록이에요."
+        titleLabel.font = .systemFont(ofSize: 21, weight: .bold)
+        titleLabel.numberOfLines = 2
         
         let subtitleLabel = UILabel()
         subtitleLabel.text = "다음 중 관람하신 공연이 있나요?\n나만의 기록을 작성해 보세요."
