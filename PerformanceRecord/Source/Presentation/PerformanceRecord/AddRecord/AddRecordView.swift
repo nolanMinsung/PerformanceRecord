@@ -155,7 +155,6 @@ class AddRecordView: UIView {
         memoTextView.font = .systemFont(ofSize: 15)
         memoTextView.backgroundColor = .secondarySystemBackground
         memoTextView.layer.cornerRadius = 10
-        memoTextView.isScrollEnabled = false
         memoTextView.snp.makeConstraints { make in
             make.height.equalTo(100)
         }
