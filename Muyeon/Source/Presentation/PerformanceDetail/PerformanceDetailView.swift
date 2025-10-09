@@ -189,6 +189,26 @@ final class PerformanceDetailView: UIView {
         return label
     }()
     
+    let addRecordButton: UIButton = {
+        var config = UIButton.Configuration.filled()
+        config.title = "이 공연을 관람했나요?"
+        config.subtitle = "공연 기록을 추가해보세요"
+        config.titlePadding = 5
+        config.titleAlignment = .center
+        config.baseBackgroundColor = .Main.primary.withAlphaComponent(0.1)
+        config.baseForegroundColor = .Main.primary
+        config.cornerStyle = .large
+        config.titleTextAttributesTransformer = .init({ incoming in
+            var outgoing = incoming
+            outgoing.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
+            return outgoing
+        })
+        let button = ShrinkableButton(configuration: config)
+        button.isEnabled = false
+        button.isHidden = true
+        return button
+    }()
+    
     private let additionalImageStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -232,6 +252,7 @@ final class PerformanceDetailView: UIView {
         scrollView.addSubview(infoStackView)
         scrollView.addSubview(storyTitleLabel)
         scrollView.addSubview(storyBodyLabel)
+        scrollView.addSubview(addRecordButton)
         scrollView.addSubview(additionalImageStackView)
         
         // 세로 정보 스택 뷰
@@ -333,8 +354,13 @@ final class PerformanceDetailView: UIView {
             make.verticalEdges.trailing.equalToSuperview()
         }
         
-        additionalImageStackView.snp.makeConstraints { make in
+        addRecordButton.snp.makeConstraints { make in
             make.top.equalTo(storyBodyLabel.snp.bottom).offset(30)
+            make.horizontalEdges.equalTo(infoStackView)
+        }
+        
+        additionalImageStackView.snp.makeConstraints { make in
+            make.top.equalTo(addRecordButton.snp.bottom).offset(30)
             make.horizontalEdges.equalTo(scrollView.frameLayoutGuide)
             make.bottom.equalTo(scrollView.contentLayoutGuide)
         }
@@ -397,6 +423,14 @@ extension PerformanceDetailView {
             storyBodyLabel.isHidden = false
             storyTitleLabel.isHidden = false
         }
+        
+        let recordCount = performance.records.count
+        let titleText = (recordCount == 0) ? "이 공연을 관람했나요?" : "이 공연을 \(recordCount)회 관람했어요."
+        let subTitleText = (recordCount == 0) ? "공연 기록을 추가해보세요" : "n차 관람했다면 기록을 추가해보세요."
+        addRecordButton.configuration?.title = titleText
+        addRecordButton.configuration?.subtitle = subTitleText
+        addRecordButton.isHidden = false
+        addRecordButton.isEnabled = true
         
         updateAdditionalImages(urls: performance.detail?.detailImageURLs ?? [])
     }

@@ -121,17 +121,7 @@ class AddRecordViewController: ModalCardViewController {
         picker.delegate = self
         present(picker, animated: true)
     }
-
-    private func saveRecord() {
-        let memo = rootView.memoTextView.text
-        
-        print("--- 저장할 데이터 ---")
-        print("공연: \(performance.name)")
-        print("관람일: \(selectedDate)")
-        print("평점: \(rating)")
-        print("메모: \(memo ?? "없음")")
-        print("이미지 개수: \(currentSelectedImage.count)")
-    }
+    
 }
 
 // MARK: - PHPickerViewControllerDelegate

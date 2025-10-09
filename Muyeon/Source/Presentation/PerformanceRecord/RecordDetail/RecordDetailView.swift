@@ -16,7 +16,7 @@ class RecordDetailView: UIView {
     
     let addRecordButton: UIButton = {
         var config = UIButton.Configuration.filled()
-        config.title = "공연 기록 남기기"
+        config.title = "공연 기록 추가하기"
         config.baseBackgroundColor = .Main.primary.withAlphaComponent(0.1)
         config.baseForegroundColor = .Main.primary
         config.cornerStyle = .large

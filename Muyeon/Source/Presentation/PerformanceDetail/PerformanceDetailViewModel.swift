@@ -14,7 +14,8 @@ final class PerformanceDetailViewModel {
     
     struct Input {
         let likeButtonTapped: Observable<Bool>
-        let facilityButtonTapped: Observable<String>
+        let facilityButtonTapped: Observable<Void>
+        let addRecordButtonTapped: Observable<Void>
     }
     
     struct Output {
@@ -22,24 +23,25 @@ final class PerformanceDetailViewModel {
         let performanceDetail: Observable<Performance>
         let showFacilityDetail: Observable<String>
         let likeButtonSelectionState: Observable<Bool>
+        let showAddRecordVC: Observable<Performance>
         let error: Observable<any Error>
     }
     
     let performanceID: String
     let posterURL: String
-    let fetchPerformanceDetailUseCase: any FetchRemotePerformanceDetailUseCase
-    let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
+    private let fetchRemotePerformanceDetailUseCase: any FetchRemotePerformanceDetailUseCase
+    private let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
     private let disposeBag = DisposeBag()
     
     init(
         performanceID: String,
         posterURL: String,
-        fetchPerformanceDetailUseCase: FetchRemotePerformanceDetailUseCase,
+        fetchRemotePerformanceDetailUseCase: FetchRemotePerformanceDetailUseCase,
         togglePerformanceLikeUseCase: TogglePerformanceLikeUseCase,
     ) {
         self.performanceID = performanceID
         self.posterURL = posterURL
-        self.fetchPerformanceDetailUseCase = fetchPerformanceDetailUseCase
+        self.fetchRemotePerformanceDetailUseCase = fetchRemotePerformanceDetailUseCase
         self.togglePerformanceLikeUseCase = togglePerformanceLikeUseCase
     }
     
@@ -47,10 +49,11 @@ final class PerformanceDetailViewModel {
         let performanceDetail = PublishRelay<Performance>()
         let showFacilityDetail = PublishRelay<String>()
         let likeButtonStatusRelay = PublishRelay<Bool>()
+        let showAddRecordVCRelay = PublishRelay<Performance>()
         let errorRelay = PublishRelay<any Error>()
         
         Task {
-            let performanceDetailInfo = try await fetchPerformanceDetailUseCase.execute(performanceID: performanceID)
+            let performanceDetailInfo = try await fetchRemotePerformanceDetailUseCase.execute(performanceID: performanceID)
             performanceDetail.accept(performanceDetailInfo)
         }
         
@@ -74,11 +77,18 @@ final class PerformanceDetailViewModel {
             .bind(to: showFacilityDetail)
             .disposed(by: disposeBag)
         
+        // TODO: 기록 유무 여부에 따라 저장 버튼 상태 분기처리하기 (Remote 데이터 처리는 어떻게 할 것인지...)
+        input.addRecordButtonTapped
+            .withLatestFrom(performanceDetail)
+            .bind(to: showAddRecordVCRelay)
+            .disposed(by: disposeBag)
+        
         return .init(
             posterURL: Observable<String>.just(posterURL),
             performanceDetail: performanceDetail.asObservable(),
             showFacilityDetail: showFacilityDetail.asObservable(),
             likeButtonSelectionState: likeButtonStatusRelay.asObservable(),
+            showAddRecordVC: showAddRecordVCRelay.asObservable(),
             error: errorRelay.asObservable()
         )
     }

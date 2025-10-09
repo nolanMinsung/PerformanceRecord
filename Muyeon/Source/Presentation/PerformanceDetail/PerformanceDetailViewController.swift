@@ -20,7 +20,7 @@ class PerformanceDetailViewController: UIViewController {
         self.viewModel = PerformanceDetailViewModel(
             performanceID: performanceID,
             posterURL: posterURL,
-            fetchPerformanceDetailUseCase: DefaultFetchRemotePerformanceDetailUseCase(
+            fetchRemotePerformanceDetailUseCase: DefaultFetchRemotePerformanceDetailUseCase(
                 performanceRepository: DefaultPerformanceRepository.shared
             ),
             togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(
@@ -59,12 +59,10 @@ private extension PerformanceDetailViewController {
             .map(\.isSelected)
             .share()
             
-        let facilityButtonTapped = rootView.facilityButton.rx.tap
-            .withLatestFrom(Observable.just(viewModel.performanceID))
-        
         let input = PerformanceDetailViewModel.Input(
             likeButtonTapped: likeButtonTapped.asObservable(),
-            facilityButtonTapped: facilityButtonTapped
+            facilityButtonTapped: rootView.facilityButton.rx.tap.asObservable(),
+            addRecordButtonTapped: rootView.addRecordButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -112,6 +110,19 @@ private extension PerformanceDetailViewController {
                 print(error.localizedDescription)
                 owner.wisp.dismiss(autoFallback: true)
             }
+            .disposed(by: disposeBag)
+        
+        output.showAddRecordVC
+            .observe(on: MainScheduler.instance)
+            .bind(
+                with: self,
+                onNext: { owner, performance in
+                    let addRecordVC = AddRecordViewController(performance: performance)
+                    addRecordVC.modalPresentationStyle = .overFullScreen
+                    addRecordVC.modalTransitionStyle = .crossDissolve
+                    owner.present(addRecordVC, animated: true)
+                }
+            )
             .disposed(by: disposeBag)
     }
     
