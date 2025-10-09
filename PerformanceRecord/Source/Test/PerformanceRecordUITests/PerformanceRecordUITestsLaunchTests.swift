@@ -7,7 +7,7 @@
 
 import XCTest
 
-final class MuyeonUITestsLaunchTests: XCTestCase {
+final class PerformanceRecordUITestsLaunchTests: XCTestCase {
 
     override class var runsForEachTargetApplicationUIConfiguration: Bool {
         true

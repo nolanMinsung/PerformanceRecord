@@ -51,49 +51,49 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Muyeon.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		4E52FAA02E890BF100EB3EBB /* MuyeonTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuyeonTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		4E52FAAA2E890BF100EB3EBB /* MuyeonUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MuyeonUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E52FA8A2E890BEF00EB3EBB /* PerformanceRecord.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PerformanceRecord.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E52FAA02E890BF100EB3EBB /* PerformanceRecordTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PerformanceRecordTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		4E52FAAA2E890BF100EB3EBB /* PerformanceRecordUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = PerformanceRecordUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		4E52FABE2E890C2C00EB3EBB /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		4E52FAB22E890BF100EB3EBB /* Exceptions for "Muyeon" folder in "Muyeon" target */ = {
+		4E12568F2E979AF20097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecord" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Source/Global/Supporting FIles/InfoPlist/Info.plist",
-				Source/Test/MuyeonTests/MuyeonTests.swift,
-				Source/Test/MuyeonUITests/MuyeonUITests.swift,
-				Source/Test/MuyeonUITests/MuyeonUITestsLaunchTests.swift,
+				Source/Test/PerformanceRecordTests/PerformanceRecordTests.swift,
+				Source/Test/PerformanceRecordUITests/PerformanceRecordUITests.swift,
+				Source/Test/PerformanceRecordUITests/PerformanceRecordUITestsLaunchTests.swift,
 			);
-			target = 4E52FA892E890BEF00EB3EBB /* Muyeon */;
+			target = 4E52FA892E890BEF00EB3EBB /* PerformanceRecord */;
 		};
-		4E52FAD02E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonTests" target */ = {
+		4E1256912E979DB80097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecordTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Source/Test/MuyeonTests/MuyeonTests.swift,
+				Source/Test/PerformanceRecordTests/PerformanceRecordTests.swift,
 			);
-			target = 4E52FA9F2E890BF100EB3EBB /* MuyeonTests */;
+			target = 4E52FA9F2E890BF100EB3EBB /* PerformanceRecordTests */;
 		};
-		4E52FAD12E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonUITests" target */ = {
+		4E1256942E979DC00097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecordUITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Source/Test/MuyeonUITests/MuyeonUITests.swift,
-				Source/Test/MuyeonUITests/MuyeonUITestsLaunchTests.swift,
+				Source/Test/PerformanceRecordUITests/PerformanceRecordUITests.swift,
+				Source/Test/PerformanceRecordUITests/PerformanceRecordUITestsLaunchTests.swift,
 			);
-			target = 4E52FAA92E890BF100EB3EBB /* MuyeonUITests */;
+			target = 4E52FAA92E890BF100EB3EBB /* PerformanceRecordUITests */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		4E52FA8C2E890BEF00EB3EBB /* Muyeon */ = {
+		4E52FA8C2E890BEF00EB3EBB /* PerformanceRecord */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				4E52FAB22E890BF100EB3EBB /* Exceptions for "Muyeon" folder in "Muyeon" target */,
-				4E52FAD02E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonTests" target */,
-				4E52FAD12E890CD500EB3EBB /* Exceptions for "Muyeon" folder in "MuyeonUITests" target */,
+				4E12568F2E979AF20097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecord" target */,
+				4E1256912E979DB80097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecordTests" target */,
+				4E1256942E979DC00097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecordUITests" target */,
 			);
-			path = Muyeon;
+			path = PerformanceRecord;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -135,7 +135,7 @@
 			isa = PBXGroup;
 			children = (
 				4E52FABE2E890C2C00EB3EBB /* .gitignore */,
-				4E52FA8C2E890BEF00EB3EBB /* Muyeon */,
+				4E52FA8C2E890BEF00EB3EBB /* PerformanceRecord */,
 				4E52FA8B2E890BEF00EB3EBB /* Products */,
 			);
 			sourceTree = "<group>";
@@ -143,9 +143,9 @@
 		4E52FA8B2E890BEF00EB3EBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */,
-				4E52FAA02E890BF100EB3EBB /* MuyeonTests.xctest */,
-				4E52FAAA2E890BF100EB3EBB /* MuyeonUITests.xctest */,
+				4E52FA8A2E890BEF00EB3EBB /* PerformanceRecord.app */,
+				4E52FAA02E890BF100EB3EBB /* PerformanceRecordTests.xctest */,
+				4E52FAAA2E890BF100EB3EBB /* PerformanceRecordUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -153,9 +153,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		4E52FA892E890BEF00EB3EBB /* Muyeon */ = {
+		4E52FA892E890BEF00EB3EBB /* PerformanceRecord */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4E52FAB32E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "Muyeon" */;
+			buildConfigurationList = 4E52FAB32E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "PerformanceRecord" */;
 			buildPhases = (
 				4E52FA862E890BEF00EB3EBB /* Sources */,
 				4E52FA872E890BEF00EB3EBB /* Frameworks */,
@@ -167,9 +167,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				4E52FA8C2E890BEF00EB3EBB /* Muyeon */,
+				4E52FA8C2E890BEF00EB3EBB /* PerformanceRecord */,
 			);
-			name = Muyeon;
+			name = PerformanceRecord;
 			packageProductDependencies = (
 				4E52FB692E8911C000EB3EBB /* RxCocoa */,
 				4E52FB6B2E8911C000EB3EBB /* RxSwift */,
@@ -181,12 +181,12 @@
 				4EF7EB5E2E913F2400B5E5B6 /* RealmSwift */,
 			);
 			productName = Muyeon;
-			productReference = 4E52FA8A2E890BEF00EB3EBB /* Muyeon.app */;
+			productReference = 4E52FA8A2E890BEF00EB3EBB /* PerformanceRecord.app */;
 			productType = "com.apple.product-type.application";
 		};
-		4E52FA9F2E890BF100EB3EBB /* MuyeonTests */ = {
+		4E52FA9F2E890BF100EB3EBB /* PerformanceRecordTests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4E52FAB82E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "MuyeonTests" */;
+			buildConfigurationList = 4E52FAB82E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "PerformanceRecordTests" */;
 			buildPhases = (
 				4E52FA9C2E890BF100EB3EBB /* Sources */,
 				4E52FA9D2E890BF100EB3EBB /* Frameworks */,
@@ -197,16 +197,16 @@
 			dependencies = (
 				4E52FAA22E890BF100EB3EBB /* PBXTargetDependency */,
 			);
-			name = MuyeonTests;
+			name = PerformanceRecordTests;
 			packageProductDependencies = (
 			);
 			productName = MuyeonTests;
-			productReference = 4E52FAA02E890BF100EB3EBB /* MuyeonTests.xctest */;
+			productReference = 4E52FAA02E890BF100EB3EBB /* PerformanceRecordTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		4E52FAA92E890BF100EB3EBB /* MuyeonUITests */ = {
+		4E52FAA92E890BF100EB3EBB /* PerformanceRecordUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 4E52FABB2E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "MuyeonUITests" */;
+			buildConfigurationList = 4E52FABB2E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "PerformanceRecordUITests" */;
 			buildPhases = (
 				4E52FAA62E890BF100EB3EBB /* Sources */,
 				4E52FAA72E890BF100EB3EBB /* Frameworks */,
@@ -217,11 +217,11 @@
 			dependencies = (
 				4E52FAAC2E890BF100EB3EBB /* PBXTargetDependency */,
 			);
-			name = MuyeonUITests;
+			name = PerformanceRecordUITests;
 			packageProductDependencies = (
 			);
 			productName = MuyeonUITests;
-			productReference = 4E52FAAA2E890BF100EB3EBB /* MuyeonUITests.xctest */;
+			productReference = 4E52FAAA2E890BF100EB3EBB /* PerformanceRecordUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -247,7 +247,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 4E52FA852E890BEF00EB3EBB /* Build configuration list for PBXProject "Muyeon" */;
+			buildConfigurationList = 4E52FA852E890BEF00EB3EBB /* Build configuration list for PBXProject "PerformanceRecord" */;
 			developmentRegion = ko;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -271,9 +271,9 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				4E52FA892E890BEF00EB3EBB /* Muyeon */,
-				4E52FA9F2E890BF100EB3EBB /* MuyeonTests */,
-				4E52FAA92E890BF100EB3EBB /* MuyeonUITests */,
+				4E52FA892E890BEF00EB3EBB /* PerformanceRecord */,
+				4E52FA9F2E890BF100EB3EBB /* PerformanceRecordTests */,
+				4E52FAA92E890BF100EB3EBB /* PerformanceRecordUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -330,12 +330,12 @@
 /* Begin PBXTargetDependency section */
 		4E52FAA22E890BF100EB3EBB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4E52FA892E890BEF00EB3EBB /* Muyeon */;
+			target = 4E52FA892E890BEF00EB3EBB /* PerformanceRecord */;
 			targetProxy = 4E52FAA12E890BF100EB3EBB /* PBXContainerItemProxy */;
 		};
 		4E52FAAC2E890BF100EB3EBB /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 4E52FA892E890BEF00EB3EBB /* Muyeon */;
+			target = 4E52FA892E890BEF00EB3EBB /* PerformanceRecord */;
 			targetProxy = 4E52FAAB2E890BF100EB3EBB /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -350,8 +350,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 548W892M42;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/InfoPlist/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Muyeon;
+				INFOPLIST_FILE = "PerformanceRecord/Source/Global/Supporting FIles/InfoPlist/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "공기팡";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -363,7 +363,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.minsung.Muyeon.Muyeon;
+				PRODUCT_BUNDLE_IDENTIFIER = com.minsung.PerformanceRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -380,8 +380,8 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 548W892M42;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "Muyeon/Source/Global/Supporting FIles/InfoPlist/Info.plist";
-				INFOPLIST_KEY_CFBundleDisplayName = Muyeon;
+				INFOPLIST_FILE = "PerformanceRecord/Source/Global/Supporting FIles/InfoPlist/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "공기팡";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
@@ -393,7 +393,7 @@
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.minsung.Muyeon.Muyeon;
+				PRODUCT_BUNDLE_IDENTIFIER = com.minsung.PerformanceRecord;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -403,7 +403,7 @@
 		};
 		4E52FAB62E890BF100EB3EBB /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 4E52FA8C2E890BEF00EB3EBB /* Muyeon */;
+			baseConfigurationReferenceAnchor = 4E52FA8C2E890BEF00EB3EBB /* PerformanceRecord */;
 			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -470,7 +470,7 @@
 		};
 		4E52FAB72E890BF100EB3EBB /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReferenceAnchor = 4E52FA8C2E890BEF00EB3EBB /* Muyeon */;
+			baseConfigurationReferenceAnchor = 4E52FA8C2E890BEF00EB3EBB /* PerformanceRecord */;
 			baseConfigurationReferenceRelativePath = Secrets.xcconfig;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
@@ -543,7 +543,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Muyeon.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Muyeon";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PerformanceRecord.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PerformanceRecord";
 			};
 			name = Debug;
 		};
@@ -562,7 +562,7 @@
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Muyeon.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Muyeon";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/PerformanceRecord.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/PerformanceRecord";
 			};
 			name = Release;
 		};
@@ -603,7 +603,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		4E52FA852E890BEF00EB3EBB /* Build configuration list for PBXProject "Muyeon" */ = {
+		4E52FA852E890BEF00EB3EBB /* Build configuration list for PBXProject "PerformanceRecord" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4E52FAB62E890BF100EB3EBB /* Debug */,
@@ -612,7 +612,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4E52FAB32E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "Muyeon" */ = {
+		4E52FAB32E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "PerformanceRecord" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4E52FAB42E890BF100EB3EBB /* Debug */,
@@ -621,7 +621,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4E52FAB82E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "MuyeonTests" */ = {
+		4E52FAB82E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "PerformanceRecordTests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4E52FAB92E890BF100EB3EBB /* Debug */,
@@ -630,7 +630,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		4E52FABB2E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "MuyeonUITests" */ = {
+		4E52FABB2E890BF100EB3EBB /* Build configuration list for PBXNativeTarget "PerformanceRecordUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				4E52FABC2E890BF100EB3EBB /* Debug */,
