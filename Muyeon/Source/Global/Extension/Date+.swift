@@ -14,4 +14,12 @@ extension Date {
         return addingTimeInterval(timeToAdd)
     }
     
+    /// 그레고리안력 기준
+    var isThisYear: Bool {
+        let calendar = Calendar(identifier: .gregorian)
+        let targetYear = calendar.component(.year, from: self)
+        let currentYear = calendar.component(.year, from: Date())
+        return targetYear == currentYear
+    }
+    
 }

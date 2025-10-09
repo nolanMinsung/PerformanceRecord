@@ -81,7 +81,7 @@ class PerformanceRecordViewController: UIViewController {
                     let totalRecords = diaries.count
                     let uniquePerformanceIDs = Set(diaries.map { $0.performanceID })
                     let averageRating = diaries.isEmpty ? 0 : diaries.map { $0.rating }.reduce(0, +) / Double(diaries.count)
-                    let thisYearCount = 0// diaries.filter { Calendar.current.isDateInThisYear($0.viewedAt) }.count
+                    let thisYearCount = diaries.filter { $0.viewedAt.isThisYear }.count
                     let photoCount = diaries.flatMap { $0.diaryImageUUIDs }.count
                     
                     owner.headerData.stats = (totalRecords, uniquePerformanceIDs.count, averageRating, thisYearCount, photoCount)
