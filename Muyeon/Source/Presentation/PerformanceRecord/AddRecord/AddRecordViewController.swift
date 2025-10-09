@@ -38,7 +38,7 @@ class AddRecordViewController: ModalCardViewController {
     
     private let disposeBag = DisposeBag()
     
-    var onDiaryDataChanged: (() -> Void)?
+    var onRecordDataChanged: (() -> Void)?
     
     init(performance: Performance) {
         self.performance = performance
@@ -96,10 +96,10 @@ class AddRecordViewController: ModalCardViewController {
             })
             .disposed(by: disposeBag)
         
-        output.successCreateDiary
+        output.successCreateRecord
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, _ in
-                owner.onDiaryDataChanged?()
+                owner.onRecordDataChanged?()
                 owner.dismiss(animated: true)
             })
             .disposed(by: disposeBag)

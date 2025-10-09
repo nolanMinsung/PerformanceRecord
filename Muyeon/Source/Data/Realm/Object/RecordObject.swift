@@ -30,7 +30,7 @@ final class RecordObject: Object {
     // MARK: - 첨부 이미지 및 출연진
     
     // 기록용 이미지 UUID 목록 (로컬 FileManager 저장 파일명, 메타데이터는 파일 시스템에 저장)
-    @Persisted var diaryImageUUIDs: RealmSwift.List<String>
+    @Persisted var recordImageUUIDs: RealmSwift.List<String>
     
     // MARK: Relationships (N:N 관계의 '1' 쪽)
     // 이 일기에 출연한 모든 출연진 목록 (N:N 관계의 List)
@@ -56,7 +56,7 @@ extension RecordObject {
         object.viewedAt = viewedAt
         object.rating = max(0, min(rating, 5.0))
         object.reviewText = reviewText
-        object.diaryImageUUIDs.append(objectsIn: imageUUIDs)
+        object.recordImageUUIDs.append(objectsIn: imageUUIDs)
         return object
     }
     
@@ -67,7 +67,7 @@ extension RecordObject {
     
     func toDomain() throws -> Record {
         guard let performance = self.performance.first else {
-            throw DefaultRecordRepositoryError.diaryNotHavingPerformance
+            throw DefaultRecordRepositoryError.recordNotHavingPerformance
         }
         return Record(
             id: self.id,
@@ -76,7 +76,7 @@ extension RecordObject {
             viewedAt: self.viewedAt,
             rating: self.rating,
             reviewText: self.reviewText,
-            diaryImageUUIDs: Array(self.diaryImageUUIDs)
+            recordImageUUIDs: Array(self.recordImageUUIDs)
         )
     }
     

@@ -8,8 +8,8 @@
 import Foundation
 
 protocol RecordRepository {
-    func createDiary(_ diary: Record, images imageData: [ImageDataForSaving]) async throws
-    func fetchDiaries(of performance: Performance) async throws -> [Record]
-    func fetchAllDiaries() async throws -> [Record]
+    func createRecord(_ record: Record, images imageData: [ImageDataForSaving]) async throws
+    func fetchRecords(of performance: Performance) async throws -> [Record]
+    func fetchAllRecords() async throws -> [Record]
     func deleteRecord(_ record: Record) async throws
 }

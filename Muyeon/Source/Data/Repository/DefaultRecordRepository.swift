@@ -12,7 +12,7 @@ import RxSwift
 import RxRelay
 
 enum DefaultRecordRepositoryError: LocalizedError {
-    case diaryNotHavingPerformance
+    case recordNotHavingPerformance
 }
 
 actor DefaultRecordRepository: RecordRepository {
@@ -31,7 +31,7 @@ actor DefaultRecordRepository: RecordRepository {
         self.imageRepository = imageRepository
     }
     
-    func createDiary(_ diary: Record, images imageData: [ImageDataForSaving]) async throws {
+    func createRecord(_ record: Record, images imageData: [ImageDataForSaving]) async throws {
         // 플로우
         // ---- 트랜잭션 1 시작 ----
         // - 기록할 performanceObject 먼저 찾기
@@ -40,55 +40,55 @@ actor DefaultRecordRepository: RecordRepository {
         //       |
         //       |  동기 작업
         //       V
-        // - 추가한 DiaryObject의 id를 활용해서 FileManager에 폴더를 만들고 이미지 저장하기
+        // - 추가한 RecordObject의 id를 활용해서 FileManager에 폴더를 만들고 이미지 저장하기
         //       |
         //       |  동기 작업
         //       V
         // ---- 트랜잭션 2 시작 ----
-        // - 저장한 이미지들의 ID 배열을 추가한 DiaryObject의 diaryImageUUIDs 속성에 추가하기
+        // - 저장한 이미지들의 ID 배열을 추가한 RecordObject의 recordImageUUIDs 속성에 추가하기
         // ---- 트랜잭션 2 끝 ----
         
-        let createdDiaryID = try await Task.detached {
+        let createdRecordID = try await Task.detached {
             let realm = try Realm()
             guard let performanceObject = realm.objects(PerformanceObject.self)
-                .filter({ $0.id == diary.performanceID })
+                .filter({ $0.id == record.performanceID })
                 .first
             else {
                 throw DefaultPerformanceRepositoryError.performanceObjectNotFound
             }
-            let diaryID = UUID().uuidString
+            let recordID = UUID().uuidString
             let recordObject = RecordObject.create(
-                id: diaryID,
-                viewedAt: diary.viewedAt,
-                rating: diary.rating,
-                reviewText: diary.reviewText
+                id: recordID,
+                viewedAt: record.viewedAt,
+                rating: record.rating,
+                reviewText: record.reviewText
             )
             try realm.write {
                 performanceObject.records.append(recordObject)
             }
-            return diaryID
+            return recordID
         }.value
         
-        // 생성한 DiaryObject의 id를 이용해 폴더를 만들고 그 폴더에 이미지 저장(폴더의 이름이 일기의 ID)
-        let savedDiaryImageIDs = try await saveImagesToFileManager(diaryID: createdDiaryID, imageData: imageData)
+        // 생성한 RecordObject의 id를 이용해 폴더를 만들고 그 폴더에 이미지 저장(폴더의 이름이 일기의 ID)
+        let savedRecordImageIDs = try await saveImagesToFileManager(recordID: createdRecordID, imageData: imageData)
         
         // FileManager에 저장한 이미지 ID 가져와서 Realm에 반영
         try await Task.detached {
             let realm = try Realm()
             try realm.write {
-                guard let diaryObject = realm.objects(RecordObject.self)
-                    .filter({ $0.id == createdDiaryID })
+                guard let recordObject = realm.objects(RecordObject.self)
+                    .filter({ $0.id == createdRecordID })
                     .first
                 else {
                     fatalError()
                 }
-                diaryObject.diaryImageUUIDs.append(objectsIn: savedDiaryImageIDs)
+                recordObject.recordImageUUIDs.append(objectsIn: savedRecordImageIDs)
             }
         }.value
         recordUpdatedRelay.accept(())
     }
     
-    func fetchDiaries(of performance: Performance) async throws -> [Record] {
+    func fetchRecords(of performance: Performance) async throws -> [Record] {
         return try await Task.detached {
             let realm = try Realm()
             return try realm.objects(RecordObject.self)
@@ -97,7 +97,7 @@ actor DefaultRecordRepository: RecordRepository {
         }.value
     }
     
-    func fetchAllDiaries() async throws -> [Record] {
+    func fetchAllRecords() async throws -> [Record] {
         return try await Task.detached {
             let realm = try Realm()
             return try realm.objects(RecordObject.self)
@@ -107,7 +107,7 @@ actor DefaultRecordRepository: RecordRepository {
     
     func deleteRecord(_ record: Record) async throws {
         // 이미지가 있을 경우, 이미지 먼저 삭제
-        if !record.diaryImageUUIDs.isEmpty {
+        if !record.recordImageUUIDs.isEmpty {
             try await imageRepository.deleteAllImages(of: .record(id: record.id))
             print("Record 이미지 삭제 완료")
         }
@@ -137,14 +137,14 @@ actor DefaultRecordRepository: RecordRepository {
 
 private extension DefaultRecordRepository {
     
-    func saveImagesToFileManager(diaryID: String, imageData: [ImageDataForSaving]) async throws -> [String] {
+    func saveImagesToFileManager(recordID: String, imageData: [ImageDataForSaving]) async throws -> [String] {
         let imageUUIDs = try await withThrowingTaskGroup(
             of: (index: Int, imageID: String).self,
             returning: [String].self,
             body: { group in
                 for (index, dataForSaving) in imageData.enumerated() {
                     group.addTask {
-                        let imageUUID = try await self.imageRepository.saveImage(data: dataForSaving, to: .record(id: diaryID))
+                        let imageUUID = try await self.imageRepository.saveImage(data: dataForSaving, to: .record(id: recordID))
                         return (index, imageUUID)
                     }
                 }

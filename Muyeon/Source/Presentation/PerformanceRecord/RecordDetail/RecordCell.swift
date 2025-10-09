@@ -131,7 +131,7 @@ class RecordCell: SwipableCell {
         }
         
         // 사진이 있으면 표시하고, 없으면 숨김
-        let uuids = record.diaryImageUUIDs
+        let uuids = record.recordImageUUIDs
         photoTitleLabel.isHidden = uuids.isEmpty
         photoCollectionView.isHidden = uuids.isEmpty
         if !uuids.isEmpty {

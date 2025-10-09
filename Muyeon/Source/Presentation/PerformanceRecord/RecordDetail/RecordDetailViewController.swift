@@ -130,7 +130,7 @@ class RecordDetailViewController: UIViewController {
                 viewedAt: dateFormatter.date(from: "2024-06-20")!,
                 rating: 4.5,
                 reviewText: "",
-                diaryImageUUIDs: ["0"]
+                recordImageUUIDs: ["0"]
             ),
             Record(
                 id: UUID().uuidString,
@@ -139,7 +139,7 @@ class RecordDetailViewController: UIViewController {
                 viewedAt: dateFormatter.date(from: "2024-10-01")!,
                 rating: 5.0,
                 reviewText: "평생 잊지 못할 경험! 아미들과 함께 떼창하는 순간이 최고였다. 무대 연출도 정말 화려했다.",
-                diaryImageUUIDs: []
+                recordImageUUIDs: []
             ),
             Record(
                 id: UUID().uuidString,
@@ -148,7 +148,7 @@ class RecordDetailViewController: UIViewController {
                 viewedAt: dateFormatter.date(from: "2024-03-15")!,
                 rating: 5.0,
                 reviewText: "정말 감동적이었다. 장발장 역의 연기가 특히 인상적이었고, 마지막 장면에서 눈물이 났다.",
-                diaryImageUUIDs: ["0", "1", "2", "3", "4"]
+                recordImageUUIDs: ["0", "1", "2", "3", "4"]
             ),
             Record(
                 id: UUID().uuidString,
@@ -157,7 +157,7 @@ class RecordDetailViewController: UIViewController {
                 viewedAt: dateFormatter.date(from: "2024-03-15")!,
                 rating: 5.0,
                 reviewText: "정말 감동적이었다. 장발장 역의 연기가 특히 인상적이었고, 마지막 장면에서 눈물이 났다.",
-                diaryImageUUIDs: ["0", "1", "2", "3", "4"]
+                recordImageUUIDs: ["0", "1", "2", "3", "4"]
             )
         ]
     }

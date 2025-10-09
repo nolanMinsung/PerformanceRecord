@@ -23,13 +23,13 @@ final class AddRecordViewModel {
     
     struct Output {
         let selectedImage: Observable<[(ImageDataForSaving, UIImage)]>
-        let successCreateDiary: Observable<Void>
+        let successCreateRecord: Observable<Void>
         let errorRelay: Observable<any Error>
     }
     
     private let performance: Performance
     private let createRecordUseCase: any CreateRecordUseCase
-    private let diaryContent = PublishRelay<Record>()
+    private let recordContent = PublishRelay<Record>()
     private let disposeBag = DisposeBag()
     
     init(performance: Performance, createRecordUseCase: any CreateRecordUseCase) {
@@ -39,7 +39,7 @@ final class AddRecordViewModel {
     
     func transform(input: Input) -> Output {
         let currentImageData = BehaviorRelay<[(ImageDataForSaving, UIImage)]>(value: [])
-        let successCreateDiary = PublishRelay<Void>()
+        let successCreateRecord = PublishRelay<Void>()
         let errorRelay = PublishRelay<any Error>()
         
         input.addedImageData
@@ -76,27 +76,27 @@ final class AddRecordViewModel {
                 viewedAt: viewedDate,
                 rating: rating,
                 reviewText: reviewText,
-                diaryImageUUIDs: []
+                recordImageUUIDs: []
             )
         }
-        .bind(to: diaryContent)
+        .bind(to: recordContent)
         .disposed(by: disposeBag)
         
         input.saveButtonTapped
-            .withLatestFrom(diaryContent)
+            .withLatestFrom(recordContent)
             .withLatestFrom(
                 currentImageData,
-                resultSelector: { diary, imageDataList in
-                    return (diary, imageDataList)
+                resultSelector: { record, imageDataList in
+                    return (record, imageDataList)
                 })
             .bind(
                 with: self,
                 onNext: { owner, data in
-                    let (diary, imageDataList) = data
+                    let (record, imageDataList) = data
                     Task {
                         do {
-                            try await owner.createRecordUseCase.execute(record: diary, imageData: imageDataList.map(\.0))
-                            successCreateDiary.accept(())
+                            try await owner.createRecordUseCase.execute(record: record, imageData: imageDataList.map(\.0))
+                            successCreateRecord.accept(())
                         } catch {
                             errorRelay.accept(error)
                         }
@@ -106,7 +106,7 @@ final class AddRecordViewModel {
         
         return .init(
             selectedImage: currentImageData.asObservable(),
-            successCreateDiary: successCreateDiary.asObservable(),
+            successCreateRecord: successCreateRecord.asObservable(),
             errorRelay: errorRelay.asObservable()
         )
     }

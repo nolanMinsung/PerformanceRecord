@@ -29,7 +29,7 @@ final class CastMemberObject: Object {
     // MARK: Relationships (N:N 관계의 'N' 쪽 - 역참조)
     // 이 출연진이 등장한 모든 일기 목록 (LinkingObjects를 사용한 역참조)
     @Persisted(originProperty: "castMembers")
-    var diaries: LinkingObjects<RecordObject>
+    var records: LinkingObjects<RecordObject>
     
     convenience init(name: String, profileImageID: String? = nil) {
         self.init()

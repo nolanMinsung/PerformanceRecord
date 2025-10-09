@@ -39,8 +39,8 @@ final class DefaultImageRepository: ImageRepository {
         try await localDataSource.load(imageID: id, category: category)
     }
     
-    func loadImages(in diary: Record) async throws -> [UIImage] {
-        let imageIDs = diary.diaryImageUUIDs
+    func loadImages(in record: Record) async throws -> [UIImage] {
+        let imageIDs = record.recordImageUUIDs
         
         return try await withThrowingTaskGroup(
             of: (index: Int, image: UIImage).self,
@@ -48,7 +48,7 @@ final class DefaultImageRepository: ImageRepository {
             body: { group in
                 for item in imageIDs.enumerated() {
                     group.addTask {
-                        let image = try await self.localDataSource.load(imageID: item.element, category: .record(id: diary.id))
+                        let image = try await self.localDataSource.load(imageID: item.element, category: .record(id: record.id))
                         return (item.offset, image)
                     }
                 }

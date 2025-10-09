@@ -34,16 +34,16 @@ class PerformanceRecordViewController: UIViewController {
         fetchMostViewedPerformanceUseCase: DefaultFetchMostViewedPerformanceUseCase(
             performanceRepository: DefaultPerformanceRepository.shared
         ),
-        fetchAllDiariesUseCase: DefaultFetchAllDiariesUseCase(
-            diaryRepository: DefaultRecordRepository.shared
+        fetchAllRecordsUseCase: DefaultFetchAllRecordsUseCase(
+            recordRepository: DefaultRecordRepository.shared
         )
     )
     private let addRecordButtonTap = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
     // MARK: - Properties
-    private let diariesUpdateTrigger = PublishRelay<Void>()
-    private var diaries: [Record] = []
+    private let recordsUpdateTrigger = PublishRelay<Void>()
+    private var records: [Record] = []
     private var performancesWithRecords: [Performance] = []
     
     override func loadView() {
@@ -57,16 +57,16 @@ class PerformanceRecordViewController: UIViewController {
         rootView.collectionView.delegate = self
         navigationController?.navigationBar.isHidden = true
         bind()
-        diariesUpdateTrigger.accept(())
+        recordsUpdateTrigger.accept(())
     }
     
     private func bind() {
         DefaultRecordRepository.shared.recordUpdated
-            .bind(to: diariesUpdateTrigger)
+            .bind(to: recordsUpdateTrigger)
             .disposed(by: disposeBag)
         
         let input = PerformanceRecordViewModel.Input(
-            updateRecords: diariesUpdateTrigger.asObservable(),
+            updateRecords: recordsUpdateTrigger.asObservable(),
             addRecordButtonTapped: addRecordButtonTap.asObservable()
         )
         
@@ -76,13 +76,13 @@ class PerformanceRecordViewController: UIViewController {
             .observe(on: MainScheduler.instance)
             .bind(
                 with: self,
-                onNext: { owner, diaries in
-                    owner.diaries = diaries
-                    let totalRecords = diaries.count
-                    let uniquePerformanceIDs = Set(diaries.map { $0.performanceID })
-                    let averageRating = diaries.isEmpty ? 0 : diaries.map { $0.rating }.reduce(0, +) / Double(diaries.count)
-                    let thisYearCount = diaries.filter { $0.viewedAt.isThisYear }.count
-                    let photoCount = diaries.flatMap { $0.diaryImageUUIDs }.count
+                onNext: { owner, records in
+                    owner.records = records
+                    let totalRecords = records.count
+                    let uniquePerformanceIDs = Set(records.map { $0.performanceID })
+                    let averageRating = records.isEmpty ? 0 : records.map { $0.rating }.reduce(0, +) / Double(records.count)
+                    let thisYearCount = records.filter { $0.viewedAt.isThisYear }.count
+                    let photoCount = records.flatMap { $0.recordImageUUIDs }.count
                     
                     owner.headerData.stats = (totalRecords, uniquePerformanceIDs.count, averageRating, thisYearCount, photoCount)
                     owner.rootView.collectionView.reloadData()
@@ -149,7 +149,7 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         let performance = performancesWithRecords[indexPath.item]
-        let relatedRecords = diaries.filter { $0.performanceID == performance.id }
+        let relatedRecords = records.filter { $0.performanceID == performance.id }
         cell.configure(performance: performance, records: relatedRecords)
         return cell
     }
@@ -262,7 +262,7 @@ private extension PerformanceRecordViewController {
                 viewedAt: dateFormatter.date(from: "2024-06-20")!,
                 rating: 4.5,
                 reviewText: "두 번째 관람이었는데 첫 번째만큼 감동적이지는 않았지만 여전히 좋았다. 다른 배우들의 연기를 볼 수 있어서 좋았다.",
-                diaryImageUUIDs: []
+                recordImageUUIDs: []
             ),
             Record(
                 id: UUID().uuidString,
@@ -271,7 +271,7 @@ private extension PerformanceRecordViewController {
                 viewedAt: dateFormatter.date(from: "2024-10-01")!,
                 rating: 5.0,
                 reviewText: "평생 잊지 못할 경험! 아미들과 함께 떼창하는 순간이 최고였다. 무대 연출도 정말 화려했다.",
-                diaryImageUUIDs: []
+                recordImageUUIDs: []
             ),
             Record(
                 id: UUID().uuidString,
@@ -280,7 +280,7 @@ private extension PerformanceRecordViewController {
                 viewedAt: dateFormatter.date(from: "2024-03-15")!,
                 rating: 5.0,
                 reviewText: "정말 감동적이었다. 장발장 역의 연기가 특히 인상적이었고, 마지막 장면에서 눈물이 났다.",
-                diaryImageUUIDs: []
+                recordImageUUIDs: []
             )
         ]
     }
@@ -302,8 +302,8 @@ extension PerformanceRecordViewController: SelectPerformanceDelegate {
     // MARK: - SelectPerformanceDelegate
     func didSelectPerformance(_ performance: Performance) {
         let addRecordVC = AddRecordViewController(performance: performance)
-        addRecordVC.onDiaryDataChanged = { [weak self] in
-            self?.diariesUpdateTrigger.accept(())
+        addRecordVC.onRecordDataChanged = { [weak self] in
+            self?.recordsUpdateTrigger.accept(())
         }
         addRecordVC.modalPresentationStyle = .overFullScreen
         addRecordVC.modalTransitionStyle = .crossDissolve

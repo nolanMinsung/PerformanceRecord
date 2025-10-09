@@ -14,5 +14,5 @@ struct Record: Identifiable, Hashable {
     let viewedAt: Date
     let rating: Double
     let reviewText: String
-    let diaryImageUUIDs: [String]
+    let recordImageUUIDs: [String]
 }

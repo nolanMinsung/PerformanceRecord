@@ -30,7 +30,7 @@ final class PerformanceRecordViewModel {
     private let fetchLocalPerformanceListUseCase: any FetchLocalPerformanceListUseCase
     private let fetchLocalPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase
     private let fetchMostViewedPerformanceUseCase: any FetchMostViewedPerformanceUseCase
-    private let fetchAllDiariesUseCase: any FetchAllDiariesUseCase
+    private let fetchAllRecordsUseCase: any FetchAllRecordsUseCase
     private let disposeBag = DisposeBag()
     
     init(
@@ -38,13 +38,13 @@ final class PerformanceRecordViewModel {
         fetchLocalPerformanceListUseCase: any FetchLocalPerformanceListUseCase,
         fetchPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase,
         fetchMostViewedPerformanceUseCase: any FetchMostViewedPerformanceUseCase,
-        fetchAllDiariesUseCase: any FetchAllDiariesUseCase
+        fetchAllRecordsUseCase: any FetchAllRecordsUseCase
     ) {
         self.fetchLikePerformanceListUseCase = fetchLikePerformanceListUseCase
         self.fetchLocalPerformanceListUseCase = fetchLocalPerformanceListUseCase
         self.fetchLocalPerformanceDetailUseCase = fetchPerformanceDetailUseCase
         self.fetchMostViewedPerformanceUseCase = fetchMostViewedPerformanceUseCase
-        self.fetchAllDiariesUseCase = fetchAllDiariesUseCase
+        self.fetchAllRecordsUseCase = fetchAllRecordsUseCase
     }
     
     func transform(input: Input) -> Output {
@@ -59,7 +59,7 @@ final class PerformanceRecordViewModel {
             .bind { _ in
                 Task {
                     do {
-                        let allRecords = try await self.fetchAllDiariesUseCase.execute()
+                        let allRecords = try await self.fetchAllRecordsUseCase.execute()
                         let recentRecord = allRecords.sorted(by: { $0.viewedAt > $1.viewedAt }).first
                         if let performanceID = recentRecord?.performanceID {
                             let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performanceID)

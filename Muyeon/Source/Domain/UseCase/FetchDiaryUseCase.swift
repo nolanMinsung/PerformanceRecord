@@ -1,5 +1,5 @@
 //
-//  FetchDiaryUseCase.swift
+//  FetchRecordsUseCase.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/7/25.
@@ -7,21 +7,21 @@
 
 import Foundation
 
-protocol FetchDiariesUseCase {
+protocol FetchRecordsUseCase {
     func execute(performance: Performance) async throws -> [Record]
 }
 
 
-final class DefaultFetchDiariesUseCase: FetchDiariesUseCase {
+final class DefaultFetchRecordsUseCase: FetchRecordsUseCase {
     
-    private let diaryRepository: any RecordRepository
+    private let recordRepository: any RecordRepository
     
-    init(diaryRepository: any RecordRepository) {
-        self.diaryRepository = diaryRepository
+    init(recordRepository: any RecordRepository) {
+        self.recordRepository = recordRepository
     }
     
     func execute(performance: Performance) async throws -> [Record] {
-        try await diaryRepository.fetchDiaries(of: performance)
+        try await recordRepository.fetchRecords(of: performance)
     }
     
 }
