@@ -69,7 +69,20 @@ extension SelectPerformanceViewController: UICollectionViewDataSource {
 
 extension SelectPerformanceViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        selectedPerformance = performances[indexPath.row]
-        rootView.addRecordButton.isEnabled = true
+        let selectedPerformance  = performances[indexPath.row]
+        let isUpcoming = Calendar.current.compare(.now, to: selectedPerformance.startDate, toGranularity: .day) == .orderedAscending
+        if isUpcoming {
+            self.selectedPerformance = nil
+            rootView.addRecordButton.configuration?.title = "아직 시작하지 않은 공연은 기록을 남길 수 없어요."
+            rootView.addRecordButton.configuration?.subtitle = "관람했던 공연으로 기록을 남겨보세요."
+            rootView.addRecordButton.configuration?.titleAlignment = .center
+            rootView.addRecordButton.isEnabled = false
+        } else {
+            self.selectedPerformance = selectedPerformance
+            rootView.addRecordButton.configuration?.title = "공연 기록 남기기"
+            rootView.addRecordButton.configuration?.subtitle = nil
+            rootView.addRecordButton.configuration?.titleAlignment = .center
+            rootView.addRecordButton.isEnabled = true
+        }
     }
 }

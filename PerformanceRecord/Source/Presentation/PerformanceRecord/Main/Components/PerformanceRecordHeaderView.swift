@@ -41,7 +41,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
         return label
     }()
     
-    let addRecordButton: UIButton = {
+    let favoritesButton: UIButton = {
         let button = ShrinkableButton(type: .system)
         button.setTitle("즐겨찾기한 공연", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
@@ -53,7 +53,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
     }()
     
     private lazy var recordsListHeaderStack: UIStackView = {
-        let stack = UIStackView(arrangedSubviews: [recordsListHeaderLabel, addRecordButton])
+        let stack = UIStackView(arrangedSubviews: [recordsListHeaderLabel, favoritesButton])
         stack.axis = .horizontal
         stack.alignment = .center
         stack.distribution = .equalSpacing
@@ -104,8 +104,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
             make.bottom.equalToSuperview().inset(12)
         }
         
-        addRecordButton.snp.makeConstraints { make in
-//            make.width.equalTo(90)
+        favoritesButton.snp.makeConstraints { make in
             make.height.equalTo(36)
         }
     }

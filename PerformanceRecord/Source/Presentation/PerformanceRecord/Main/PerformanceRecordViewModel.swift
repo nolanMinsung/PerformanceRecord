@@ -14,7 +14,7 @@ final class PerformanceRecordViewModel {
     
     struct Input {
         let updateRecords: Observable<Void>
-        let addRecordButtonTapped: Observable<Void>
+        let favoritesButtonTapped: Observable<Void>
     }
     
     struct Output {
@@ -84,16 +84,12 @@ final class PerformanceRecordViewModel {
             }
             .disposed(by: disposeBag)
         
-        input.addRecordButtonTapped
+        input.favoritesButtonTapped
             .bind { _ in
                 Task {
                     do {
                         let likePerformances = try await self.fetchLikePerformanceListUseCase.execute()
-                        // startDate이 아직 오지 않은 날짜인 경우, 기록 시 공연 명단에서 제외
-                        let recordablePerformances = likePerformances.filter {
-                            Calendar.current.compare($0.startDate, to: .now, toGranularity: .day) != .orderedDescending
-                        }
-                        likePerformanceListRelay.accept(recordablePerformances)
+                        likePerformanceListRelay.accept(likePerformances)
                     } catch {
                         errorRelay.accept(error)
                     }

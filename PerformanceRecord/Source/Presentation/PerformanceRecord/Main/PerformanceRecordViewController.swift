@@ -38,7 +38,7 @@ class PerformanceRecordViewController: UIViewController {
             recordRepository: DefaultRecordRepository.shared
         )
     )
-    private let addRecordButtonTap = PublishSubject<Void>()
+    private let favoritesButtonTapped = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
     // MARK: - Properties
@@ -67,7 +67,7 @@ class PerformanceRecordViewController: UIViewController {
         
         let input = PerformanceRecordViewModel.Input(
             updateRecords: recordsUpdateTrigger.asObservable(),
-            addRecordButtonTapped: addRecordButtonTap.asObservable()
+            favoritesButtonTapped: favoritesButtonTapped.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -182,8 +182,8 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
             header.configureMostViewed(mostViewedPerformance: mostViewed)
         }
         
-        header.addRecordButton.rx.tap
-            .bind(to: addRecordButtonTap)
+        header.favoritesButton.rx.tap
+            .bind(to: favoritesButtonTapped)
             .disposed(by: header.disposeBag)
         
         return header
