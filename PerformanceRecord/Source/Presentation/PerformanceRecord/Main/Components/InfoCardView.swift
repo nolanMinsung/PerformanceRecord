@@ -93,6 +93,8 @@ class InfoCardView: UIView {
             make.size.equalTo(20)
         }
         
+        tagLabel.snp.contentCompressionResistanceHorizontalPriority = 800
+        tagLabelContainer.snp.contentCompressionResistanceHorizontalPriority = 800
         tagLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(5)
             make.horizontalEdges.equalToSuperview().inset(6)
