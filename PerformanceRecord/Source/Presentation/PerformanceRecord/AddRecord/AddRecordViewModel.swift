@@ -29,7 +29,6 @@ final class AddRecordViewModel {
     
     private let performance: Performance
     private let createRecordUseCase: any CreateRecordUseCase
-    private let recordContent = PublishRelay<Record>()
     private let disposeBag = DisposeBag()
     
     init(performance: Performance, createRecordUseCase: any CreateRecordUseCase) {
@@ -61,7 +60,7 @@ final class AddRecordViewModel {
             .bind(to: currentImageData)
             .disposed(by: disposeBag)
         
-        Observable.combineLatest(
+        let recordDataStream = Observable.combineLatest(
             input.viewedDate,
             input.ratingInput,
             input.reviewText
@@ -79,11 +78,9 @@ final class AddRecordViewModel {
                 recordImageUUIDs: []
             )
         }
-        .bind(to: recordContent)
-        .disposed(by: disposeBag)
         
         input.saveButtonTapped
-            .withLatestFrom(recordContent)
+            .withLatestFrom(recordDataStream)
             .withLatestFrom(
                 currentImageData,
                 resultSelector: { record, imageDataList in
