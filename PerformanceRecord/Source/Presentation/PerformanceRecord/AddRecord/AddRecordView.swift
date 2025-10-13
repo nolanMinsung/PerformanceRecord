@@ -6,25 +6,28 @@
 //
 
 import UIKit
+
+import RxSwift
+import RxCocoa
 import SnapKit
 
 class AddRecordView: UIView {
     
     // MARK: - UI Components
+    let viewedDatePicker = UIDatePicker()
+    let ratingView = StarRatingView()
     let memoTextView = UITextView()
-    let imagesCollectionView: UICollectionView
+    private(set) var imagesCollectionView: UICollectionView!
+    let imageAddBox = UIView()
+    let imageLoadingIndicator = UIActivityIndicatorView(style: .large)
     let saveButton = ShrinkableButton()
     
-    // MARK: - Actions (Closures)
-    var onAddImageTapped: (() -> Void)?
-    var onDeleteImage: ((Int) -> Void)?
-    
-    // MARK: - Private UI Components
-    let viewedDatePicker = UIDatePicker()
-    private let imageAddBox = UIView()
-    let ratingView = StarRatingView()
+    // MARK: - Gesture Recognizers
+    let imageBoxTapGesture = UITapGestureRecognizer()
     
     init(performance: Performance) {
+        super.init(frame: .zero)
+        
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: 100, height: 100)
@@ -47,8 +50,6 @@ class AddRecordView: UIView {
         
         ratingView.setRating(5.0)
         
-        super.init(frame: .zero)
-        
         backgroundColor = .clear
         imagesCollectionView.register(AddedPhotoCell.self, forCellWithReuseIdentifier: AddedPhotoCell.identifier)
         setupLayout(with: performance)
@@ -68,6 +69,8 @@ class AddRecordView: UIView {
         let hasImages = imageCount > 0
         imagesCollectionView.isHidden = !hasImages
         imageAddBox.isHidden = hasImages
+        imageLoadingIndicator.isHidden = !hasImages
+        imageLoadingIndicator.stopAnimating()
         imagesCollectionView.reloadData()
         
         // 이미지 추가 박스의 레이블 업데이트
@@ -95,7 +98,7 @@ class AddRecordView: UIView {
         scrollView.snp.makeConstraints { make in
             make.top.equalToSuperview()
             make.leading.trailing.equalToSuperview().inset(24)
-            make.height.equalTo(400)
+            make.height.equalTo(500)
         }
         
         saveButton.snp.makeConstraints { make in
@@ -152,11 +155,17 @@ class AddRecordView: UIView {
     }
     
     private func createMemoView() -> UIView {
-        memoTextView.font = .systemFont(ofSize: 15)
+//        memoTextView.font = .systemFont(ofSize: 15)
         memoTextView.backgroundColor = .secondarySystemBackground
         memoTextView.layer.cornerRadius = 10
+        let paragraphStyle = NSMutableParagraphStyle()
+        paragraphStyle.lineSpacing = 5
+        memoTextView.typingAttributes = [
+            .paragraphStyle: paragraphStyle,
+            .font: UIFont.systemFont(ofSize: 15)
+        ]
         memoTextView.snp.makeConstraints { make in
-            make.height.equalTo(100)
+            make.height.equalTo(130)
         }
         return memoTextView
     }
@@ -165,7 +174,9 @@ class AddRecordView: UIView {
         let container = UIView()
         container.addSubview(imageAddBox)
         container.addSubview(imagesCollectionView)
+        container.addSubview(imageLoadingIndicator)
         
+        imageLoadingIndicator.snp.makeConstraints { $0.center.equalToSuperview() }
         imageAddBox.snp.makeConstraints { $0.edges.equalToSuperview() }
         imagesCollectionView.snp.makeConstraints { $0.edges.equalToSuperview() }
         
@@ -179,8 +190,7 @@ class AddRecordView: UIView {
         imageAddBox.layer.borderWidth = 1
         imageAddBox.layer.borderColor = UIColor.systemGray3.cgColor
         
-        let tapGesture = UITapGestureRecognizer(target: self, action: #selector(addImageTapped))
-        imageAddBox.addGestureRecognizer(tapGesture)
+        imageAddBox.addGestureRecognizer(imageBoxTapGesture)
         
         let icon = UIImageView(image: UIImage(systemName: "photo"))
         icon.tintColor = .secondaryLabel
@@ -202,8 +212,5 @@ class AddRecordView: UIView {
             make.height.equalTo(100)
         }
     }
-    
-    // MARK: - Actions
-    @objc private func addImageTapped() { onAddImageTapped?() }
     
 }

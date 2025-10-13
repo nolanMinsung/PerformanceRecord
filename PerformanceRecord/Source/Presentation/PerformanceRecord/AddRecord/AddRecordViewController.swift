@@ -108,9 +108,18 @@ class AddRecordViewController: ModalCardViewController {
     private func setupActions() {
 //        rootView.memoTextView.delegate = self
         rootView.imagesCollectionView.dataSource = self
-        rootView.onAddImageTapped = { [weak self] in
-            self?.presentImagePicker()
-        }
+        rootView.imageBoxTapGesture.rx.event
+            .filter { $0.state == .recognized }
+            .bind(
+                with: self,
+                onNext: { owner, gesture in
+                    owner.rootView.imageAddBox.isHidden = true
+                    owner.rootView.imageLoadingIndicator.isHidden = false
+                    owner.rootView.imageLoadingIndicator.startAnimating()
+                    owner.presentImagePicker()
+                }
+            )
+            .disposed(by: disposeBag)
     }
     
     // MARK: - Logic
@@ -119,6 +128,7 @@ class AddRecordViewController: ModalCardViewController {
         config.selectionLimit = 5 - currentSelectedImage.count
         config.filter = .images
         let picker = PHPickerViewController(configuration: config)
+        picker.isModalInPresentation = true
         picker.delegate = self
         present(picker, animated: true)
     }
@@ -127,6 +137,7 @@ class AddRecordViewController: ModalCardViewController {
 
 // MARK: - PHPickerViewControllerDelegate
 extension AddRecordViewController: PHPickerViewControllerDelegate {
+    
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
         Task {
