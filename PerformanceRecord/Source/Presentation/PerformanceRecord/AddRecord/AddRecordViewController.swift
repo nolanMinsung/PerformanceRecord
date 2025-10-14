@@ -14,11 +14,14 @@ import SnapKit
 
 enum AddRecordError: LocalizedError {
     case unsupportedImageExtension
+    case dataConvertingToImageFailed
     
     var errorDescription: String? {
         switch self {
         case .unsupportedImageExtension:
             return "지원하지 않는 이미지 확장자 파일입니다."
+        case .dataConvertingToImageFailed:
+            return "데이터를 이미지로 변환하는 데 실패했습니다."
         }
     }
 }
@@ -32,7 +35,8 @@ class AddRecordViewController: ModalCardViewController {
     private let performance: Performance
     private var selectedDate: Date = Date()
     private var rating: Double = 5.0
-    private var addedImageData = PublishRelay<[(ImageDataForSaving, UIImage)]>()
+    private var addedImageData = PublishRelay<[ImageDataForSaving]>()
+    private var phPickerSelected = PublishRelay<[PHPickerResult]>()
     private var deleteImageData = PublishRelay<IndexPath>()
     private var currentSelectedImage: [UIImage] = []
     
@@ -48,7 +52,8 @@ class AddRecordViewController: ModalCardViewController {
             createRecordUseCase: DefaultCreateRecordUseCase(
                 performanceRepository: DefaultPerformanceRepository.shared,
                 recordRepository: DefaultRecordRepository.shared
-            )
+            ),
+            processUserSelectedImageUseCase: DefaultProcessUserSelectedImageUseCase()
         )
         super.init(nibName: nil, bundle: nil)
     }
@@ -80,7 +85,7 @@ class AddRecordViewController: ModalCardViewController {
             viewedDate: rootView.viewedDatePicker.rx.date.asObservable().startWith(.now),
             ratingInput: rootView.ratingView.rating.asObservable().startWith(5.0),
             reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable().startWith(""),
-            addedImageData: addedImageData.asObservable(),
+            phPickerSelected: phPickerSelected.asObservable(),
             deleteImageData: deleteImageData.asObservable(),
             saveButtonTapped: rootView.saveButton.rx.tap.asObservable(),
         )
@@ -89,10 +94,10 @@ class AddRecordViewController: ModalCardViewController {
         
         output.selectedImage
             .observe(on: MainScheduler.instance)
-            .bind(with: self, onNext: { owner, imageData in
-                owner.currentSelectedImage = imageData.map(\.1)
+            .bind(with: self, onNext: { owner, images in
+                owner.currentSelectedImage = images
                 owner.rootView.imagesCollectionView.reloadData()
-                owner.rootView.updatePhotoSection(imageCount: imageData.count)
+                owner.rootView.updatePhotoSection(imageCount: images.count)
             })
             .disposed(by: disposeBag)
         
@@ -140,56 +145,7 @@ extension AddRecordViewController: PHPickerViewControllerDelegate {
     
     func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
         picker.dismiss(animated: true)
-        Task {
-            let loadedImageDataList = await loadDataAndImage(from: results)
-            addedImageData.accept(loadedImageDataList)
-        }
-    }
-    
-    private func loadDataAndImage(from results: [PHPickerResult]) async -> [(ImageDataForSaving, UIImage)] {
-        var imageDataArray: [(ImageDataForSaving, UIImage)] = []
-        
-        await withTaskGroup(of: (ImageDataForSaving, UIImage)?.self) { group in
-            for result in results {
-                group.addTask {
-                    let itemProvider = result.itemProvider
-                    // itemProvider가 이미지를 나타낼 수 있는지 확인(UTType.image 사용)
-                    guard itemProvider.hasItemConformingToTypeIdentifier(UTType.image.identifier),
-                          itemProvider.canLoadObject(ofClass: UIImage.self)
-                    else {
-                        return nil
-                    }
-                    do {
-                        let data = try await self.prepareImageData(from: itemProvider)
-                        let image = try await itemProvider.loadImage()
-                        return (data, image)
-                    } catch {
-                        print("이미지 데이터를 로드하는 데 실패했습니다: \(error)")
-                        return nil
-                    }
-                }
-            }
-            
-            // group 내의 모든 작업이 완료될 때까지 기다리고, nil이 아닌 결과만 필터링하여 배열에 추가
-            for await data in group {
-                if let data = data {
-                    imageDataArray.append(data)
-                }
-            }
-        }
-        
-        return imageDataArray
-    }
-    
-    private func prepareImageData(from provider: NSItemProvider) async throws -> ImageDataForSaving {
-        let supportedTypes: [UTType] = [.heic, .jpeg, .png, .tiff, .gif, .webP, .bmp]
-        guard let supportedType = supportedTypes.first(
-            where: { type in provider.hasItemConformingToTypeIdentifier(type.identifier)}
-        ) else {
-            throw AddRecordError.unsupportedImageExtension
-        }
-        let data = try await provider.loadDataRepresentation(for: supportedType)
-        return ImageDataForSaving(data: data, type: supportedType)
+        phPickerSelected.accept(results)
     }
     
 }
