@@ -60,9 +60,10 @@ class RecordCell: SwipableCell {
     }()
     
     private var record: Record? = nil
+    private var recordDetailUIModel: RecordDetailUIModel? = nil
     
     // MARK: - Properties
-    private var photoUUIDs: [String] = []
+    private var photos: [UIImage] = []
     var onPhotoTapped: ((UIImage?) -> Void)? // 사진 탭 이벤트를 전달할 클로저
 
     // MARK: - Initializer
@@ -85,6 +86,15 @@ class RecordCell: SwipableCell {
         super.prepareForReuse()
         
         record = nil
+        recordDetailUIModel = nil
+        photos.removeAll()
+        onPhotoTapped = nil
+        
+        dateLabel.text = nil
+        ratingLabel.text = nil
+        memoLabel.attributedText = nil
+        photoTitleLabel.text = nil
+        photoCollectionView.reloadData()
     }
     
     // MARK: - Setup
@@ -109,17 +119,18 @@ class RecordCell: SwipableCell {
     }
     
     // MARK: - Public Methods
-    func configure(with record: Record) {
-        self.record = record
+
+    func configure(with uiModel: RecordDetailUIModel) {
+        self.recordDetailUIModel = uiModel
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy년 M월 d일"
-        dateLabel.text = formatter.string(from: record.viewedAt)
+        dateLabel.text = formatter.string(from: uiModel.record.viewedAt)
         
-        ratingLabel.text = "⭐️ \(record.rating)"
+        ratingLabel.text = "⭐️ \(uiModel.record.rating)"
         
         // 메모가 있으면 표시하고, 없으면 숨김
-        let reviewText = record.reviewText
+        let reviewText = uiModel.record.reviewText
         if !reviewText.isEmpty {
             let paragraphStyle = NSMutableParagraphStyle()
             paragraphStyle.lineSpacing = 4
@@ -131,40 +142,33 @@ class RecordCell: SwipableCell {
         }
         
         // 사진이 있으면 표시하고, 없으면 숨김
-        let uuids = record.recordImageUUIDs
-        photoTitleLabel.isHidden = uuids.isEmpty
-        photoCollectionView.isHidden = uuids.isEmpty
-        if !uuids.isEmpty {
-            photoUUIDs = uuids
-            photoTitleLabel.text = "📷 사진 (\(uuids.count))"
+        let images = uiModel.recordImages
+        photoTitleLabel.isHidden = images.isEmpty
+        photoCollectionView.isHidden = images.isEmpty
+        if !images.isEmpty {
+            photos = images
+            photoTitleLabel.text = "📷 사진 (\(images.count))"
             photoCollectionView.reloadData()
         }
     }
+    
 }
 
 // MARK: - UICollectionViewDataSource for PhotoCollectionView
 extension RecordCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photoUUIDs.count
+        return photos.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: PhotoCell.reuseIdentifier, for: indexPath) as? PhotoCell else {
+        guard let cell = collectionView.dequeueReusableCell(
+            withReuseIdentifier: PhotoCell.reuseIdentifier,
+            for: indexPath
+        ) as? PhotoCell else {
             return UICollectionViewCell()
         }
-        
-        let imageID = photoUUIDs[indexPath.item]
-        Task {
-            do {
-                guard let recordID = record?.id else {
-                    return
-                }
-                let image = try await DefaultLocalImageDataSource.shared.load(imageID: imageID, category: .record(id: recordID))
-                cell.imageView.image = image
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
+        let image = photos[indexPath.item]
+        cell.imageView.image = image
         return cell
     }
 }

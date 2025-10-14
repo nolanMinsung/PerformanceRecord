@@ -29,7 +29,7 @@ class RecordDetailView: UIView {
         return button
     }()
     
-    lazy var collectionView: UICollectionView = {
+    private(set) lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
         collectionView.backgroundColor = .clear
         collectionView.showsVerticalScrollIndicator = false
