@@ -59,11 +59,9 @@ class RecordCell: SwipableCell {
         return stackView
     }()
     
-    private var record: Record? = nil
-    private var recordDetailUIModel: RecordDetailUIModel? = nil
     
     // MARK: - Properties
-    private var photos: [UIImage] = []
+    private var recordDetailUIModel: RecordDetailUIModel? = nil
     var onPhotoTapped: ((UIImage?) -> Void)? // 사진 탭 이벤트를 전달할 클로저
 
     // MARK: - Initializer
@@ -85,9 +83,7 @@ class RecordCell: SwipableCell {
     override func prepareForReuse() {
         super.prepareForReuse()
         
-        record = nil
         recordDetailUIModel = nil
-        photos.removeAll()
         onPhotoTapped = nil
         
         dateLabel.text = nil
@@ -142,14 +138,11 @@ class RecordCell: SwipableCell {
         }
         
         // 사진이 있으면 표시하고, 없으면 숨김
-        let images = uiModel.recordImages
-        photoTitleLabel.isHidden = images.isEmpty
-        photoCollectionView.isHidden = images.isEmpty
-        if !images.isEmpty {
-            photos = images
-            photoTitleLabel.text = "📷 사진 (\(images.count))"
-            photoCollectionView.reloadData()
-        }
+        let thumbnails = uiModel.recordImageThumbnails
+        photoTitleLabel.isHidden = thumbnails.isEmpty
+        photoTitleLabel.text = "📷 사진 (\(thumbnails.count))"
+        photoCollectionView.isHidden = thumbnails.isEmpty
+        photoCollectionView.reloadData()
     }
     
 }
@@ -157,7 +150,7 @@ class RecordCell: SwipableCell {
 // MARK: - UICollectionViewDataSource for PhotoCollectionView
 extension RecordCell: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photos.count
+        return recordDetailUIModel?.recordImageThumbnails.count ?? 0
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -167,8 +160,8 @@ extension RecordCell: UICollectionViewDataSource {
         ) as? PhotoCell else {
             return UICollectionViewCell()
         }
-        let image = photos[indexPath.item]
-        cell.imageView.image = image
+        let thumbnail = recordDetailUIModel?.recordImageThumbnails[indexPath.item]
+        cell.imageView.image = thumbnail
         return cell
     }
 }
@@ -176,7 +169,13 @@ extension RecordCell: UICollectionViewDataSource {
 // MARK: - UICollectionViewDelegate for PhotoCollectionView
 extension RecordCell: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard let cell = collectionView.cellForItem(at: indexPath) as? PhotoCell else { return }
-        onPhotoTapped?(cell.imageView.image)
+        Task {
+            guard let recordUIModel = recordDetailUIModel else {
+                return
+            }
+            let imageID = recordUIModel.record.recordImageUUIDs[indexPath.item]
+            let originalImage = try await DefaultImageRepository.shared.loadImage(with: imageID, in: .record(id: recordUIModel.record.id))
+            onPhotoTapped?(originalImage)
+        }
     }
 }

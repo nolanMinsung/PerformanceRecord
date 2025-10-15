@@ -150,7 +150,11 @@ extension RecordDetailViewController {
         DefaultRecordRepository.shared.recordUpdated
             .bind(with: self, onNext: { owner, _ in
                 Task {
-                    try await owner.updateContents()
+                    do {
+                        try await owner.updateContents()
+                    } catch {
+                        print(error)
+                    }
                 }
             })
             .disposed(by: disposeBag)
@@ -171,12 +175,22 @@ extension RecordDetailViewController {
     private func updateContents() async throws {
         let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performance.id)
         self.performance = detailPerformance
-        self.recordUIModels.removeAll(keepingCapacity: true)
-        let sortedRecordArray = detailPerformance.records.sorted(by: { $0.viewedAt > $1.viewedAt })
-        for record in sortedRecordArray {
-            let recordUIModel = try await RecordDetailUIModel(from: record)
-            self.recordUIModels.append(recordUIModel)
-        }
+        self.recordUIModels = try await withThrowingTaskGroup(
+            of: RecordDetailUIModel.self,
+            returning: [RecordDetailUIModel].self,
+            body: { group in
+                for record in detailPerformance.records {
+                    group.addTask {
+                        return try await RecordDetailUIModel(from: record)
+                    }
+                }
+                var sortedRecordUIModel: [RecordDetailUIModel] = []
+                for try await recordUIModel in group {
+                    sortedRecordUIModel.append(recordUIModel)
+                }
+                return sortedRecordUIModel.sorted { $0.record.viewedAt > $1.record.viewedAt }
+            }
+        )
         self.applySnapshot(records: self.recordUIModels)
     }
     

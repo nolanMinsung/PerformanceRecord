@@ -38,6 +38,7 @@ class PhotoViewController: UIViewController {
     
     init(image: UIImage?) {
         super.init(nibName: nil, bundle: nil)
+        // TODO: - 이미지 값 nil 처리(에러 케이스)
         self.imageView.image = image
     }
     
