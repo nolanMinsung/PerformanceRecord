@@ -39,6 +39,10 @@ final class DefaultImageRepository: ImageRepository {
         try await localDataSource.load(imageID: id, category: category)
     }
     
+    func loadThumbnail(with id: String, in category: ImageCategory) async throws -> UIImage {
+        try await localDataSource.loadThumbnail(imageID: id, category: category)
+    }
+    
     func loadImages(in record: Record) async throws -> [UIImage] {
         let imageIDs = record.recordImageUUIDs
         
@@ -62,6 +66,17 @@ final class DefaultImageRepository: ImageRepository {
                 return sortedImage
             }
         )
+    }
+    
+    // 썸네일을 가져오는 속도는 원본 이미지보다 훨씬 빠르므로, 굳이 taskGroup을 사용하지 않고 우선 동기적으로 이미지 로드 
+    func loadThumbnails(in record: Record) async throws -> [UIImage] {
+        let imageIDs = record.recordImageUUIDs
+        var thumbnails: [UIImage] = []
+        for imageID in imageIDs {
+            let thumbnail = try await self.localDataSource.loadThumbnail(imageID: imageID, category: .record(id: record.id))
+            thumbnails.append(thumbnail)
+        }
+        return thumbnails
     }
     
     func deleteImage(with id: String, in category: ImageCategory) async throws {
