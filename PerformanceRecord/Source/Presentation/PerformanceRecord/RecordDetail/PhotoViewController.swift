@@ -9,7 +9,7 @@ import UIKit
 
 import SnapKit
 
-class PhotoViewController: UIViewController {
+final class PhotoViewController: UIViewController {
     
     // MARK: - UI Components
     private let scrollView: UIScrollView = {
@@ -30,7 +30,9 @@ class PhotoViewController: UIViewController {
     
     private lazy var closeButton: UIButton = {
         let button = UIButton(type: .system)
+        button.layer.cornerRadius = 8
         button.setImage(UIImage(systemName: "xmark"), for: .normal)
+        button.backgroundColor = .black.withAlphaComponent(0.3)
         button.tintColor = .white
         button.addTarget(self, action: #selector(dismissViewController), for: .touchUpInside)
         return button

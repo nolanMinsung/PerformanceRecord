@@ -98,6 +98,7 @@ class AddRecordViewController: ModalCardViewController {
                 owner.currentSelectedImage = images
                 owner.rootView.imagesCollectionView.reloadData()
                 owner.rootView.updatePhotoSection(imageCount: images.count)
+                owner.rootView.saveButton.isEnabled = true
             })
             .disposed(by: disposeBag)
         
@@ -113,11 +114,13 @@ class AddRecordViewController: ModalCardViewController {
     private func setupActions() {
 //        rootView.memoTextView.delegate = self
         rootView.imagesCollectionView.dataSource = self
+        rootView.imagesCollectionView.delegate = self
         rootView.imageBoxTapGesture.rx.event
             .filter { $0.state == .recognized }
             .bind(
                 with: self,
                 onNext: { owner, gesture in
+                    owner.rootView.saveButton.isEnabled = false
                     owner.rootView.imageAddBox.isHidden = true
                     owner.rootView.imageLoadingIndicator.isHidden = false
                     owner.rootView.imageLoadingIndicator.startAnimating()
@@ -159,7 +162,7 @@ extension AddRecordViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(
-            withReuseIdentifier: AddedPhotoCell.identifier,
+            withReuseIdentifier: AddedPhotoCell.reuseIdentifier,
             for: indexPath
         ) as? AddedPhotoCell else { return UICollectionViewCell() }
         cell.imageView.image = currentSelectedImage[indexPath.item]
@@ -169,6 +172,18 @@ extension AddRecordViewController: UICollectionViewDataSource {
         }
         return cell
     }
+}
+
+
+// MARK: - UICollectionViewDelegate
+extension AddRecordViewController: UICollectionViewDelegate {
+    
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let selectedTempImage = currentSelectedImage[indexPath.item]
+        let photoVC = PhotoViewController(image: selectedTempImage)
+        present(photoVC, animated: true)
+    }
+    
 }
 
 extension AddRecordViewController: UITextViewDelegate {

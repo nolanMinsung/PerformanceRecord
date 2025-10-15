@@ -33,6 +33,7 @@ class AddRecordView: UIView {
         layout.itemSize = CGSize(width: 100, height: 100)
         layout.minimumLineSpacing = 10
         self.imagesCollectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        self.imagesCollectionView.showsHorizontalScrollIndicator = false
         
         viewedDatePicker.datePickerMode = .date
         viewedDatePicker.minimumDate = performance.startDate
@@ -51,7 +52,7 @@ class AddRecordView: UIView {
         ratingView.setRating(5.0)
         
         backgroundColor = .clear
-        imagesCollectionView.register(AddedPhotoCell.self, forCellWithReuseIdentifier: AddedPhotoCell.identifier)
+        imagesCollectionView.register(AddedPhotoCell.self, forCellWithReuseIdentifier: AddedPhotoCell.reuseIdentifier)
         setupLayout(with: performance)
     }
     

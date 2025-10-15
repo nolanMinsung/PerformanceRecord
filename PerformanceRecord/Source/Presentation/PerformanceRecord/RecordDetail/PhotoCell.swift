@@ -8,7 +8,17 @@
 import UIKit
 import SnapKit
 
-class PhotoCell: UICollectionViewCell {
+class PhotoCell: UICollectionViewCell, ViewShrinkable {
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.95)
+            } else {
+                restore()
+            }
+        }
+    }
     
     let imageView: UIImageView = {
         let imageView = UIImageView()

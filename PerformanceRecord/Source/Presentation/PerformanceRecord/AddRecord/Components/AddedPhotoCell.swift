@@ -8,8 +8,17 @@
 import UIKit
 import SnapKit
 
-class AddedPhotoCell: UICollectionViewCell {
-    static let identifier = "AddedPhotoCell"
+class AddedPhotoCell: UICollectionViewCell, ViewShrinkable {
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(scale: 0.95)
+            } else {
+                restore()
+            }
+        }
+    }
     
     let imageView: UIImageView = {
         let iv = UIImageView()
@@ -19,8 +28,8 @@ class AddedPhotoCell: UICollectionViewCell {
         return iv
     }()
     
-    private lazy var deleteButton: UIButton = {
-        let button = UIButton(type: .system)
+    private lazy var deleteButton: ShrinkableButton = {
+        let button = ShrinkableButton(type: .system)
         button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)
         button.tintColor = .white
         button.backgroundColor = .black.withAlphaComponent(0.5)
