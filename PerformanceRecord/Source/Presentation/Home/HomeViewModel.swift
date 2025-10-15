@@ -27,6 +27,7 @@ final class HomeViewModel {
         let topTenContents: BehaviorRelay<[BoxOfficeItem]>
         let boxOfficeGenres: BehaviorRelay<[Constant.BoxOfficeGenre]>
         let trendingContents: BehaviorRelay<[BoxOfficeItem]>
+        let trendingContentsLoadingState: Observable<Bool>
         let errorRelay: PublishRelay<any Error>
     }
     
@@ -44,6 +45,7 @@ final class HomeViewModel {
             value: Constant.BoxOfficeGenre.allCases.filter({ $0 != .unknown })
         )
         let trendingBoxOffice = BehaviorRelay<[BoxOfficeItem]>(value: [])
+        let trendingContentsLoadingState = PublishRelay<Bool>()
         let errorRelay = PublishRelay<any Error>()
         
         input.topTenLoadingTrigger
@@ -77,6 +79,7 @@ final class HomeViewModel {
                     do {
                         let trendingBoxOfficeItems = try await self.fetchBoxOfficeUseCase.execute(requestInfo: boxOfficeRequestParam)
                         trendingBoxOffice.accept(trendingBoxOfficeItems)
+                        trendingContentsLoadingState.accept(false)
                     } catch {
                         errorRelay.accept(error)
                     }
@@ -86,6 +89,7 @@ final class HomeViewModel {
         
         let genreSelected = input.itemSelected
             .filter { $0.section == 1 }
+            .share()
         
         genreSelected
             .map { boxOfficeGenres.value[$0.item] }
@@ -100,6 +104,7 @@ final class HomeViewModel {
                     do {
                         let boxOfficeListResult = try await self.fetchBoxOfficeUseCase.execute(requestInfo: parameter)
                         trendingBoxOffice.accept(boxOfficeListResult)
+                        trendingContentsLoadingState.accept(false)
                     } catch {
                         errorRelay.accept(error)
                     }
@@ -108,10 +113,19 @@ final class HomeViewModel {
             }
             .disposed(by: disposeBag)
         
+        genreSelected
+            .bind { _ in
+                // 순서 주의!! 아래 두 흐름의 순서를 바꾸면 부자연스러워진다. -> 나중에 해결하기
+                trendingContentsLoadingState.accept(true)
+                trendingBoxOffice.accept([])
+            }
+            .disposed(by: disposeBag)
+        
         return .init(
             topTenContents: topTenContents,
             boxOfficeGenres: boxOfficeGenres,
             trendingContents: trendingBoxOffice,
+            trendingContentsLoadingState: trendingContentsLoadingState.asObservable(),
             errorRelay: errorRelay
         )
     }

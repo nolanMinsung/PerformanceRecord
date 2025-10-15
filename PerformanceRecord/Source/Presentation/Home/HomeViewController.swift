@@ -85,6 +85,15 @@ private extension HomeViewController {
             )
             .disposed(by: disposeBag)
         
+        output.trendingContentsLoadingState
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, loadingState in
+                UIView.animate(withDuration: 0.2) {
+                    owner.rootView.homeCollectionView.contentInset.bottom = loadingState ? 500 : 0
+                }
+            })
+            .disposed(by: disposeBag)
+        
         rootView.homeCollectionView.rx.itemSelected
             .bind(with: self, onNext: { owner, indexPath in
                 if indexPath.section == 1 {
@@ -240,6 +249,7 @@ private extension HomeViewController {
 }
 
 
+// MARK: - UICollectionViewDelegate
 extension HomeViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
