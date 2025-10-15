@@ -151,6 +151,13 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        vStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        latestRecordStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    }
+    
     private func setupUI() {
         contentView.addSubview(containerView)
         
@@ -166,8 +173,8 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
         
         let zStack1 = UIView()
         let zStack2 = UIView()
-        zStack1.backgroundColor = .systemGray4
-        zStack2.backgroundColor = .systemGray5
+        zStack1.backgroundColor = .systemGray5
+        zStack2.backgroundColor = .systemGray6
         zStack1.layer.cornerRadius = 5
         zStack2.layer.cornerRadius = 5
         
@@ -211,8 +218,6 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
 
     func configure(performance: Performance, records: [Record]) {
         guard let latestRecord = records.sorted(by: { $0.viewedAt > $1.viewedAt }).first else { return }
-        
-        vStack.arrangedSubviews.forEach { $0.removeFromSuperview() }
         
         titleLabel.text = performance.name
         vStack.addArrangedSubview(titleLabel)
