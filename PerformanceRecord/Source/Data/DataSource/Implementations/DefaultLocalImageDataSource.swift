@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import ImageIO
+import ImageIO // UIKit에 이미 내장. 명시적 표현을 위해 작성
 import UniformTypeIdentifiers
 
 enum DefaultImageDataSourceError: LocalizedError {
@@ -14,6 +14,7 @@ enum DefaultImageDataSourceError: LocalizedError {
     enum Reason: LocalizedError {
         case documentDirectoryNotFound
         case failedConvertingToImageFromFile
+        case failedConvertingToThumbnailFromFile
         case imageFileNotFound
         case imageFolderNotFound
         case fileURLIsNotFolder
@@ -24,6 +25,8 @@ enum DefaultImageDataSourceError: LocalizedError {
                 "document directory를 찾을 수 없습니다."
             case .failedConvertingToImageFromFile:
                 "file을 이미지 파일로 변환하는 데 실패했습니다."
+            case .failedConvertingToThumbnailFromFile:
+                "file을 썸네일 이미지 파일로 변환하는 데 실패했습니다."
             case .imageFileNotFound:
                 "경로에 이미지 파일이 존재하지 않습니다."
             case .imageFolderNotFound:
@@ -61,6 +64,10 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
             throw DefaultImageDataSourceError.imageSavingError(reason: .documentDirectoryNotFound)
         }
         
+        guard let thumbnailData = createThumbnailDataWithImageIO(from: imageData.data, maxPixelSize: 300) else {
+            throw DefaultImageDataSourceError.imageSavingError(reason: .failedConvertingToThumbnailFromFile)
+        }
+        
         // 카테고리에 맞는 폴더 URL 생성
         let folderURL = documentsURL.appendingPathComponent(category.subpath)
         
@@ -70,60 +77,31 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
         }
         
         // 최종 파일 URL 결정 후 저장
-        let fileURL = folderURL.appendingPathComponent(imageID).appendingPathExtension(imageData.type.preferredFilenameExtension ?? "jpeg")
+        let fileURL = folderURL
+            .appendingPathComponent(imageID)
+            .appendingPathExtension(imageData.type.preferredFilenameExtension ?? "jpeg")
+        let thumbnailFileURL = folderURL
+            .appendingPathComponent("\(imageID)_thumbnail")
+            .appendingPathExtension(imageData.type.preferredFilenameExtension ?? "jpeg")
+        
         try imageData.data.write(to: fileURL)
+        try thumbnailData.write(to: thumbnailFileURL)
         print("이미지 저장 성공: \(fileURL)")
     }
     
     func load(imageID: String, category: ImageCategory) async throws -> UIImage {
-        let possibleImageType: [UTType] = [.jpeg, .png, .heic, .heif, .gif, .tiff, .webP, .bmp]
-        let possibleExtensions: [String] = possibleImageType.compactMap { $0.preferredFilenameExtension } + ["jpg"]
-        
-        let fileManager = FileManager.default
-        
-        // Documents 디렉토리 경로 가져오기
-        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw DefaultImageDataSourceError.imageLoadingError(reason: .documentDirectoryNotFound)
-        }
-        
-        // 예상되는 이미지 확장자를 순회하며 파일의 확장자 유추
-        for extensionString in possibleExtensions {
-            // 저장된 이미지의 전체 경로 생성
-            let fileURL = documentsURL.appendingPathComponent(category.subpath)
-                .appendingPathComponent(imageID)
-                .appendingPathExtension(extensionString)
-            
-            // 해당 경로에 파일이 실제로 존재하는지 확인
-            if fileManager.fileExists(atPath: fileURL.path) {
-                // 경로로부터 UIImage 객체 생성
-                guard let image = UIImage(contentsOfFile: fileURL.path) else {
-                    // 파일은 있지만, 이미지로 변환이 실패한 경우
-                    throw DefaultImageDataSourceError.imageLoadingError(reason: .failedConvertingToImageFromFile)
-                }
-                return image
-            }
-        }
-        throw DefaultImageDataSourceError.imageLoadingError(reason: .imageFileNotFound)
+        return try await loadImageFile(fileName: imageID, category: category)
+    }
+    
+    func loadThumbnail(imageID: String, category: ImageCategory) async throws -> UIImage {
+        return try await loadImageFile(fileName: "\(imageID)_thumbnail", category: category)
     }
     
     func delete(imageID: String, category: ImageCategory) async throws {
-        let fileManager = FileManager.default
-        
-        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            throw DefaultImageDataSourceError.imageDeletingError(reason: .documentDirectoryNotFound)
-        }
-        
-        // 저장된 이미지의 전체 경로 생성
-        let fileURL = documentsURL.appendingPathComponent(category.subpath)
-            .appendingPathComponent(imageID)
-            .appendingPathExtension("jpeg")
-        
-        // 해당 경로에 파일이 실제로 존재하는지 확인
-        guard fileManager.fileExists(atPath: fileURL.path) else {
-            throw DefaultImageDataSourceError.imageDeletingError(reason: .imageFileNotFound)
-        }
-        
-        try fileManager.removeItem(at: fileURL)
+        // 썸네일 삭제
+        try await deleteImageFile(fileName: "\(imageID)_thumbnail", category: category)
+        // 이미지 삭제
+        try await deleteImageFile(fileName: imageID, category: category)
     }
     
     func deleteAllImages(in imageCategory: ImageCategory) async throws {
@@ -150,10 +128,67 @@ actor DefaultLocalImageDataSource: LocalImageDataSource {
     
 }
 
-extension DefaultLocalImageDataSource {
+private extension DefaultLocalImageDataSource {
+    
+    func loadImageFile(fileName: String, category: ImageCategory) async throws -> UIImage {
+        let possibleImageType: [UTType] = [.jpeg, .png, .heic, .heif, .gif, .tiff, .webP, .bmp]
+        let possibleExtensions: [String] = possibleImageType.compactMap { $0.preferredFilenameExtension } + ["jpg"]
+        
+        let fileManager = FileManager.default
+        
+        // Documents 디렉토리 경로 가져오기
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw DefaultImageDataSourceError.imageLoadingError(reason: .documentDirectoryNotFound)
+        }
+        
+        // 예상되는 이미지 확장자를 순회하며 파일의 확장자 유추
+        for extensionString in possibleExtensions {
+            // 저장된 이미지의 전체 경로 생성
+            let fileURL = documentsURL.appendingPathComponent(category.subpath)
+                .appendingPathComponent(fileName)
+                .appendingPathExtension(extensionString)
+            
+            // 해당 경로에 파일이 실제로 존재하는지 확인
+            if fileManager.fileExists(atPath: fileURL.path) {
+                // 경로로부터 UIImage 객체 생성
+                guard let image = UIImage(contentsOfFile: fileURL.path) else {
+                    // 파일은 있지만, 이미지로 변환이 실패한 경우
+                    throw DefaultImageDataSourceError.imageLoadingError(reason: .failedConvertingToImageFromFile)
+                }
+                return image
+            }
+        }
+        throw DefaultImageDataSourceError.imageLoadingError(reason: .imageFileNotFound)
+    }
+    
+    func deleteImageFile(fileName: String, category: ImageCategory) async throws {
+        let possibleImageType: [UTType] = [.jpeg, .png, .heic, .heif, .gif, .tiff, .webP, .bmp]
+        let possibleExtensions: [String] = possibleImageType.compactMap { $0.preferredFilenameExtension } + ["jpg"]
+        
+        let fileManager = FileManager.default
+        
+        // Documents 디렉토리 경로 가져오기
+        guard let documentsURL = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            throw DefaultImageDataSourceError.imageLoadingError(reason: .documentDirectoryNotFound)
+        }
+        
+        // 예상되는 이미지 확장자를 순회하며 파일의 확장자 유추
+        for extensionString in possibleExtensions {
+            // 저장된 이미지의 전체 경로 생성
+            let fileURLToDelete = documentsURL.appendingPathComponent(category.subpath)
+                .appendingPathComponent(fileName)
+                .appendingPathExtension(extensionString)
+            
+            // 해당 경로에 파일이 실제로 존재하는지 확인
+            if fileManager.fileExists(atPath: fileURLToDelete.path) {
+                try fileManager.removeItem(at: fileURLToDelete)
+                print("단일 이미지(및 썸네일) 삭제 성공: \(fileURLToDelete)")
+            }
+        }
+    }
     
     /// `data`가 이미지 파일이 맞는지 확인 후, 맞으면 이미지 파일 확장자를 반환. 이미지 파일이 아닐 경우 `nil` 반환
-    private func imageFileExtension(from data: Data) -> String? {
+    func imageFileExtension(from data: Data) -> String? {
         guard let source = CGImageSourceCreateWithData(data as CFData, nil),
               let type = CGImageSourceGetType(source),
               let utType = UTType(type as String)
@@ -161,6 +196,31 @@ extension DefaultLocalImageDataSource {
             return nil
         }
         return utType.preferredFilenameExtension
+    }
+    
+    func createThumbnailDataWithImageIO(from imageData: Data, maxPixelSize: Int) -> Data? {
+        // 썸네일 생성 옵션 설정
+        let options: [CFString: Any] = [
+            kCGImageSourceCreateThumbnailFromImageIfAbsent: true, // 썸네일이 없는 경우에만 생성
+            kCGImageSourceCreateThumbnailWithTransform: true,     // 이미지 방향(orientation)을 썸네일에 반영
+            kCGImageSourceShouldCacheImmediately: true,           // 생성된 썸네일을 즉시 디코딩(캐시)
+            kCGImageSourceThumbnailMaxPixelSize: maxPixelSize     // 썸네일의 가로/세로 중 더 긴 쪽의 최대 크기
+        ]
+
+        // CGImageSource 생성
+        guard let imageSource = CGImageSourceCreateWithData(imageData as CFData, nil) else {
+            return nil
+        }
+
+        // 옵션을 사용하여 썸네일 CGImage 생성
+        guard let thumbnailImage = CGImageSourceCreateThumbnailAtIndex(imageSource, 0, options as CFDictionary) else {
+            return nil
+        }
+
+        // CGImage -> UIImage -> Data 변환
+        // 이미지 썸네일 용량 작아서 메모리 부담 적음.
+        let uiImage = UIImage(cgImage: thumbnailImage)
+        return uiImage.jpegData(compressionQuality: 1.0)
     }
     
 }
