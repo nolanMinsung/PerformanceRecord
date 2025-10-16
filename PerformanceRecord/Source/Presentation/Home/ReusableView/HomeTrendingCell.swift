@@ -43,8 +43,10 @@ class HomeTrendingCell: UICollectionViewCell, ViewShrinkable {
         
         placeNameLabel.font = .systemFont(ofSize: 11)
         
-        performingPeriodLabel.font = .systemFont(ofSize: 13, weight: .semibold)
+        performingPeriodLabel.font = .systemFont(ofSize: 11, weight: .regular)
+        performingPeriodLabel.textColor = .secondaryLabel
         performingPeriodLabel.numberOfLines = 2
+        performingPeriodLabel.adjustsFontSizeToFitWidth = true
         
         textStackView.axis = .vertical
         textStackView.spacing = 4
@@ -90,7 +92,11 @@ class HomeTrendingCell: UICollectionViewCell, ViewShrinkable {
         )
         titleLabel.text = boxOfficeItem.name
         placeNameLabel.text = boxOfficeItem.performingPlaceName
-        performingPeriodLabel.text = boxOfficeItem.performPeriod.replacingOccurrences(of: "~", with: "~\n")
+//        performingPeriodLabel.text = boxOfficeItem.performPeriod.replacingOccurrences(of: "~", with: "~\n")
+        performingPeriodLabel.text = boxOfficeItem.performPeriod
+            .components(separatedBy: "~")
+            .map({ $0.dropFirst(2) })
+            .joined(separator: "~")
     }
     
 }
