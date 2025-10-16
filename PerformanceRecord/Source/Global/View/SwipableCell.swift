@@ -17,6 +17,8 @@ class SwipableCell: UICollectionViewCell {
     private var roomID: Int = 0
     private var isBlueCircleFilled: Bool = false
     private var isRedCircleFilled: Bool = false
+    private let horizontalInset: CGFloat = 10
+    private let cornerRadius: CGFloat = 0
     
     var isLeftSwipeEnable: Bool = true
     var isRightSwipeEnable: Bool = true
@@ -43,7 +45,7 @@ class SwipableCell: UICollectionViewCell {
     
     private let blueViewLabel: UILabel = {
         let label = UILabel()
-        label.text = "OO 목록에\n추가" // 임시 문구
+        label.text = "기록\n수정하기" // 임시 문구
         label.font = UIFont.systemFont(ofSize: 14)
         label.textColor = .systemBackground
         label.numberOfLines = 2
@@ -62,7 +64,7 @@ class SwipableCell: UICollectionViewCell {
     private var blueCirclePathLayer = CAShapeLayer()
     
     private let addIconImageViewForBlueView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "plus")?
+        let imageView = UIImageView(image: UIImage(systemName: "pencil")?
             .withTintColor(
                 .systemBackground.withAlphaComponent(1),
                 renderingMode: .alwaysOriginal
@@ -149,7 +151,7 @@ class SwipableCell: UICollectionViewCell {
     private func setUI() {
         contentView.backgroundColor = .clear
         contentView.clipsToBounds = false
-        contentView.layer.cornerRadius = 18
+        contentView.layer.cornerRadius = cornerRadius
         
     }
     
@@ -169,7 +171,8 @@ class SwipableCell: UICollectionViewCell {
     
     private func setConstraints() {
         blueViewToAddCompare.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.verticalEdges.leading.equalToSuperview()
+            make.trailing.equalToSuperview().inset(horizontalInset + cornerRadius + 10)
         }
         
         blueViewLabel.snp.makeConstraints { make in
@@ -190,7 +193,8 @@ class SwipableCell: UICollectionViewCell {
         }
         
         redViewToDeleteFromCompare.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.verticalEdges.trailing.equalToSuperview()
+            make.leading.equalToSuperview().inset(horizontalInset + cornerRadius + 10)
         }
         
         redViewLabel.snp.makeConstraints { make in
@@ -211,7 +215,8 @@ class SwipableCell: UICollectionViewCell {
         }
         
         swipeableView.snp.makeConstraints { make in
-            make.edges.equalToSuperview()
+            make.verticalEdges.equalToSuperview()
+            make.horizontalEdges.equalToSuperview().inset(horizontalInset)
         }
     }
     
@@ -233,13 +238,10 @@ class SwipableCell: UICollectionViewCell {
             feedbackGenerator.prepare()
             return
         case .changed:
-            if swipeableView.frame.origin.x > 0 {
-                blueViewToAddCompare.isHidden = false
-                redViewToDeleteFromCompare.isHidden = true
-            } else if swipeableView.frame.origin.x < 0 {
-                blueViewToAddCompare.isHidden = true
-                redViewToDeleteFromCompare.isHidden = false
-            }
+            let swipableViewXFrame = swipeableView.frame.origin.x
+            
+            blueViewToAddCompare.isHidden = swipableViewXFrame < 0
+            redViewToDeleteFromCompare.isHidden = swipableViewXFrame > horizontalInset * 2
             
             let translatedLocation = sender.translation(in: contentView)
             
@@ -248,13 +250,13 @@ class SwipableCell: UICollectionViewCell {
             
             if translatedLocation.x > 0 {
                 let maxPosition = isRightSwipeEnable ? bounds.width * 0.55 : 0.0
-                swipeableView.frame.origin.x = min(translatedLocation.x, maxPosition)
+                swipeableView.frame.origin.x = min(translatedLocation.x, maxPosition) + horizontalInset
                 drawCircleAtBlueView(circlePercentage: (swipeableView.frame.origin.x) / (bounds.width * 0.55))
                 circleViewForAddInteraction.transform = .init(scaleX: circleScaleProportion, y: circleScaleProportion)
                 addIconImageViewForBlueView.transform = .init(scaleX: addIconScaleProportion, y: addIconScaleProportion)
             } else if translatedLocation.x < 0 {
                 let minPosition = isLeftSwipeEnable ? -bounds.width * 0.55 : 0.0
-                swipeableView.frame.origin.x = max(translatedLocation.x, minPosition)
+                swipeableView.frame.origin.x = max(translatedLocation.x, minPosition) + horizontalInset
                 drawCircleAtRedView(circlePercentage: (swipeableView.frame.origin.x) / (bounds.width * 0.55))
                 circleViewForDeleteInteraction.transform = .init(scaleX: circleScaleProportion, y: circleScaleProportion)
                 deleteIconImageViewForRedView.transform = .init(scaleX: addIconScaleProportion, y: addIconScaleProportion)
@@ -265,26 +267,20 @@ class SwipableCell: UICollectionViewCell {
              */
             if swipeableView.frame.origin.x >= bounds.width * 0.54 {
                 if !isBlueCircleFilled {
-                    fillBlueCircle() { [weak self] in
-                        guard let self else { return }
-                        panGestureRecognizer.state = .ended
+                    fillBlueCircle() {
+                        sender.state = .ended
                     }
                 }
                 
             } else if swipeableView.frame.origin.x < -bounds.width * 0.54 {
                 if !isRedCircleFilled {
-                    fillRedCircle() { [weak self] in
-                        guard let self else { return }
-                        panGestureRecognizer.state = .ended
+                    fillRedCircle() {
+                        sender.state = .ended
                     }
                 }
             }
-        case .ended:
+        default:
             setSwipeableViewToInitialLocaion()
-        case .cancelled, .failed:
-            return
-        @unknown default:
-            return
         }
     }
     
@@ -362,7 +358,7 @@ class SwipableCell: UICollectionViewCell {
         animator.addAnimations { [weak self] in
             guard let self else { return }
             circleViewForAddInteraction.backgroundColor = .systemBackground
-            addIconImageViewForBlueView.image = UIImage(systemName: "plus")?.withTintColor(
+            addIconImageViewForBlueView.image = UIImage(systemName: "pencil")?.withTintColor(
                 UIColor.systemBlue,
                 renderingMode: .alwaysOriginal
             )
@@ -377,7 +373,7 @@ class SwipableCell: UICollectionViewCell {
     private func emptyBlueCircle() {
         isBlueCircleFilled = false
         circleViewForAddInteraction.backgroundColor = .clear
-        addIconImageViewForBlueView.image = UIImage(systemName: "plus")?.withTintColor(
+        addIconImageViewForBlueView.image = UIImage(systemName: "pencil")?.withTintColor(
             UIColor.systemBackground,
             renderingMode: .alwaysOriginal
         )
