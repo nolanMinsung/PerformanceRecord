@@ -113,6 +113,15 @@ extension RecordDetailViewController {
                     }
                 }
             }
+            
+            cell.rightSwipeAction = { [weak self] in
+                guard let self else { return }
+                print("right swipe aciton detected")
+                let addRecordVC = AddRecordViewController(performance: self.performance)
+                addRecordVC.modalPresentationStyle = .overFullScreen
+                addRecordVC.modalTransitionStyle = .crossDissolve
+                self.present(addRecordVC, animated: true)
+            }
         }
         
         let cellProvider: CellProvider = { (collectionView, indexPath, itemIdentifier) -> UICollectionViewCell? in

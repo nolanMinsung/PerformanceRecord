@@ -9,7 +9,7 @@
 import UIKit
 import SnapKit
 
-class RecordCell: SwipableCell {
+final class RecordCell: SwipableCell {
     
     // MARK: - UI Components
     private let dateLabel: UILabel = {
