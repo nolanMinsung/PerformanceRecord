@@ -29,13 +29,13 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell, ViewShrinkable {
         super.init(frame: frame)
         
         contentView.backgroundColor = .systemGray6
-        contentView.layer.cornerRadius = 10
+        contentView.layer.cornerRadius = 20 // 셀 높이는 40으로 고정되어있음.
         contentView.clipsToBounds = true
         contentView.addSubview(genreNameLabel)
         
         genreNameLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(10)
-            make.horizontalEdges.equalToSuperview().inset(10)
+            make.horizontalEdges.equalToSuperview().inset(15)
         }
         self.setSelected(false)
     }
@@ -45,8 +45,11 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell, ViewShrinkable {
     }
     
     func setSelected(_ isSelected: Bool) {
-        genreNameLabel.textColor = isSelected ? .Main.primary : .systemGray4
-        contentView.backgroundColor = isSelected ? .Main.third : .systemGray6
+        genreNameLabel.textColor = isSelected ? .white : .Main.primary
+        let fontWeight: UIFont.Weight = isSelected ? .bold : .regular
+        genreNameLabel.font = .systemFont(ofSize: 17, weight:  fontWeight)
+        contentView.backgroundColor = isSelected ? .Main.primary : .Main.third
+        
     }
     
     func configure(with model: HomeUIModel) {

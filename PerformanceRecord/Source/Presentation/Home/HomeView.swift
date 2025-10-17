@@ -173,7 +173,7 @@ private extension HomeView {
         let item = NSCollectionLayoutItem(layoutSize: itemSize)
         let groupSize = NSCollectionLayoutSize(
             widthDimension: .estimated(100),
-            heightDimension: .absolute(35)
+            heightDimension: .absolute(40)
         )
         let group = NSCollectionLayoutGroup.vertical(
             layoutSize: groupSize,
