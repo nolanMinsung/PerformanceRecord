@@ -19,34 +19,37 @@ class RecordDetailViewController: UIViewController {
     typealias Snapshot = NSDiffableDataSourceSnapshot<Section, RecordDetailUIModel>
     typealias SupplementaryRegistration = UICollectionView.SupplementaryRegistration<RecordSectionHeaderView>
     
-    
-    // MARK: - UseCase
-    private let fetchLocalPosterUseCase: any FetchLocalPosterUseCase
-    private let fetchLocalPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase
-    private let deleteRecordUseCase: any DeleteRecordUseCase
-    
     // MARK: - Properties
-    private let rootView = RecordDetailView()
-    private var dataSource: DiffableDataSource!
-    private let disposeBag = DisposeBag()
     
-    private var performance: Performance
+    private let rootView = RecordDetailView()
+    private let viewModel: RecordDetailViewModel
+    private var dataSource: DiffableDataSource!
     private var recordUIModels: [RecordDetailUIModel] = []
+    
+    private let disposeBag = DisposeBag()
+    private let deleteRecord = PublishRelay<RecordDetailUIModel>()
+    private let editRecord = PublishRelay<RecordDetailUIModel>()
     
     enum Section {
         case main
     }
     
-    init(
-        fetchLocalPosterUseCase: any FetchLocalPosterUseCase,
-        fetchLocalPerformanceDetailUseCase: any FetchLocalPerformanceDetailUseCase,
-        deleteRecordUseCase: any DeleteRecordUseCase,
-        performance: Performance
-    ) {
-        self.fetchLocalPosterUseCase = fetchLocalPosterUseCase
-        self.fetchLocalPerformanceDetailUseCase = fetchLocalPerformanceDetailUseCase
-        self.deleteRecordUseCase = deleteRecordUseCase
-        self.performance = performance
+    init(performance: Performance) {
+        self.viewModel = RecordDetailViewModel(
+            fetchLocalPosterUseCase: DefaultFetchLocalPosterUseCase(
+                imageRepository: DefaultImageRepository.shared
+            ),
+            fetchLocalPerformanceDetailUseCase: DefaultFetchLocalPerformanceDetailUseCase(
+                performanceRepository: DefaultPerformanceRepository.shared
+            ),
+            deleteRecordUseCase: DefaultDeleteRecordUseCase(
+                recordRepository: DefaultRecordRepository.shared
+            ),
+            deletePerformanceUseCase: DefaultDeletePerformanceUseCase(
+                performanceRepository: DefaultPerformanceRepository.shared
+            ),
+            performance: performance
+        )
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -62,25 +65,10 @@ class RecordDetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        configureUI()
+        self.view.backgroundColor = .systemGroupedBackground
         configureDataSource()
         bind()
-        Task {
-            try await self.updateContents()
-        }
-    }
-    
-    // MARK: - Setup
-    private func configureUI() {
-        self.view.backgroundColor = .systemGroupedBackground
-        Task {
-            do {
-                let image = try await self.fetchLocalPosterUseCase.execute(performance: performance)
-                self.rootView.configureHeader(with: performance, poster: image)
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
+        viewModel.recordsUpdateTrigger.accept(())
     }
     
 }
@@ -105,22 +93,13 @@ extension RecordDetailViewController {
             // left Swipe 핸들러 설정
             cell.leftSwipeAction = { [weak self] in
                 guard let self else { return }
-                Task {
-                    do {
-                        try await self.deleteRecordUseCase.execute(record: recordUIModel.record)
-                    } catch {
-                        print(error.localizedDescription)
-                    }
-                }
+                deleteRecord.accept(recordUIModel)
             }
             
             cell.rightSwipeAction = { [weak self] in
                 guard let self else { return }
-                print("right swipe aciton detected")
-                let addRecordVC = AddRecordViewController(performance: self.performance)
-                addRecordVC.modalPresentationStyle = .overFullScreen
-                addRecordVC.modalTransitionStyle = .crossDissolve
-                self.present(addRecordVC, animated: true)
+                debugPrint("right swipe aciton detected")
+                self.editRecord.accept(recordUIModel)
             }
         }
         
@@ -136,13 +115,14 @@ extension RecordDetailViewController {
             collectionView: rootView.collectionView,
             cellProvider: cellProvider
         )
-
+        
         // 헤더 설정
         let headerRegistration = SupplementaryRegistration(
             elementKind: UICollectionView.elementKindSectionHeader,
             handler: { [weak self] (headerView, string, indexPath) in
                 guard let self else { return }
-                headerView.configure(count: self.recordUIModels.count)
+                let currentSnapshotCount = self.dataSource.snapshot(for: .main).items.count
+                headerView.configure(count: currentSnapshotCount)
             }
         )
         
@@ -155,55 +135,59 @@ extension RecordDetailViewController {
         }
     }
     
-    private func bind() {
-        DefaultRecordRepository.shared.recordUpdated
-            .bind(with: self, onNext: { owner, _ in
-                Task {
-                    do {
-                        try await owner.updateContents()
-                    } catch {
-                        print(error)
-                    }
+}
+    
+
+private extension RecordDetailViewController {
+    
+    func bind() {
+        let input = RecordDetailViewModel.Input(
+            addRecordTrigger: rootView.addRecordButton.rx.tap.asObservable(),
+            editRecordAction: editRecord.asObservable(),
+            recordDeleteAction: deleteRecord.asObservable()
+        )
+        
+        let output = viewModel.transform(input: input)
+        
+        output.performanceUIModel
+            .observe(on: MainScheduler.instance)
+            .bind(
+                with: self,
+                onNext: { owner, performanceUIModel in
+                    owner.rootView.configureHeader(with: performanceUIModel)
                 }
+            )
+            .disposed(by: disposeBag)
+        
+        output.recordUIModels
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, recordDetailUIModel in
+                owner.applySnapshot(records: recordDetailUIModel)
             })
             .disposed(by: disposeBag)
         
-        rootView.addRecordButton.rx.tap
+        output.addNewRecord
+            .observe(on: MainScheduler.instance)
             .bind(
                 with: self,
-                onNext: { owner, _ in
-                    let addRecordVC = AddRecordViewController(performance: owner.performance)
+                onNext: { owner, performanceUIModel in
+                    let addRecordVC = AddRecordViewController(performance: performanceUIModel.performance)
                     addRecordVC.modalPresentationStyle = .overFullScreen
                     addRecordVC.modalTransitionStyle = .crossDissolve
                     owner.present(addRecordVC, animated: true)
                 }
             )
             .disposed(by: disposeBag)
-    }
-    
-    private func updateContents() async throws {
-        let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performance.id)
-        self.performance = detailPerformance
-        self.recordUIModels = try await withThrowingTaskGroup(
-            of: RecordDetailUIModel.self,
-            returning: [RecordDetailUIModel].self,
-            body: { group in
-                for record in detailPerformance.records {
-                    group.addTask {
-                        return try await RecordDetailUIModel(from: record)
-                    }
-                }
-                var sortedRecordUIModel: [RecordDetailUIModel] = []
-                for try await recordUIModel in group {
-                    sortedRecordUIModel.append(recordUIModel)
-                }
-                return sortedRecordUIModel.sorted { $0.record.viewedAt > $1.record.viewedAt }
+        
+        output.error
+            .bind { error in
+                print(error.localizedDescription)
             }
-        )
-        self.applySnapshot(records: self.recordUIModels)
+            .disposed(by: disposeBag)
+        
     }
     
-    private func applySnapshot(records: [RecordDetailUIModel]) {
+    func applySnapshot(records: [RecordDetailUIModel]) {
         var snapshot = Snapshot()
         snapshot.appendSections([.main])
         snapshot.reloadSections([.main])

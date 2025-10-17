@@ -77,6 +77,10 @@ class RecordDetailView: UIView {
         performanceInfoView.configure(with: performance, poster: poster)
     }
     
+    func configureHeader(with performanceUIModel: RecordDetailPerformanceUIModel) {
+        performanceInfoView.configure(with: performanceUIModel.performance, poster: performanceUIModel.poster)
+    }
+    
     // MARK: - Compositional Layout
     private func createLayout() -> UICollectionViewLayout {
         let itemSize = NSCollectionLayoutSize(

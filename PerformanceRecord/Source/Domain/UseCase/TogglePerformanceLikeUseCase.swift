@@ -29,6 +29,7 @@ final class DefaultTogglePerformanceLikeUseCase: TogglePerformanceLikeUseCase {
             let performance = try await performanceRepository.fetchDetailFromLocal(id: performanceID)
             if performance.records.isEmpty {
                 // 기록이 없다면 Performance 데이터 삭제해도 된다.
+                debugPrint("좋아요 해제한 공연에 기록이 없으므로 로컬 저장소에서 Performance를 삭제합니다.")
                 try await performanceRepository.delete(performanceID: performanceID)
             }
             newList.removeAll { $0 == performanceID }

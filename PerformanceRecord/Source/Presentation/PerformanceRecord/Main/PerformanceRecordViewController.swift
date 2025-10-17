@@ -195,20 +195,9 @@ extension PerformanceRecordViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let performance = performancesWithRecords[indexPath.item]
-        let vc = RecordDetailViewController(
-            fetchLocalPosterUseCase: DefaultFetchLocalPosterUseCase(
-                imageRepository: DefaultImageRepository.shared
-            ),
-            fetchLocalPerformanceDetailUseCase: DefaultFetchLocalPerformanceDetailUseCase(
-                performanceRepository: DefaultPerformanceRepository.shared
-            ),
-            deleteRecordUseCase: DefaultDeleteRecordUseCase(
-                recordRepository: DefaultRecordRepository.shared
-            ),
-            performance: performance
-        )
-        vc.hidesBottomBarWhenPushed = true
-        navigationController?.pushViewController(vc, animated: true)
+        let recordDetailVC = RecordDetailViewController(performance: performance)
+        recordDetailVC.hidesBottomBarWhenPushed = true
+        navigationController?.pushViewController(recordDetailVC, animated: true)
     }
     
 }
