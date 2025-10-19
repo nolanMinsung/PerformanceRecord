@@ -32,7 +32,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         let searchNaviCon = UINavigationController(rootViewController: SearchViewController(container: container))
         searchNaviCon.tabBarItem = UITabBarItem(title: "검색", image: .init(systemName: "magnifyingglass"), tag: 1)
         
-        let performanceRecordNaviCon = UINavigationController(rootViewController: PerformanceRecordViewController(container: container))
+        let performanceRecordNaviCon = UINavigationController(rootViewController: RecordMainViewController(container: container))
         performanceRecordNaviCon.tabBarItem = UITabBarItem(title: "나의 기록", image: .init(systemName: "pencil.and.scribble"), tag: 2)
         
         let mainTabBarCon = UITabBarController()

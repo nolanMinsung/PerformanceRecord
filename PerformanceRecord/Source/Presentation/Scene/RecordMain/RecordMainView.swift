@@ -1,5 +1,5 @@
 //
-//  PerformanceRecordView.swift
+//  RecordMainView.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/6/25.
@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 // MARK: - 공연 기록 메인 뷰
-class PerformanceRecordView: UIView {
+class RecordMainView: UIView {
     
     private(set) lazy var collectionView: UICollectionView = {
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())

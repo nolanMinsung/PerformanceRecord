@@ -1,5 +1,5 @@
 //
-//  PerformanceRecordViewController.swift
+//  RecordMainViewController.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/6/25.
@@ -10,7 +10,7 @@ import UIKit
 import RxSwift
 import RxCocoa
 
-class PerformanceRecordViewController: UIViewController {
+class RecordMainViewController: UIViewController {
     
     private struct HeaderData {
         var stats: (totalCount: Int, performanceCount: Int, averageRating: Double, thisYearCount: Int, photoCount: Int)?
@@ -20,9 +20,9 @@ class PerformanceRecordViewController: UIViewController {
     
     private var headerData = HeaderData()
     
-    private let rootView = PerformanceRecordView()
+    private let rootView = RecordMainView()
     private let container: DIContainer
-    private let viewModel: PerformanceRecordViewModel
+    private let viewModel: RecordMainViewModel
     private let favoritesButtonTapped = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
@@ -33,7 +33,7 @@ class PerformanceRecordViewController: UIViewController {
     
     init(container: DIContainer) {
         self.container = container
-        viewModel = PerformanceRecordViewModel(
+        viewModel = RecordMainViewModel(
             fetchLikePerformanceListUseCase: container.resolve(type: FetchLikePerformanceListUseCase.self),
             fetchLocalPerformanceListUseCase: container.resolve(type: FetchLocalPerformanceListUseCase.self),
             fetchPerformanceDetailUseCase: container.resolve(type: FetchLocalPerformanceDetailUseCase.self),
@@ -66,7 +66,7 @@ class PerformanceRecordViewController: UIViewController {
             .bind(to: recordsUpdateTrigger)
             .disposed(by: disposeBag)
         
-        let input = PerformanceRecordViewModel.Input(
+        let input = RecordMainViewModel.Input(
             updateRecords: recordsUpdateTrigger.asObservable(),
             favoritesButtonTapped: favoritesButtonTapped.asObservable()
         )
@@ -140,7 +140,7 @@ class PerformanceRecordViewController: UIViewController {
 
 
 // MARK: - UICollectionViewDataSource
-extension PerformanceRecordViewController: UICollectionViewDataSource {
+extension RecordMainViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return performancesWithRecords.count
     }
@@ -192,7 +192,7 @@ extension PerformanceRecordViewController: UICollectionViewDataSource {
 }
 
 
-extension PerformanceRecordViewController: UICollectionViewDelegate {
+extension RecordMainViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let performance = performancesWithRecords[indexPath.item]
@@ -204,7 +204,7 @@ extension PerformanceRecordViewController: UICollectionViewDelegate {
 }
 
 
-private extension PerformanceRecordViewController {
+private extension RecordMainViewController {
     
     func loadSampleData() -> [Record] {
         // React 코드의 샘플 데이터를 Swift 모델로 변환
@@ -276,7 +276,7 @@ private extension PerformanceRecordViewController {
 }
 
 
-extension PerformanceRecordViewController: SelectPerformanceDelegate {
+extension RecordMainViewController: SelectPerformanceDelegate {
     
     func showAddRecordFlow(performances: [Performance]) {
         let selectVC = SelectPerformanceViewController(performances: performances)

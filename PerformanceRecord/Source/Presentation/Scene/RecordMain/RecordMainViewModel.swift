@@ -1,5 +1,5 @@
 //
-//  PerformanceRecordViewModel.swift
+//  RecordMainViewModel.swift
 //  Muyeon
 //
 //  Created by 김민성 on 10/6/25.
@@ -10,7 +10,7 @@ import Foundation
 import RxSwift
 import RxCocoa
 
-final class PerformanceRecordViewModel {
+final class RecordMainViewModel {
     
     struct Input {
         let updateRecords: Observable<Void>
