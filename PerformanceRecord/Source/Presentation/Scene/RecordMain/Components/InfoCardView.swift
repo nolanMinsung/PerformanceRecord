@@ -10,7 +10,7 @@ import UIKit
 import SnapKit
 
 // MARK: - 정보 카드 뷰 (최근/최다 관람 등)
-class InfoCardView: UIView {
+class InfoCardView: UIControl {
     private let iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit

@@ -15,6 +15,7 @@ final class RecordMainViewModel {
     struct Input {
         let updateRecords: Observable<Void>
         let favoritesButtonTapped: Observable<Void>
+        let infoCardTapped: Observable<Performance>
     }
     
     struct Output {
@@ -23,6 +24,7 @@ final class RecordMainViewModel {
         let mostViewedPerformance: Observable<Performance>
         let performancesWithRecord: Observable<[Performance]>
         let showAddRecordView: Observable<[Performance]>
+        let infoCardTapped: Observable<Performance>
         let errorRelay: PublishRelay<any Error>
     }
     
@@ -103,6 +105,7 @@ final class RecordMainViewModel {
             mostViewedPerformance: mostViewedPerformanceRelay.asObservable(),
             performancesWithRecord: performancesWithRecordsRelay.asObservable(),
             showAddRecordView: likePerformanceListRelay.asObservable(),
+            infoCardTapped: input.infoCardTapped,
             errorRelay: errorRelay
         )
     }

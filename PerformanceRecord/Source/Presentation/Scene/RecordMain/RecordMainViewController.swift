@@ -23,7 +23,8 @@ class RecordMainViewController: UIViewController {
     private let rootView = RecordMainView()
     private let container: DIContainer
     private let viewModel: RecordMainViewModel
-    private let favoritesButtonTapped = PublishSubject<Void>()
+    private let infoCardViewTapped = PublishRelay<Performance>()
+    private let favoritesButtonTapped = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
     
     // MARK: - Properties
@@ -68,7 +69,8 @@ class RecordMainViewController: UIViewController {
         
         let input = RecordMainViewModel.Input(
             updateRecords: recordsUpdateTrigger.asObservable(),
-            favoritesButtonTapped: favoritesButtonTapped.asObservable()
+            favoritesButtonTapped: favoritesButtonTapped.asObservable(),
+            infoCardTapped: infoCardViewTapped.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -121,6 +123,19 @@ class RecordMainViewController: UIViewController {
                     owner.showAddRecordFlow(performances: likePerformances)
                 }
             )
+            .disposed(by: disposeBag)
+        
+        output.infoCardTapped
+            .bind(
+                with: self,
+                onNext: { owner, performance in
+                    let recordDetailVC = RecordDetailViewController(
+                        performance: performance,
+                        container: owner.container
+                    )
+                    recordDetailVC.hidesBottomBarWhenPushed = true
+                    owner.navigationController?.pushViewController(recordDetailVC, animated: true)
+            })
             .disposed(by: disposeBag)
         
         output.errorRelay
@@ -177,10 +192,18 @@ extension RecordMainViewController: UICollectionViewDataSource {
         
         if let recentData = headerData.recentRecord {
             header.configureRecentRecord(recentRecord: recentData.record, performance: recentData.performance)
+            header.recentViewCard.rx.controlEvent(.touchUpInside)
+                .map { return recentData.performance }
+                .bind(to: infoCardViewTapped)
+                .disposed(by: header.disposeBag)
         }
         
         if let mostViewed = headerData.mostViewed {
             header.configureMostViewed(mostViewedPerformance: mostViewed)
+            header.mostViewedCard.rx.controlEvent(.touchUpInside)
+                .map { return mostViewed }
+                .bind(to: infoCardViewTapped)
+                .disposed(by: header.disposeBag)
         }
         
         header.favoritesButton.rx.tap
