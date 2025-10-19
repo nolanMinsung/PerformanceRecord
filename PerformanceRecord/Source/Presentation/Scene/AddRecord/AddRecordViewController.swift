@@ -111,6 +111,15 @@ class AddRecordViewController: ModalCardViewController {
     }
     
     private func setupActions() {
+        let tapGesture = UITapGestureRecognizer()
+        containerView.addGestureRecognizer(tapGesture)
+        tapGesture.rx.event
+            .filter { $0.state == .recognized }
+            .bind(with: self, onNext: { owner, gesture in
+                owner.view.endEditing(true)
+            })
+            .disposed(by: disposeBag)
+        
 //        rootView.memoTextView.delegate = self
         rootView.imagesCollectionView.dataSource = self
         rootView.imagesCollectionView.delegate = self
