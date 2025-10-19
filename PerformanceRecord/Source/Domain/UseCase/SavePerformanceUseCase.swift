@@ -12,7 +12,7 @@ protocol SavePerformanceUseCase {
 }
 
 
-final class DefaultStorePerformanceUseCase: SavePerformanceUseCase {
+final class DefaultSavePerformanceUseCase: SavePerformanceUseCase {
     
     private let repository: PerformanceRepository
     
