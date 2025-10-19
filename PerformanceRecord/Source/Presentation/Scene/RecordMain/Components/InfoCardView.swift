@@ -10,7 +10,12 @@ import UIKit
 import SnapKit
 
 // MARK: - 정보 카드 뷰 (최근/최다 관람 등)
-class InfoCardView: UIControl {
+class InfoCardView: UIControl, ViewShrinkable {
+    private let bubbleBackground: UIImageView = {
+        let imageView = UIImageView(image: .bubble32)
+        return imageView
+    }()
+    
     private let iconImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFit
@@ -56,6 +61,16 @@ class InfoCardView: UIControl {
         return label
     }()
     
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                shrink(duration: 1, scale: 0.95, isBubble: true)
+            } else {
+                restore(duration: 1, isBubble: true)
+            }
+        }
+    }
+    
     init(iconName: String, title: String) {
         super.init(frame: .zero)
         self.iconImageView.image = UIImage(systemName: iconName)
@@ -68,8 +83,7 @@ class InfoCardView: UIControl {
     }
 
     private func setupUI() {
-        backgroundColor = .systemGray6
-        layer.cornerRadius = 16
+        layer.cornerRadius = 32
         
         let headerStack = UIStackView(arrangedSubviews: [iconImageView, titleLabel])
         headerStack.axis = .horizontal
@@ -86,8 +100,14 @@ class InfoCardView: UIControl {
         mainVStack.axis = .vertical
         mainVStack.spacing = 10
         mainVStack.alignment = .leading
+        mainVStack.isUserInteractionEnabled = false
         
+        addSubview(bubbleBackground)
         addSubview(mainVStack)
+        
+        bubbleBackground.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
         iconImageView.snp.makeConstraints { make in
             make.size.equalTo(20)

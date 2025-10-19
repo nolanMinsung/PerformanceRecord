@@ -11,6 +11,11 @@ import SnapKit
 
 class StatItemView: UIView {
     
+    private let bubbleBackground: UIImageView = {
+        let imageView = UIImageView(image: .bubble32)
+        return imageView
+    }()
+    
     private let iconImageView: UIImageView = {
         let iv = UIImageView()
         iv.contentMode = .scaleAspectFit
@@ -59,8 +64,7 @@ class StatItemView: UIView {
     }
     
     private func setupViews() {
-        backgroundColor = .systemGray6
-        layer.cornerRadius = 16
+        layer.cornerRadius = 32
         
         let vStack = UIStackView(arrangedSubviews: [titleLabel, labelStackView])
         vStack.axis = .vertical
@@ -73,7 +77,12 @@ class StatItemView: UIView {
         hStack.alignment = .center
         hStack.translatesAutoresizingMaskIntoConstraints = false
         
+        addSubview(bubbleBackground)
         addSubview(hStack)
+        
+        bubbleBackground.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
         iconImageView.snp.makeConstraints { make in
             make.size.equalTo(24)

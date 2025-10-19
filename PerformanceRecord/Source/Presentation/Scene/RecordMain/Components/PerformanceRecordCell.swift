@@ -12,19 +12,25 @@ import SnapKit
 // MARK: - '공연 기록' CollectionView Cell
 final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
     
-    final class ContainerView: UIView, ORBRecommendationGradientStyle {
-        override init(frame: CGRect) {
-            super.init(frame: frame)
-            layer.cornerRadius = 25
-            applyGradientStyle()
-        }
-        
-        required init?(coder: NSCoder) {
-            fatalError("init(coder:) has not been implemented")
-        }
-        
-    }
-    private let containerView = ContainerView()
+    // 그라데이션 테두리 적용하는 경우 사용
+//    final class ContainerView: UIView, ORBRecommendationGradientStyle {
+//        override init(frame: CGRect) {
+//            super.init(frame: frame)
+//            layer.cornerRadius = 40
+//            applyGradientStyle()
+//        }
+//        
+//        required init?(coder: NSCoder) {
+//            fatalError("init(coder:) has not been implemented")
+//        }
+//        
+//    }
+//    private let containerView = ContainerView()
+    
+    private let bubbleBackground: UIImageView = {
+        let imageView = UIImageView(image: .bubble40Blue)
+        return imageView
+    }()
     
     private let titleLabel: UILabel = {
         let label = UILabel()
@@ -135,9 +141,9 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
     override var isHighlighted: Bool {
         didSet {
             if isHighlighted {
-                shrink(scale: 0.97)
+                shrink(duration: 1, scale: 0.95, isBubble: true)
             } else {
-                restore()
+                restore(duration: 1, isBubble: true)
             }
         }
     }
@@ -159,7 +165,11 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
     }
     
     private func setupUI() {
-        contentView.addSubview(containerView)
+        layer.cornerRadius = 40
+        layer.cornerCurve = .continuous
+        
+//        contentView.addSubview(containerView)
+        contentView.addSubview(bubbleBackground)
         
         countLabelContainer.addSubview(countLabel)
         countLabel.snp.contentCompressionResistanceHorizontalPriority = 800
@@ -182,9 +192,12 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
         latestRecordZStack.addSubview(zStack2)
         latestRecordZStack.addSubview(latestRecordContentContainer)
         
-        containerView.addSubview(vStack)
+        contentView.addSubview(vStack)
         
-        containerView.snp.makeConstraints { make in
+//        containerView.snp.makeConstraints { make in
+//            make.edges.equalToSuperview()
+//        }
+        bubbleBackground.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
         countLabel.snp.makeConstraints { make in
@@ -211,8 +224,8 @@ final class PerformanceRecordCell: UICollectionViewCell, ViewShrinkable {
             make.top.horizontalEdges.equalToSuperview()
         }
         vStack.snp.makeConstraints { make in
-            make.top.horizontalEdges.equalToSuperview().inset(16)
-            make.bottom.equalToSuperview().inset(16)
+            make.top.horizontalEdges.equalToSuperview().inset(20)
+            make.bottom.equalToSuperview().inset(20)
         }
     }
 

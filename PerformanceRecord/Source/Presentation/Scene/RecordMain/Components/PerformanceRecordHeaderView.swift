@@ -43,12 +43,13 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
     
     let favoritesButton: UIButton = {
         let button = ShrinkableButton(type: .system)
+        button.setBackgroundImage(.bubble24Blue, for: .normal)
         button.setTitle("즐겨찾기한 공연", for: .normal)
         button.titleLabel?.font = .systemFont(ofSize: 14, weight: .semibold)
-        button.backgroundColor = .Main.primary
-        button.setTitleColor(.white, for: .normal)
-        button.layer.cornerRadius = 10
-        button.contentEdgeInsets = .init(top: 10, left: 10, bottom: 10, right: 10)
+        button.backgroundColor = .clear
+        button.setTitleColor(.darkGray, for: .normal)
+        button.layer.cornerRadius = 24
+        button.contentEdgeInsets = .init(top: 8, left: 16, bottom: 8, right: 16)
         return button
     }()
     
@@ -105,7 +106,7 @@ final class PerformanceRecordHeaderView: UICollectionReusableView {
         }
         
         favoritesButton.snp.makeConstraints { make in
-            make.height.equalTo(36)
+            make.height.equalTo(44)
         }
     }
 }

@@ -12,6 +12,7 @@ class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
     static let identifier = "PerformanceSelectionCell"
     
     private let containerView = UIView()
+    private let bubbleBackground = UIImageView()
     private let titleLabel = UILabel()
     private let venueLabel = UILabel()
     private let genreTagLabelContainer = UIView()
@@ -20,9 +21,9 @@ class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
     override var isHighlighted: Bool {
         didSet {
             if isHighlighted {
-                shrink(scale: 0.95)
+                shrink(duration: 1, scale: 0.95, isBubble: true)
             } else {
-                restore()
+                restore(duration: 1, isBubble: true)
             }
         }
     }
@@ -30,7 +31,10 @@ class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
     override var isSelected: Bool {
         didSet {
             containerView.layer.borderColor = isSelected ? UIColor.Main.primary.cgColor : UIColor.systemGray5.cgColor
-            containerView.backgroundColor = isSelected ? .Main.primary.withAlphaComponent(0.05) : .clear
+            UIView.animate(withDuration: 0.3) { [weak self] in
+                guard let self else { return }
+                containerView.backgroundColor = isSelected ? .Main.primary.withAlphaComponent(0.07) : .clear
+            }
         }
     }
     
@@ -46,6 +50,8 @@ class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
 
     private func setupUI() {
         // UI 컴포넌트 속성 설정
+        bubbleBackground.image = .bubble24Blue
+        
         titleLabel.font = .systemFont(ofSize: 15, weight: .semibold)
         titleLabel.numberOfLines = 0
         venueLabel.font = .systemFont(ofSize: 14)
@@ -59,10 +65,8 @@ class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
         genreTagLabel.textColor = .Main.primary
         genreTagLabel.textAlignment = .center
         
-        containerView.layer.cornerRadius = 12
-        containerView.layer.borderWidth = 1.5
-        containerView.layer.borderColor = UIColor.systemGray5.cgColor
-        containerView.clipsToBounds = true
+        containerView.layer.cornerRadius = 24
+        containerView.layer.cornerCurve = .continuous
         
         let infoStack = UIStackView(arrangedSubviews: [titleLabel, venueLabel])
         infoStack.axis = .vertical
@@ -73,12 +77,17 @@ class PerformanceSelectionCell: UICollectionViewCell, ViewShrinkable {
         genreTagLabelContainer.addSubview(genreTagLabel)
         
         contentView.addSubview(containerView)
+        containerView.addSubview(bubbleBackground)
         containerView.addSubview(infoStack)
         containerView.addSubview(genreTagLabelContainer)
         
         containerView.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(6)
             make.horizontalEdges.equalToSuperview()
+        }
+        
+        bubbleBackground.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
         }
         
         infoStack.snp.makeConstraints { make in

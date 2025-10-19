@@ -22,6 +22,7 @@ class SelectPerformanceView: UIView {
         )
         let group = NSCollectionLayoutGroup.horizontal(layoutSize: groupSize, subitems: [item])
         let section = NSCollectionLayoutSection(group: group)
+        section.contentInsets = .init(top: 0, leading: 24, bottom: 0, trailing: 24)
         let layout = UICollectionViewCompositionalLayout(section: section)
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.showsVerticalScrollIndicator = false
@@ -43,6 +44,7 @@ class SelectPerformanceView: UIView {
             return outgoing
         })
         let button = ShrinkableButton(configuration: config)
+        button.configuration?.cornerStyle = .large
         button.isEnabled = false
         return button
     }()
@@ -85,7 +87,7 @@ class SelectPerformanceView: UIView {
         
         collectionView.snp.makeConstraints { make in
             make.top.equalTo(titleStack.snp.bottom).offset(16)
-            make.horizontalEdges.equalTo(titleStack)
+            make.horizontalEdges.equalToSuperview()
         }
         
         addRecordButton.snp.makeConstraints { make in
