@@ -12,20 +12,18 @@ import RxSwift
 class PerformanceDetailViewController: UIViewController {
     
     private let rootView = PerformanceDetailView()
+    private let container: DIContainer
     private let viewModel: PerformanceDetailViewModel
     
     private let disposeBag = DisposeBag()
     
-    init(performanceID: String, posterURL: String, posterThumbnail: UIImage? = nil) {
+    init(performanceID: String, posterURL: String, posterThumbnail: UIImage? = nil, container: DIContainer) {
+        self.container = container
         self.viewModel = PerformanceDetailViewModel(
             performanceID: performanceID,
             posterURL: posterURL,
-            fetchRemotePerformanceDetailUseCase: DefaultFetchRemotePerformanceDetailUseCase(
-                performanceRepository: DefaultPerformanceRepository.shared
-            ),
-            togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(
-                performanceRepository: DefaultPerformanceRepository.shared
-            )
+            fetchRemotePerformanceDetailUseCase: container.resolve(type: FetchRemotePerformanceDetailUseCase.self),
+            togglePerformanceLikeUseCase: container.resolve(type: TogglePerformanceLikeUseCase.self)
         )
         super.init(nibName: nil, bundle: nil)
         if let posterThumbnail {
@@ -93,7 +91,7 @@ private extension PerformanceDetailViewController {
                 with: self,
                 onNext: { owner, facilityID in
                     owner.navigationController?.pushViewController(
-                        FacilityDetailViewController(facilityID: facilityID),
+                        FacilityDetailViewController(facilityID: facilityID, container: owner.container),
                         animated: true
                     )
                 }
@@ -117,7 +115,7 @@ private extension PerformanceDetailViewController {
             .bind(
                 with: self,
                 onNext: { owner, performance in
-                    let addRecordVC = AddRecordViewController(performance: performance)
+                    let addRecordVC = AddRecordViewController(performance: performance, container: owner.container)
                     addRecordVC.modalPresentationStyle = .overFullScreen
                     addRecordVC.modalTransitionStyle = .crossDissolve
                     owner.present(addRecordVC, animated: true)

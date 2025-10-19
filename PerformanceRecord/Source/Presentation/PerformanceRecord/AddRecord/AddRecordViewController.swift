@@ -29,6 +29,7 @@ enum AddRecordError: LocalizedError {
 class AddRecordViewController: ModalCardViewController {
     
     private let rootView: AddRecordView
+    private let container: DIContainer
     private let viewModel: AddRecordViewModel
     
     // 데이터 프로퍼티
@@ -44,16 +45,14 @@ class AddRecordViewController: ModalCardViewController {
     
     var onRecordDataChanged: (() -> Void)?
     
-    init(performance: Performance) {
+    init(performance: Performance, container: DIContainer) {
         self.performance = performance
         self.rootView = AddRecordView(performance: performance)
+        self.container = container
         self.viewModel = AddRecordViewModel(
             performance: performance,
-            createRecordUseCase: DefaultCreateRecordUseCase(
-                performanceRepository: DefaultPerformanceRepository.shared,
-                recordRepository: DefaultRecordRepository.shared
-            ),
-            processUserSelectedImageUseCase: DefaultProcessUserSelectedImageUseCase()
+            createRecordUseCase: container.resolve(type: CreateRecordUseCase.self),
+            processUserSelectedImageUseCase: container.resolve(type: ProcessUserSelectedImageUseCase.self)
         )
         super.init(nibName: nil, bundle: nil)
     }

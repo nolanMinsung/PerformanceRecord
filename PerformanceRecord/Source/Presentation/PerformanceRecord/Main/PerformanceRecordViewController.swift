@@ -21,23 +21,8 @@ class PerformanceRecordViewController: UIViewController {
     private var headerData = HeaderData()
     
     private let rootView = PerformanceRecordView()
-    private let viewModel = PerformanceRecordViewModel(
-        fetchLikePerformanceListUseCase: DefaultFetchLikePerformanceListUseCase(
-            performanceRepository: DefaultPerformanceRepository.shared
-        ),
-        fetchLocalPerformanceListUseCase: DefaultFetchLocalPerformanceListUseCase(
-            performanceRepository: DefaultPerformanceRepository.shared
-        ),
-        fetchPerformanceDetailUseCase: DefaultFetchLocalPerformanceDetailUseCase(
-            performanceRepository: DefaultPerformanceRepository.shared
-        ),
-        fetchMostViewedPerformanceUseCase: DefaultFetchMostViewedPerformanceUseCase(
-            performanceRepository: DefaultPerformanceRepository.shared
-        ),
-        fetchAllRecordsUseCase: DefaultFetchAllRecordsUseCase(
-            recordRepository: DefaultRecordRepository.shared
-        )
-    )
+    private let container: DIContainer
+    private let viewModel: PerformanceRecordViewModel
     private let favoritesButtonTapped = PublishSubject<Void>()
     private let disposeBag = DisposeBag()
     
@@ -45,6 +30,22 @@ class PerformanceRecordViewController: UIViewController {
     private let recordsUpdateTrigger = PublishRelay<Void>()
     private var records: [Record] = []
     private var performancesWithRecords: [Performance] = []
+    
+    init(container: DIContainer) {
+        self.container = container
+        viewModel = PerformanceRecordViewModel(
+            fetchLikePerformanceListUseCase: container.resolve(type: FetchLikePerformanceListUseCase.self),
+            fetchLocalPerformanceListUseCase: container.resolve(type: FetchLocalPerformanceListUseCase.self),
+            fetchPerformanceDetailUseCase: container.resolve(type: FetchLocalPerformanceDetailUseCase.self),
+            fetchMostViewedPerformanceUseCase: container.resolve(type: FetchMostViewedPerformanceUseCase.self),
+            fetchAllRecordsUseCase: container.resolve(type: FetchAllRecordsUseCase.self)
+        )
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -195,7 +196,7 @@ extension PerformanceRecordViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let performance = performancesWithRecords[indexPath.item]
-        let recordDetailVC = RecordDetailViewController(performance: performance)
+        let recordDetailVC = RecordDetailViewController(performance: performance, container: container)
         recordDetailVC.hidesBottomBarWhenPushed = true
         navigationController?.pushViewController(recordDetailVC, animated: true)
     }
@@ -288,7 +289,7 @@ extension PerformanceRecordViewController: SelectPerformanceDelegate {
     
     // MARK: - SelectPerformanceDelegate
     func didSelectPerformance(_ performance: Performance) {
-        let addRecordVC = AddRecordViewController(performance: performance)
+        let addRecordVC = AddRecordViewController(performance: performance, container: container)
         addRecordVC.onRecordDataChanged = { [weak self] in
             self?.recordsUpdateTrigger.accept(())
         }

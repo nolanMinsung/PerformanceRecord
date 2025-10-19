@@ -10,12 +10,14 @@ import UIKit
 class FacilityDetailViewController: UIViewController {
 
     private let rootView = FacilityDetailView()
+    private let container: DIContainer
     private let viewModel: FacilityDetailViewModel
     
-    init(facilityID: String) {
+    init(facilityID: String, container: DIContainer) {
+        self.container = container
         self.viewModel = FacilityDetailViewModel(
             facilityID: facilityID,
-            fetchFacilityDetailUseCase: DefaultFetchFacilityDetailUseCase()
+            fetchFacilityDetailUseCase: container.resolve(type: FetchFacilityDetailUseCase.self)
         )
         super.init(nibName: nil, bundle: nil)
     }
@@ -40,8 +42,6 @@ class FacilityDetailViewController: UIViewController {
             let facility = try await viewModel.fetchFacilityDetailUseCase.execute(facilityID: viewModel.facilityID)
             rootView.configure(with: facility)
         }
-        
-//        rootView.configure(with: createDummyFacility())
     }
     
     

@@ -23,6 +23,7 @@ class RecordDetailViewController: UIViewController {
     
     private let rootView = RecordDetailView()
     private let viewModel: RecordDetailViewModel
+    private let container: DIContainer
     private var dataSource: DiffableDataSource!
     private var recordUIModels: [RecordDetailUIModel] = []
     
@@ -34,20 +35,13 @@ class RecordDetailViewController: UIViewController {
         case main
     }
     
-    init(performance: Performance) {
+    init(performance: Performance, container: DIContainer) {
+        self.container = container
         self.viewModel = RecordDetailViewModel(
-            fetchLocalPosterUseCase: DefaultFetchLocalPosterUseCase(
-                imageRepository: DefaultImageRepository.shared
-            ),
-            fetchLocalPerformanceDetailUseCase: DefaultFetchLocalPerformanceDetailUseCase(
-                performanceRepository: DefaultPerformanceRepository.shared
-            ),
-            deleteRecordUseCase: DefaultDeleteRecordUseCase(
-                recordRepository: DefaultRecordRepository.shared
-            ),
-            deletePerformanceUseCase: DefaultDeletePerformanceUseCase(
-                performanceRepository: DefaultPerformanceRepository.shared
-            ),
+            fetchLocalPosterUseCase: container.resolve(type: FetchLocalPosterUseCase.self),
+            fetchLocalPerformanceDetailUseCase: container.resolve(type: FetchLocalPerformanceDetailUseCase.self),
+            deleteRecordUseCase: container.resolve(type: DeleteRecordUseCase.self),
+            deletePerformanceUseCase: container.resolve(type: DeletePerformanceUseCase.self),
             performance: performance
         )
         super.init(nibName: nil, bundle: nil)
@@ -171,7 +165,7 @@ private extension RecordDetailViewController {
             .bind(
                 with: self,
                 onNext: { owner, performanceUIModel in
-                    let addRecordVC = AddRecordViewController(performance: performanceUIModel.performance)
+                    let addRecordVC = AddRecordViewController(performance: performanceUIModel.performance, container: owner.container)
                     addRecordVC.modalPresentationStyle = .overFullScreen
                     addRecordVC.modalTransitionStyle = .crossDissolve
                     owner.present(addRecordVC, animated: true)

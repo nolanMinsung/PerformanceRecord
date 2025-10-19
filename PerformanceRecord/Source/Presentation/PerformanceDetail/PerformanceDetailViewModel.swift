@@ -27,8 +27,8 @@ final class PerformanceDetailViewModel {
         let error: Observable<any Error>
     }
     
-    let performanceID: String
-    let posterURL: String
+    private let performanceID: String
+    private let posterURL: String
     private let fetchRemotePerformanceDetailUseCase: any FetchRemotePerformanceDetailUseCase
     private let togglePerformanceLikeUseCase: any TogglePerformanceLikeUseCase
     private let disposeBag = DisposeBag()

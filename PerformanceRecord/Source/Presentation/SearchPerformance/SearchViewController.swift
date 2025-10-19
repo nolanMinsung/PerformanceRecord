@@ -25,19 +25,26 @@ class SearchViewController: UIViewController {
     
     private var diffableDataSource: DiffableDataSource!
     private let rootView = SearchView()
-    private let viewModel = SearchViewModel(
-        fetchPerformanceListUseCase: DefaultFetchRemotePerformanceListUseCase(),
-        fetchPerformanceDetailUseCase: DefaultFetchRemotePerformanceDetailUseCase(
-            performanceRepository: DefaultPerformanceRepository.shared
-        ),
-        togglePerformanceLikeUseCase: DefaultTogglePerformanceLikeUseCase(
-            performanceRepository: DefaultPerformanceRepository.shared
-        ),
-    )
+    private let container: DIContainer
+    private let viewModel: SearchViewModel
     
     private let likeButtonTapped = PublishRelay<(IndexPath,String)>()
     private let genreSelected = BehaviorRelay<Constant.Genre?>(value: nil)
     private let disposeBag = DisposeBag()
+    
+    init(container: DIContainer) {
+        self.container = container
+        viewModel = SearchViewModel(
+            fetchPerformanceListUseCase: container.resolve(type: FetchRemotePerformanceListUseCase.self),
+            fetchPerformanceDetailUseCase: container.resolve(type: FetchRemotePerformanceDetailUseCase.self),
+            togglePerformanceLikeUseCase: container.resolve(type: TogglePerformanceLikeUseCase.self)
+        )
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -95,7 +102,8 @@ class SearchViewController: UIViewController {
                 }
                 let detailVC = PerformanceDetailViewController(
                     performanceID: selectedPerformance.id,
-                    posterURL: selectedPerformance.posterURL
+                    posterURL: selectedPerformance.posterURL,
+                    container: owner.container
                 )
                 detailVC.hidesBottomBarWhenPushed = true
                 owner.navigationController?.pushViewController(detailVC, animated: true)

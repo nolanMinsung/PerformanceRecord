@@ -10,7 +10,9 @@ import UIKit
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
-
+    var assembler: Assembler!
+    // 앱 전역에서 사용할 DI Container
+    let container = DIContainer()
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         // Use this method to optionally configure and attach the UIWindow `window` to the provided UIWindowScene `scene`.
@@ -19,13 +21,18 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
         
-        let homeNaviCon = UINavigationController(rootViewController: HomeViewController())
+        assembler = Assembler(
+            assemblies: [DataSourceAssembly(), RepositoryAssembly(), UseCaseAssembly()],
+            container: container
+        )
+        
+        let homeNaviCon = UINavigationController(rootViewController: HomeViewController(container: container))
         homeNaviCon.tabBarItem = UITabBarItem(title: "홈", image: .init(systemName: "house"), tag: 0)
         
-        let searchNaviCon = UINavigationController(rootViewController: SearchViewController())
+        let searchNaviCon = UINavigationController(rootViewController: SearchViewController(container: container))
         searchNaviCon.tabBarItem = UITabBarItem(title: "검색", image: .init(systemName: "magnifyingglass"), tag: 1)
         
-        let performanceRecordNaviCon = UINavigationController(rootViewController: PerformanceRecordViewController())
+        let performanceRecordNaviCon = UINavigationController(rootViewController: PerformanceRecordViewController(container: container))
         performanceRecordNaviCon.tabBarItem = UITabBarItem(title: "나의 기록", image: .init(systemName: "pencil.and.scribble"), tag: 2)
         
         let mainTabBarCon = UITabBarController()

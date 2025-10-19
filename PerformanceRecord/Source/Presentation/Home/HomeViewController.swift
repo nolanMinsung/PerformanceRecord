@@ -26,15 +26,25 @@ class HomeViewController: UIViewController {
     private let topTenLoadingTrigger = PublishRelay<Void>()
     private let trendingLoadingTrigger = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
-    
-    private let viewModel = HomeViewModel(
-        fetchBoxOfficeUseCase: DefaultFetchBoxOfficeUseCase(),
-        fetchPerformanceListUseCase: DefaultFetchRemotePerformanceListUseCase()
-    )
+    private let container: DIContainer
+    private var viewModel: HomeViewModel
     
     private var dataSource: DiffableDataSource!
     
     private let rootView = HomeView()
+    
+    init(container: DIContainer) {
+        self.container = container
+        self.viewModel = HomeViewModel(
+            fetchBoxOfficeUseCase: container.resolve(type: FetchBoxOfficeUseCase.self),
+            fetchPerformanceListUseCase: container.resolve(type: FetchRemotePerformanceListUseCase.self)
+        )
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func loadView() {
         view = rootView
@@ -219,7 +229,8 @@ private extension HomeViewController {
         let performanceDetailVC = PerformanceDetailViewController(
             performanceID: performanceID,
             posterURL: posterURL,
-            posterThumbnail: thumbnail
+            posterThumbnail: thumbnail,
+            container: container
         )
         let naviCon = UINavigationController(rootViewController: performanceDetailVC)
         
