@@ -9,14 +9,15 @@ import UIKit
 
 class HomeBoxOfficeGenreCell: UICollectionViewCell, ViewShrinkable {
     
+    private let bubbleBackground = UIImageView(image: .bubble24Blue)
     private let genreNameLabel = UILabel()
     
     override var isHighlighted: Bool {
         didSet {
             if isHighlighted {
-                shrink(scale: 0.9)
+                shrink(duration: 1.0, scale: 0.9, isBubble: true)
             } else {
-                restore()
+                restore(duration: 1.0, isBubble: true)
             }
         }
     }
@@ -28,10 +29,14 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell, ViewShrinkable {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        contentView.backgroundColor = .systemGray6
         contentView.layer.cornerRadius = 20 // 셀 높이는 40으로 고정되어있음.
         contentView.clipsToBounds = true
+        contentView.addSubview(bubbleBackground)
         contentView.addSubview(genreNameLabel)
+        
+        bubbleBackground.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
         
         genreNameLabel.snp.makeConstraints { make in
             make.verticalEdges.equalToSuperview().inset(10)
@@ -45,10 +50,10 @@ class HomeBoxOfficeGenreCell: UICollectionViewCell, ViewShrinkable {
     }
     
     func setSelected(_ isSelected: Bool) {
-        genreNameLabel.textColor = isSelected ? .white : .Main.primary
         let fontWeight: UIFont.Weight = isSelected ? .bold : .regular
-        genreNameLabel.font = .systemFont(ofSize: 17, weight:  fontWeight)
-        contentView.backgroundColor = isSelected ? .Main.primary : .Main.third
+        genreNameLabel.font = .systemFont(ofSize: 15, weight:  fontWeight)
+        genreNameLabel.textColor = isSelected ? .Main.primary : .gray
+        contentView.backgroundColor = isSelected ? .Main.primary.withAlphaComponent(0.07) : .clear
         
     }
     
