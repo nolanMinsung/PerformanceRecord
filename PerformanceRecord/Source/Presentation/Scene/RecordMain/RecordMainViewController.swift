@@ -12,13 +12,7 @@ import RxCocoa
 
 class RecordMainViewController: UIViewController {
     
-    private struct HeaderData {
-        var stats: (totalCount: Int, performanceCount: Int, averageRating: Double, thisYearCount: Int, photoCount: Int)?
-        var recentRecord: (record: Record?, performance: Performance)?
-        var mostViewed: Performance?
-    }
-    
-    private var headerData = HeaderData()
+    private var headerData = RecordMainViewModel.HeaderData()
     
     private let rootView = RecordMainView()
     private let container: DIContainer
@@ -63,10 +57,6 @@ class RecordMainViewController: UIViewController {
     }
     
     private func bind() {
-        DefaultRecordRepository.shared.recordUpdated
-            .bind(to: recordsUpdateTrigger)
-            .disposed(by: disposeBag)
-        
         let input = RecordMainViewModel.Input(
             updateRecords: recordsUpdateTrigger.asObservable(),
             favoritesButtonTapped: favoritesButtonTapped.asObservable(),
@@ -95,8 +85,7 @@ class RecordMainViewController: UIViewController {
         output.recentRecord
             .observe(on: MainScheduler.instance)
             .bind(with: self) { owner, data in
-                let (recentRecord, performance) = data
-                owner.headerData.recentRecord = (recentRecord, performance)
+                owner.headerData.recentRecord = data
             }
             .disposed(by: disposeBag)
         
@@ -190,21 +179,17 @@ extension RecordMainViewController: UICollectionViewDataSource {
             photoCount: headerData.stats?.photoCount ?? 0
         )
         
-        if let recentData = headerData.recentRecord {
-            header.configureRecentRecord(recentRecord: recentData.record, performance: recentData.performance)
-            header.recentViewCard.rx.controlEvent(.touchUpInside)
-                .map { return recentData.performance }
-                .bind(to: infoCardViewTapped)
-                .disposed(by: header.disposeBag)
-        }
+        header.configureRecentRecord(recentRecordInfo: headerData.recentRecord)
+        header.recentViewCard.rx.controlEvent(.touchUpInside)
+            .compactMap { [weak self] in return self?.headerData.recentRecord?.performance }
+            .bind(to: infoCardViewTapped)
+            .disposed(by: header.disposeBag)
         
-        if let mostViewed = headerData.mostViewed {
-            header.configureMostViewed(mostViewedPerformance: mostViewed)
-            header.mostViewedCard.rx.controlEvent(.touchUpInside)
-                .map { return mostViewed }
-                .bind(to: infoCardViewTapped)
-                .disposed(by: header.disposeBag)
-        }
+        header.configureMostViewed(mostViewedPerformance: headerData.mostViewed)
+        header.mostViewedCard.rx.controlEvent(.touchUpInside)
+            .compactMap { [weak self] in return self?.headerData.mostViewed }
+            .bind(to: infoCardViewTapped)
+            .disposed(by: header.disposeBag)
         
         header.favoritesButton.rx.tap
             .bind(to: favoritesButtonTapped)

@@ -131,34 +131,38 @@ extension PerformanceRecordHeaderView {
         )
     }
     
-    func configureRecentRecord(recentRecord: Record?, performance: Performance) {
-        if let recentRecord {
+    func configureRecentRecord(recentRecordInfo: RecordMainViewModel.HeaderData.RecentRecordInfo?) {
+        if let recentRecordInfo {
             let dateFormatter = DateFormatter()
             dateFormatter.dateFormat = "MM월 dd일"
             recentViewCard.isHidden = false
             recentViewCard.configure(
-                mainText: performance.name,
-                tagText: "★ \(recentRecord.rating)",
+                mainText: recentRecordInfo.performance.name,
+                tagText: "★ \(recentRecordInfo.record.rating)",
                 tagColor: .systemOrange,
-                subText: dateFormatter.string(from: recentRecord.viewedAt)
+                subText: dateFormatter.string(from: recentRecordInfo.record.viewedAt)
             )
         } else {
             recentViewCard.isHidden = true
         }
     }
     
-    func configureMostViewed(mostViewedPerformance: Performance) {
-        let recordCount = mostViewedPerformance.records.count
-        if recordCount > 0 {
-            mostViewedCard.isHidden = false
-            mostViewedCard.configure(
-                mainText: mostViewedPerformance.name,
-                tagText: "\(recordCount)회",
-                tagColor: .systemIndigo,
-                subText: mostViewedPerformance.facilityFullName
-            )
-        } else {
+    func configureMostViewed(mostViewedPerformance: Performance?) {
+        guard let mostViewedPerformance else {
             mostViewedCard.isHidden = true
+            return
         }
+        let recordCount = mostViewedPerformance.records.count
+        guard recordCount > 0 else {
+            mostViewedCard.isHidden = true
+            return
+        }
+        mostViewedCard.isHidden = false
+        mostViewedCard.configure(
+            mainText: mostViewedPerformance.name,
+            tagText: "\(recordCount)회",
+            tagColor: .systemIndigo,
+            subText: mostViewedPerformance.facilityFullName
+        )
     }
 }

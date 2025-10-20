@@ -12,6 +12,17 @@ import RxCocoa
 
 final class RecordMainViewModel {
     
+    struct HeaderData {
+        struct RecentRecordInfo {
+            let record: Record
+            let performance: Performance
+        }
+        
+        var stats: (totalCount: Int, performanceCount: Int, averageRating: Double, thisYearCount: Int, photoCount: Int)?
+        var recentRecord: RecentRecordInfo?
+        var mostViewed: Performance?
+    }
+    
     struct Input {
         let updateRecords: Observable<Void>
         let favoritesButtonTapped: Observable<Void>
@@ -20,8 +31,8 @@ final class RecordMainViewModel {
     
     struct Output {
         let allRecords: Observable<[Record]>
-        let recentRecord: Observable<(record: Record?, performance: Performance)>
-        let mostViewedPerformance: Observable<Performance>
+        let recentRecord: Observable<HeaderData.RecentRecordInfo?>
+        let mostViewedPerformance: Observable<Performance?>
         let performancesWithRecord: Observable<[Performance]>
         let showAddRecordView: Observable<[Performance]>
         let infoCardTapped: Observable<Performance>
@@ -51,22 +62,29 @@ final class RecordMainViewModel {
     
     func transform(input: Input) -> Output {
         let allRecordsRelay = PublishRelay<[Record]>()
-        let recentRecordRelay = PublishRelay<(record: Record?, performance: Performance)>()
-        let mostViewedPerformanceRelay = PublishRelay<Performance>()
+        let recentRecordRelay = PublishRelay<HeaderData.RecentRecordInfo?>()
+        let mostViewedPerformanceRelay = PublishRelay<Performance?>()
         let performancesWithRecordsRelay = PublishRelay<[Performance]>()
         let likePerformanceListRelay = PublishRelay<[Performance]>()
         let errorRelay = PublishRelay<any Error>()
         
-        input.updateRecords
+        Observable.merge(
+            [DefaultRecordRepository.shared.recordUpdated, input.updateRecords]
+        )
             .bind { _ in
                 Task {
                     do {
                         let allRecords = try await self.fetchAllRecordsUseCase.execute()
-                        let recentRecord = allRecords.sorted(by: { $0.viewedAt > $1.viewedAt }).first
-                        if let performanceID = recentRecord?.performanceID {
-                            let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(performanceID: performanceID)
-                            recentRecordRelay.accept((record: recentRecord, performance: detailPerformance))
+                        if let recentRecord = allRecords.sorted(by: { $0.viewedAt > $1.viewedAt }).first {
+                            let detailPerformance = try await self.fetchLocalPerformanceDetailUseCase.execute(
+                                performanceID: recentRecord.performanceID
+                            )
+                            let recentRecordInfo: HeaderData.RecentRecordInfo = .init(record: recentRecord, performance: detailPerformance)
+                            recentRecordRelay.accept(recentRecordInfo)
+                        } else {
+                            recentRecordRelay.accept(nil)
                         }
+                        
                         let allPerformances = try await self.fetchLocalPerformanceListUseCase.execute()
                         let mostViewedPerformance = try await self.fetchMostViewedPerformanceUseCase.execute()
                         mostViewedPerformanceRelay.accept(mostViewedPerformance)
