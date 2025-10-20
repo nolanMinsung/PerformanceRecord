@@ -195,9 +195,11 @@ final class PerformanceDetailView: UIView {
         config.subtitle = "공연 기록을 추가해보세요"
         config.titlePadding = 5
         config.titleAlignment = .center
-        config.baseBackgroundColor = .Main.primary.withAlphaComponent(0.1)
+        config.baseBackgroundColor = .clear
         config.baseForegroundColor = .Main.primary
         config.cornerStyle = .large
+        config.background.image = .bubble24Blue
+        config.background.imageContentMode = .scaleToFill
         config.titleTextAttributesTransformer = .init({ incoming in
             var outgoing = incoming
             outgoing.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
@@ -207,8 +209,9 @@ final class PerformanceDetailView: UIView {
         var disableConfig = config
         disableConfig.title = "지금은 공연 기록을 추가할 수 없어요."
         disableConfig.subtitle = "공연이 시작하면 관람 후 기록해보세요."
+        disableConfig.background.image = nil
         
-        let button = ShrinkableButton(configuration: config)
+        let button = BubbleButton(configuration: config)
         button.configurationUpdateHandler = { button in
             button.configuration = button.isEnabled ? config : disableConfig
         }
