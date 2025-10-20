@@ -6,7 +6,7 @@
 //
 
 protocol FetchMostViewedPerformanceUseCase {
-    func execute() async throws -> Performance
+    func execute() async throws -> Performance?
 }
 
 
@@ -18,7 +18,7 @@ final class DefaultFetchMostViewedPerformanceUseCase: FetchMostViewedPerformance
         self.performanceRepository = performanceRepository
     }
     
-    func execute() async throws -> Performance {
+    func execute() async throws -> Performance? {
         try await performanceRepository.fetchMostViewedFromLocal()
     }
     

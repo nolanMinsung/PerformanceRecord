@@ -68,7 +68,7 @@ actor DefaultPerformanceRepository: PerformanceRepository {
         }.value
     }
     
-    func fetchMostViewedFromLocal() async throws -> Performance {
+    func fetchMostViewedFromLocal() async throws -> Performance? {
         try await Task.detached {
             let realm = try Realm()
             let mostViewed = realm.objects(PerformanceObject.self)
@@ -76,7 +76,8 @@ actor DefaultPerformanceRepository: PerformanceRepository {
             if let mostViewed {
                 return try mostViewed.toDomain()
             } else {
-                throw DefaultPerformanceRepositoryError.performanceObjectNotFound
+                return nil
+                // throw DefaultPerformanceRepositoryError.performanceObjectNotFound
             }
         }.value
     }
