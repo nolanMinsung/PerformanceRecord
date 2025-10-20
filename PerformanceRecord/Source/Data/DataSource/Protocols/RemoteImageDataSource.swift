@@ -7,6 +7,6 @@
 
 import Foundation
 
-protocol RemoteImageDataSource {
+protocol RemoteImageDataSource: Sendable {
     func download(from url: String) async throws -> ImageDataForSaving
 }

@@ -11,15 +11,15 @@ import Alamofire
 enum DateEncodingStrategy {
     case formatted(DateFormatter)
     case iso8601
-    case custom((Date) -> String)
+    case custom(@Sendable (Date) -> String)
 }
 
 protocol ParameterConvertible: Encodable {
-    func asParameters(dateEncodingStrategy: DateEncodingStrategy) throws -> [String: Any]
+    func asParameters(dateEncodingStrategy: DateEncodingStrategy) throws -> [String: any Any & Sendable]
 }
 
 extension ParameterConvertible {
-    func asParameters(dateEncodingStrategy: DateEncodingStrategy = .iso8601) throws -> [String: Any] {
+    func asParameters(dateEncodingStrategy: DateEncodingStrategy = .iso8601) throws -> [String: any Any & Sendable] {
         let encoder = JSONEncoder()
         
         switch dateEncodingStrategy {
@@ -37,7 +37,7 @@ extension ParameterConvertible {
         let data = try encoder.encode(self)
         let object = try JSONSerialization.jsonObject(with: data, options: .allowFragments)
 
-        guard var dict = object as? [String: Any] else {
+        guard var dict = object as? [String: any Any & Sendable] else {
             throw NSError(domain: "ParameterEncodingError", code: -1, userInfo: nil)
         }
 

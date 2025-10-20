@@ -7,7 +7,7 @@
 
 import UIKit
 
-protocol ImageRepository {
+protocol ImageRepository: Sendable {
     /// Image URL 로부터 이미지 다운로드 및 저장 후 이미지 ID(파일 이름) 반환
     func saveImage(urlString: String, to: ImageCategory) async throws -> String
     
