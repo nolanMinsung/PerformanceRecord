@@ -26,6 +26,7 @@ class RecordDetailViewController: UIViewController {
     private let container: DIContainer
     private var dataSource: DiffableDataSource!
     private var recordUIModels: [RecordDetailUIModel] = []
+    private let addRecordVCTransitioningDelegate = AddRecordViewTransitioningDelegate()
     
     private let disposeBag = DisposeBag()
     private let deleteRecord = PublishRelay<RecordDetailUIModel>()
@@ -165,9 +166,13 @@ private extension RecordDetailViewController {
             .bind(
                 with: self,
                 onNext: { owner, performanceUIModel in
-                    let addRecordVC = AddRecordViewController(performance: performanceUIModel.performance, container: owner.container)
-                    addRecordVC.modalPresentationStyle = .overFullScreen
-                    addRecordVC.modalTransitionStyle = .crossDissolve
+                    let addRecordVC = AddRecordViewController(
+                        performance: performanceUIModel.performance,
+                        container: owner.container,
+                        image: performanceUIModel.poster
+                    )
+                    addRecordVC.modalPresentationStyle = .custom
+                    addRecordVC.transitioningDelegate = owner.addRecordVCTransitioningDelegate
                     owner.present(addRecordVC, animated: true)
                 }
             )

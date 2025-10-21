@@ -14,6 +14,7 @@ class PerformanceDetailViewController: UIViewController {
     private let rootView = PerformanceDetailView()
     private let container: DIContainer
     private let viewModel: PerformanceDetailViewModel
+    private let addRecordVCTransitioningDelegate = AddRecordViewTransitioningDelegate()
     
     private let disposeBag = DisposeBag()
     
@@ -116,8 +117,8 @@ private extension PerformanceDetailViewController {
                 with: self,
                 onNext: { owner, performance in
                     let addRecordVC = AddRecordViewController(performance: performance, container: owner.container)
-                    addRecordVC.modalPresentationStyle = .overFullScreen
-                    addRecordVC.modalTransitionStyle = .crossDissolve
+                    addRecordVC.modalPresentationStyle = .custom
+                    addRecordVC.transitioningDelegate = owner.addRecordVCTransitioningDelegate
                     owner.present(addRecordVC, animated: true)
                 }
             )

@@ -17,6 +17,7 @@ class RecordMainViewController: UIViewController {
     private let rootView = RecordMainView()
     private let container: DIContainer
     private let viewModel: RecordMainViewModel
+    private let addRecordVCTransitioningDelegate = AddRecordViewTransitioningDelegate()
     private let infoCardViewTapped = PublishRelay<Performance>()
     private let favoritesButtonTapped = PublishRelay<Void>()
     private let disposeBag = DisposeBag()
@@ -301,8 +302,8 @@ extension RecordMainViewController: SelectPerformanceDelegate {
         addRecordVC.onRecordDataChanged = { [weak self] in
             self?.recordsUpdateTrigger.accept(())
         }
-        addRecordVC.modalPresentationStyle = .overFullScreen
-        addRecordVC.modalTransitionStyle = .crossDissolve
+        addRecordVC.modalPresentationStyle = .custom
+        addRecordVC.transitioningDelegate = addRecordVCTransitioningDelegate
         present(addRecordVC, animated: true)
     }
 }

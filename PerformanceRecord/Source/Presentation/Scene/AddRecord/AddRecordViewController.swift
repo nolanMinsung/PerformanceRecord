@@ -26,7 +26,7 @@ enum AddRecordError: LocalizedError {
     }
 }
 
-class AddRecordViewController: ModalCardViewController {
+class AddRecordViewController: UIViewController {
     
     private let rootView: AddRecordView
     private let container: DIContainer
@@ -45,7 +45,7 @@ class AddRecordViewController: ModalCardViewController {
     
     var onRecordDataChanged: (() -> Void)?
     
-    init(performance: Performance, container: DIContainer) {
+    init(performance: Performance, container: DIContainer, image: UIImage? = nil) {
         self.performance = performance
         self.rootView = AddRecordView(performance: performance)
         self.container = container
@@ -60,15 +60,14 @@ class AddRecordViewController: ModalCardViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    override func loadView() {
+        view = rootView
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        containerView.addSubview(rootView)
-        rootView.snp.makeConstraints { make in
-            make.top.equalToSuperview().inset(46)
-            make.horizontalEdges.bottom.equalToSuperview()
-        }
         bind()
         setupActions()
     }
@@ -87,6 +86,7 @@ class AddRecordViewController: ModalCardViewController {
             phPickerSelected: phPickerSelected.asObservable(),
             deleteImageData: deleteImageData.asObservable(),
             saveButtonTapped: rootView.saveButton.rx.tap.asObservable(),
+            dismissButtonTapped: rootView.dismissButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
@@ -108,19 +108,15 @@ class AddRecordViewController: ModalCardViewController {
                 owner.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
+        
+        output.shouldDismiss
+            .bind(with: self, onNext: { owner, _ in
+                owner.dismiss(animated: true)
+            })
+            .disposed(by: disposeBag)
     }
     
     private func setupActions() {
-//        let tapGesture = UITapGestureRecognizer()
-//        containerView.addGestureRecognizer(tapGesture)
-//        tapGesture.rx.event
-//            .filter { $0.state == .recognized }
-//            .bind(with: self, onNext: { owner, gesture in
-//                owner.view.endEditing(true)
-//            })
-//            .disposed(by: disposeBag)
-        
-//        rootView.memoTextView.delegate = self
         rootView.imagesCollectionView.dataSource = self
         rootView.imagesCollectionView.delegate = self
         rootView.imageBoxTapGesture.rx.event

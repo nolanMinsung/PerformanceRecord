@@ -20,11 +20,13 @@ final class AddRecordViewModel {
         let phPickerSelected: Observable<[PHPickerResult]>
         let deleteImageData: Observable<IndexPath>
         let saveButtonTapped: Observable<Void>
+        let dismissButtonTapped: Observable<Void>
     }
     
     struct Output {
         let selectedImage: Observable<[UIImage]>
         let successCreateRecord: Observable<Void>
+        let shouldDismiss: Observable<Void>
         let errorRelay: Observable<any Error>
     }
     
@@ -146,6 +148,7 @@ final class AddRecordViewModel {
         return .init(
             selectedImage: addedImageStream,
             successCreateRecord: successCreateRecord.asObservable(),
+            shouldDismiss: input.dismissButtonTapped.asObservable(),
             errorRelay: errorRelay.asObservable()
         )
     }
