@@ -1,41 +1,11 @@
 {
   "images" : [
     {
-      "filename" : "bubble_24_blue 2.png",
       "idiom" : "universal",
-      "resizing" : {
-        "cap-insets" : {
-          "bottom" : 72,
-          "left" : 72,
-          "right" : 72,
-          "top" : 72
-        },
-        "center" : {
-          "height" : 1,
-          "mode" : "stretch",
-          "width" : 1
-        },
-        "mode" : "9-part"
-      },
       "scale" : "1x"
     },
     {
-      "filename" : "bubble_24_blue 1.png",
       "idiom" : "universal",
-      "resizing" : {
-        "cap-insets" : {
-          "bottom" : 72,
-          "left" : 72,
-          "right" : 72,
-          "top" : 72
-        },
-        "center" : {
-          "height" : 1,
-          "mode" : "stretch",
-          "width" : 1
-        },
-        "mode" : "9-part"
-      },
       "scale" : "2x"
     },
     {
