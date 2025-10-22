@@ -108,10 +108,15 @@ final class TicketView: UIView {
     private func updateGradientColors() {
         let colorInfo: [NSNumber: CGColor] = [
             0.0: gradientColorMedium,    // 0시
+            0.083: gradientColorCold,    // 1시
             0.16: gradientColorCold,     // 2시
+            0.33: gradientColorMedium,   // 4시
             0.417: gradientColorHot,     // 5시
             0.5: gradientColorMedium,    // 6시
+            0.583: gradientColorCold,    // 7시
             0.66: gradientColorCold,     // 8시
+            0.75: gradientColorCold,     // 9시
+            0.83: gradientColorMedium,   // 10시
             0.917: gradientColorHot,     // 11시
             1.0: gradientColorMedium,    // 12시
         ]
