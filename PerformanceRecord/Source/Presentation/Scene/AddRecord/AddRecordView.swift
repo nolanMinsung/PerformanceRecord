@@ -81,7 +81,7 @@ extension AddRecordView: BaseViewSettings {
         viewedDatePicker.calendar = Calendar(identifier: .gregorian)
         viewedDatePicker.locale = Locale(identifier: "ko_KR")
         
-        ratingView.setRating(3.5)
+        ratingView.setRating(5.0)
         
         var saveButtonConfig = UIButton.Configuration.plain()
         saveButtonConfig.title = "새 기록 만들기"

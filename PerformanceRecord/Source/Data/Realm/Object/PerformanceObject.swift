@@ -202,7 +202,7 @@ extension PerformanceObject {
                 let linkObject = RelatedLinkObject()
                 linkObject.name = link.name
                 linkObject.url = link.url
-                // Inverse Relationship은 자동으로 설정됩니다.
+                // Inverse Relationship은 자동으로 설정됨.
                 return linkObject
             }
             object.relatedLinks.append(objectsIn: relatedLinkObjects)
