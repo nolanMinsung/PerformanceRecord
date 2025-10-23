@@ -28,6 +28,13 @@ class AddedPhotoCell: UICollectionViewCell, ViewShrinkable {
         return iv
     }()
     
+    var isEditable: Bool = true {
+        didSet {
+            deleteButton.isHidden = !isEditable
+            contentView.alpha = isEditable ? 1.0 : 0.6
+        }
+    }
+    
     private lazy var deleteButton: ShrinkableButton = {
         let button = ShrinkableButton(type: .system)
         button.setImage(UIImage(systemName: "xmark.circle.fill"), for: .normal)

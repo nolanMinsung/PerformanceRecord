@@ -1,56 +1,36 @@
 //
-//  AddRecordViewController.swift
-//  Muyeon
+//  EditRecordViewController.swift
+//  PerformanceRecord
 //
-//  Created by 김민성 on 10/6/25.
+//  Created by 김민성 on 10/23/25.
 //
 
 import UIKit
-import PhotosUI
 
 import RxSwift
 import RxCocoa
-import SnapKit
 
-enum AddRecordError: LocalizedError {
-    case unsupportedImageExtension
-    case dataConvertingToImageFailed
-    
-    var errorDescription: String? {
-        switch self {
-        case .unsupportedImageExtension:
-            return "지원하지 않는 이미지 확장자 파일입니다."
-        case .dataConvertingToImageFailed:
-            return "데이터를 이미지로 변환하는 데 실패했습니다."
-        }
-    }
-}
-
-class AddRecordViewController: UIViewController {
+final class EditRecordViewController: UIViewController {
     
     private let rootView: AddRecordView
     private let container: DIContainer
-    private let viewModel: AddRecordViewModel
+    private let viewModel: EditRecordViewModel
     
     // 데이터 프로퍼티
-    private let performance: Performance
-    private var addedImageData = PublishRelay<[ImageDataForSaving]>()
-    private var phPickerSelected = PublishRelay<[PHPickerResult]>()
-    private var deleteImageData = PublishRelay<IndexPath>()
     private var currentSelectedImage: [UIImage] = []
     
     private let disposeBag = DisposeBag()
     
     var onRecordDataChanged: (() -> Void)?
     
-    init(performance: Performance, container: DIContainer, image: UIImage? = nil) {
-        self.performance = performance
+    init(performance: Performance, container: DIContainer, record: Record) {
         self.rootView = AddRecordView(performance: performance)
         self.container = container
-        self.viewModel = AddRecordViewModel(
+        self.viewModel = EditRecordViewModel(
             performance: performance,
-            createRecordUseCase: container.resolve(type: CreateRecordUseCase.self),
-            processUserSelectedImageUseCase: container.resolve(type: ProcessUserSelectedImageUseCase.self)
+            record: record,
+            fetchRecordImagesUseCase: container.resolve(type: FetchRecordImagesUseCase.self),
+            updateRecordUseCase: container.resolve(type: UpdateRecordUseCase.self)
         )
         super.init(nibName: nil, bundle: nil)
     }
@@ -78,17 +58,26 @@ class AddRecordViewController: UIViewController {
     }
     
     private func bind() {
-        let input = AddRecordViewModel.Input(
+        let input = EditRecordViewModel.Input(
             viewedDate: rootView.viewedDatePicker.rx.date.asObservable().startWith(.now),
             ratingInput: rootView.ratingView.rating.asObservable().startWith(5.0),
             reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable().startWith(""),
-            phPickerSelected: phPickerSelected.asObservable(),
-            deleteImageData: deleteImageData.asObservable(),
             saveButtonTapped: rootView.saveButton.rx.tap.asObservable(),
             dismissButtonTapped: rootView.dismissButton.rx.tap.asObservable()
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.initialSetting
+            .observe(on: MainScheduler.instance)
+            .compactMap { $0 }
+            .bind(with: self, onNext: { owner, record in
+                owner.rootView.viewedDatePicker.date = record.viewedAt
+                owner.rootView.ratingView.setRating(record.rating)
+                owner.rootView.memoTextView.text = record.reviewText
+                owner.rootView.saveButton.setTitle("기록 업데이트하기", for: .normal)
+            })
+            .disposed(by: disposeBag)
         
         output.selectedImage
             .observe(on: MainScheduler.instance)
@@ -100,7 +89,7 @@ class AddRecordViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        output.successCreateRecord
+        output.successEditingRecord
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, _ in
                 owner.onRecordDataChanged?()
@@ -131,38 +120,15 @@ class AddRecordViewController: UIViewController {
                     owner.rootView.imageAddBox.isHidden = true
                     owner.rootView.imageLoadingIndicator.isHidden = false
                     owner.rootView.imageLoadingIndicator.startAnimating()
-                    owner.presentImagePicker()
                 }
             )
             .disposed(by: disposeBag)
     }
     
-    // MARK: - Logic
-    private func presentImagePicker() {
-        var config = PHPickerConfiguration()
-        config.selectionLimit = 5 - currentSelectedImage.count
-        config.filter = .images
-        let picker = PHPickerViewController(configuration: config)
-        picker.isModalInPresentation = true
-        picker.delegate = self
-        present(picker, animated: true)
-    }
-    
 }
-
-// MARK: - PHPickerViewControllerDelegate
-extension AddRecordViewController: PHPickerViewControllerDelegate {
-    
-    func picker(_ picker: PHPickerViewController, didFinishPicking results: [PHPickerResult]) {
-        picker.dismiss(animated: true)
-        phPickerSelected.accept(results)
-    }
-    
-}
-
 
 // MARK: - UICollectionViewDataSource
-extension AddRecordViewController: UICollectionViewDataSource {
+extension EditRecordViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return currentSelectedImage.count
     }
@@ -173,18 +139,14 @@ extension AddRecordViewController: UICollectionViewDataSource {
             for: indexPath
         ) as? AddedPhotoCell else { return UICollectionViewCell() }
         cell.imageView.image = currentSelectedImage[indexPath.item]
-        cell.isEditable = true
-        cell.onDelete = { [weak self] in
-            guard let self = self else { return }
-            self.deleteImageData.accept(indexPath)
-        }
+        cell.isEditable = false
         return cell
     }
 }
 
 
 // MARK: - UICollectionViewDelegate
-extension AddRecordViewController: UICollectionViewDelegate {
+extension EditRecordViewController: UICollectionViewDelegate {
     
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let selectedTempImage = currentSelectedImage[indexPath.item]
@@ -194,9 +156,10 @@ extension AddRecordViewController: UICollectionViewDelegate {
     
 }
 
-extension AddRecordViewController: UITextViewDelegate {
+extension EditRecordViewController: UITextViewDelegate {
     func textViewDidChange(_ textView: UITextView) {
         // 텍스트뷰 높이 자동 조절을 위해 레이아웃 업데이트
         self.view.layoutIfNeeded()
     }
 }
+
