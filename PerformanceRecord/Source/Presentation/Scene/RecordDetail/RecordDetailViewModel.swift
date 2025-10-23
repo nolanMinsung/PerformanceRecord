@@ -22,6 +22,7 @@ final class RecordDetailViewModel {
         let performanceUIModel: Observable<RecordDetailPerformanceUIModel>
         let recordUIModels: Observable<[RecordDetailUIModel]>
         let addNewRecord: Observable<RecordDetailPerformanceUIModel>
+        let editRecord: Observable<(performanceUIModel: RecordDetailPerformanceUIModel, recordUIModel: RecordDetailUIModel)>
         let error: Observable<any Error>
     }
     
@@ -59,6 +60,7 @@ final class RecordDetailViewModel {
         let performanceUIModelRelay = PublishRelay<RecordDetailPerformanceUIModel>()
         let recordUIModelsRelay = BehaviorRelay<[RecordDetailUIModel]>(value: [])
         let addNewRecordRelay = PublishRelay<RecordDetailPerformanceUIModel>()
+        let editRecordRelay = PublishRelay<(performanceUIModel: RecordDetailPerformanceUIModel, recordUIModel: RecordDetailUIModel)>()
         let errorRelay = PublishRelay<any Error>()
         
         DefaultRecordRepository.shared.recordUpdated
@@ -103,6 +105,11 @@ final class RecordDetailViewModel {
             }
             .disposed(by: disposeBag)
         
+        input.editRecordAction
+            .withLatestFrom(performanceUIModelRelay, resultSelector: { return ($1, $0) })
+            .bind(to: editRecordRelay)
+            .disposed(by: disposeBag)
+        
         input.recordDeleteAction
             .bind(with: self, onNext: { owner, recordDetailUIModel in
                 Task {
@@ -135,6 +142,7 @@ final class RecordDetailViewModel {
             performanceUIModel: performanceUIModelRelay.asObservable(),
             recordUIModels: recordUIModelsRelay.asObservable(),
             addNewRecord: addNewRecordRelay.asObservable(),
+            editRecord: editRecordRelay.asObservable(),
             error: errorRelay.asObservable()
         )
     }

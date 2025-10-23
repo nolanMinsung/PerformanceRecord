@@ -69,7 +69,7 @@ final class RecordCell: SwipableCell {
         super.init(frame: frame)
         
         isLeftSwipeEnable = true
-        isRightSwipeEnable = false
+        isRightSwipeEnable = true
         
         setupUI()
         setupLayout()

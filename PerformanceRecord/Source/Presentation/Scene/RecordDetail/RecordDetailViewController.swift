@@ -178,6 +178,20 @@ private extension RecordDetailViewController {
             )
             .disposed(by: disposeBag)
         
+        output.editRecord
+            .observe(on: MainScheduler.instance)
+            .bind(with: self, onNext: { owner, performanceAndRecordData in
+                let editRecordVC = EditRecordViewController(
+                    performance: performanceAndRecordData.performanceUIModel.performance,
+                    container: owner.container,
+                    record: performanceAndRecordData.recordUIModel.record
+                )
+                editRecordVC.modalPresentationStyle = .custom
+                editRecordVC.transitioningDelegate = owner.addRecordVCTransitioningDelegate
+                owner.present(editRecordVC, animated: true)
+            })
+            .disposed(by: disposeBag)
+        
         output.error
             .bind { error in
                 print(error.localizedDescription)

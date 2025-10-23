@@ -58,6 +58,12 @@ class RecordMainViewController: UIViewController {
     }
     
     private func bind() {
+        DefaultRecordRepository.shared.recordUpdated
+            .bind(with: self) { owner, _ in
+                owner.recordsUpdateTrigger.accept(())
+            }
+            .disposed(by: disposeBag)
+        
         let input = RecordMainViewModel.Input(
             updateRecords: recordsUpdateTrigger.asObservable(),
             favoritesButtonTapped: favoritesButtonTapped.asObservable(),
@@ -299,9 +305,6 @@ extension RecordMainViewController: SelectPerformanceDelegate {
     // MARK: - SelectPerformanceDelegate
     func didSelectPerformance(_ performance: Performance) {
         let addRecordVC = AddRecordViewController(performance: performance, container: container)
-        addRecordVC.onRecordDataChanged = { [weak self] in
-            self?.recordsUpdateTrigger.accept(())
-        }
         addRecordVC.modalPresentationStyle = .custom
         addRecordVC.transitioningDelegate = addRecordVCTransitioningDelegate
         present(addRecordVC, animated: true)
