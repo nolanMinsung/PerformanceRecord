@@ -13,6 +13,7 @@ import RxRelay
 
 enum DefaultRecordRepositoryError: LocalizedError {
     case recordNotHavingPerformance
+    case recordNotFound
 }
 
 actor DefaultRecordRepository: RecordRepository {
@@ -90,6 +91,25 @@ actor DefaultRecordRepository: RecordRepository {
         let realm = try await Realm.open()
         return try realm.objects(RecordObject.self)
             .map { try $0.toDomain() }
+    }
+    
+    func updateRecord(id: String, viewedDate: Date?, rating: Double?, reviewText: String?) async throws {
+        let realm = try await Realm.open()
+        guard let recordObject = realm.object(ofType: RecordObject.self, forPrimaryKey: id) else {
+            throw DefaultRecordRepositoryError.recordNotFound
+        }
+        try realm.write {
+            if let viewedDate {
+                recordObject.viewedAt = viewedDate
+            }
+            if let rating {
+                recordObject.rating = rating
+            }
+            if let reviewText {
+                recordObject.reviewText = reviewText
+            }
+        }
+        recordUpdatedRelay.accept(())
     }
     
     func deleteRecord(_ record: Record) async throws {
