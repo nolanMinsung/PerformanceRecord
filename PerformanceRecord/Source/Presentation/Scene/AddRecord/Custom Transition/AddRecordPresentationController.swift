@@ -13,6 +13,7 @@ final class AddRecordPresentationController: UIPresentationController {
     
     private let dimmingView = UIView()
     private let blurView = UIVisualEffectView(effect: nil)
+    private var blurAnimator: UIViewPropertyAnimator!
     
     override init(presentedViewController: UIViewController, presenting presentingViewController: UIViewController?) {
         super.init(presentedViewController: presentedViewController, presenting: presentingViewController)
@@ -39,11 +40,25 @@ final class AddRecordPresentationController: UIPresentationController {
             return
         }
         
+        blurAnimator = UIViewPropertyAnimator(
+            duration: 0.5 * 2,
+            controlPoint1: .init(x: 0.2, y: 0.5),
+            controlPoint2: .init(x: 0.7, y: 0.0)
+        )
+        blurAnimator.addAnimations { [weak self] in
+            guard let self else { return }
+            self.blurView.effect = UIBlurEffect(style: .systemUltraThinMaterial)
+        }
+        blurAnimator.startAnimation()
+        
         coordinator.animate { [weak self] context in
             guard let self else { return }
             self.dimmingView.alpha = 0.4
-            self.blurView.effect = UIBlurEffect(style: .systemUltraThinMaterial)
         }
+    }
+    
+    override func presentationTransitionDidEnd(_ completed: Bool) {
+        blurAnimator.stopAnimation(true)
     }
     
     override func dismissalTransitionWillBegin() {

@@ -17,7 +17,7 @@ class AddRecordView: UIView {
     let scrollView = UIScrollView()
     let contentStackView = UIStackView()
     private let ticketView = TicketView()
-    let ticketBlurBackground = UIVisualEffectView(effect: UIBlurEffect(style: .extraLight))
+    let ticketBlurBackground = UIVisualEffectView(effect: UIBlurEffect(style: .systemChromeMaterial))
     let viewedDatePicker = UIDatePicker()
     let ratingView = StarRatingView()
     let memoTextView = UITextView()
@@ -95,7 +95,7 @@ extension AddRecordView: BaseViewSettings {
         })
         saveButton.configuration = saveButtonConfig
         saveButton.layer.cornerRadius = 24
-        // saveButton은 약간
+        // saveButton은 약간 밝게 표시하기 위해 반투명한 subView 추가
         let saveButtonWhiteningView = UIView()
         saveButtonWhiteningView.backgroundColor = .white
         saveButtonWhiteningView.alpha = 0.1
