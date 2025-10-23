@@ -11,6 +11,7 @@ struct UseCaseAssembly: Assembly {
         let imageRepository = container.resolve(type: ImageRepository.self)
         let performanceRepository = container.resolve(type: PerformanceRepository.self)
         let recordRepository = container.resolve(type: RecordRepository.self)
+        let imageDataSource = container.resolve(type: LocalImageDataSource.self)
         
         container.register(
             type: CreateRecordUseCase.self,
@@ -78,6 +79,11 @@ struct UseCaseAssembly: Assembly {
         )
         
         container.register(
+            type: FetchRecordImagesUseCase.self,
+            { return DefaultFetchRecordImagesUseCase(imageDataSource: imageDataSource) }
+        )
+        
+        container.register(
             type: FetchRecordsUseCase.self,
             { return DefaultFetchRecordsUseCase(recordRepository: recordRepository) }
         )
@@ -105,6 +111,11 @@ struct UseCaseAssembly: Assembly {
         container.register(
             type: TogglePerformanceLikeUseCase.self,
             { return DefaultTogglePerformanceLikeUseCase(performanceRepository: performanceRepository) }
+        )
+        
+        container.register(
+            type: UpdateRecordUseCase.self,
+            { return DefaultUpdateRecordUseCase(recordRepository: recordRepository) }
         )
     }
     
