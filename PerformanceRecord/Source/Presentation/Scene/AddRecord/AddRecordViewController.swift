@@ -34,8 +34,6 @@ class AddRecordViewController: UIViewController {
     
     // 데이터 프로퍼티
     private let performance: Performance
-    private var selectedDate: Date = Date()
-    private var rating: Double = 5.0
     private var addedImageData = PublishRelay<[ImageDataForSaving]>()
     private var phPickerSelected = PublishRelay<[PHPickerResult]>()
     private var deleteImageData = PublishRelay<IndexPath>()
@@ -68,8 +66,9 @@ class AddRecordViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        bind()
+        setupDelegates()
         setupActions()
+        bind()
     }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -110,15 +109,19 @@ class AddRecordViewController: UIViewController {
             .disposed(by: disposeBag)
         
         output.shouldDismiss
+            .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, _ in
                 owner.dismiss(animated: true)
             })
             .disposed(by: disposeBag)
     }
     
-    private func setupActions() {
+    private func setupDelegates() {
         rootView.imagesCollectionView.dataSource = self
         rootView.imagesCollectionView.delegate = self
+    }
+    
+    private func setupActions() {
         rootView.imageBoxTapGesture.rx.event
             .filter { $0.state == .recognized }
             .bind(
