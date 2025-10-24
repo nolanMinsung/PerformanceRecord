@@ -20,6 +20,15 @@ class SwipableCell: UICollectionViewCell {
     private let horizontalInset: CGFloat = 0
     private let cornerRadius: CGFloat = 0
     
+    private let leftImageName: String = {
+        if #available(iOS 18.4, *) {
+            return "long.text.page.and.pencil"
+        } else {
+            return "ticket"
+        }
+    }()
+    private let rightImageName: String = "trash"
+    
     var isLeftSwipeEnable: Bool = true
     var isRightSwipeEnable: Bool = true
     var leftSwipeAction: (() -> Void)?
@@ -63,8 +72,8 @@ class SwipableCell: UICollectionViewCell {
     
     private var blueCirclePathLayer = CAShapeLayer()
     
-    private let addIconImageViewForBlueView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "long.text.page.and.pencil")?
+    private lazy var addIconImageViewForBlueView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: self.leftImageName)?
             .withTintColor(
                 .systemBackground.withAlphaComponent(1),
                 renderingMode: .alwaysOriginal
@@ -111,8 +120,8 @@ class SwipableCell: UICollectionViewCell {
     
     private var redCirclePathLayer = CAShapeLayer()
     
-    private let deleteIconImageViewForRedView: UIImageView = {
-        let imageView = UIImageView(image: UIImage(systemName: "trash")?
+    private lazy var deleteIconImageViewForRedView: UIImageView = {
+        let imageView = UIImageView(image: UIImage(systemName: rightImageName)?
             .withTintColor(
                 .systemBackground,
                 renderingMode: .alwaysOriginal
@@ -358,7 +367,7 @@ class SwipableCell: UICollectionViewCell {
         animator.addAnimations { [weak self] in
             guard let self else { return }
             circleViewForAddInteraction.backgroundColor = .systemBackground
-            addIconImageViewForBlueView.image = UIImage(systemName: "long.text.page.and.pencil")?.withTintColor(
+            addIconImageViewForBlueView.image = UIImage(systemName: leftImageName)?.withTintColor(
                 UIColor.systemBlue,
                 renderingMode: .alwaysOriginal
             )
@@ -373,7 +382,7 @@ class SwipableCell: UICollectionViewCell {
     private func emptyBlueCircle() {
         isBlueCircleFilled = false
         circleViewForAddInteraction.backgroundColor = .clear
-        addIconImageViewForBlueView.image = UIImage(systemName: "long.text.page.and.pencil")?.withTintColor(
+        addIconImageViewForBlueView.image = UIImage(systemName: leftImageName)?.withTintColor(
             UIColor.systemBackground,
             renderingMode: .alwaysOriginal
         )
@@ -390,7 +399,7 @@ class SwipableCell: UICollectionViewCell {
         animator.addAnimations { [weak self] in
             guard let self else { return }
             circleViewForDeleteInteraction.backgroundColor = .systemBackground
-            deleteIconImageViewForRedView.image = UIImage(systemName: "trash")?.withTintColor(
+            deleteIconImageViewForRedView.image = UIImage(systemName: rightImageName)?.withTintColor(
                 UIColor.systemRed,
                 renderingMode: .alwaysOriginal
             )
@@ -405,7 +414,7 @@ class SwipableCell: UICollectionViewCell {
     private func emptyRedCircle() {
         isRedCircleFilled = false
         circleViewForDeleteInteraction.backgroundColor = .clear
-        deleteIconImageViewForRedView.image = UIImage(systemName: "trash")?.withTintColor(
+        deleteIconImageViewForRedView.image = UIImage(systemName: rightImageName)?.withTintColor(
             UIColor.systemBackground,
             renderingMode: .alwaysOriginal
         )
