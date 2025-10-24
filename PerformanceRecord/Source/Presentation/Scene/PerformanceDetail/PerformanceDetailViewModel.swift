@@ -58,13 +58,14 @@ final class PerformanceDetailViewModel {
         }
         
         input.likeButtonTapped
-            .withLatestFrom(performanceDetail)
-            .bind(with: self) { owner, performance in
+            .bind(with: self) { owner, currentLikeState in
+                likeButtonStatusRelay.accept(!currentLikeState)
                 Task {
                     do {
                         let newLikeStatus = try await owner.togglePerformanceLikeUseCase.execute(performanceID: owner.performanceID)
                         likeButtonStatusRelay.accept(newLikeStatus)
                     } catch {
+                        likeButtonStatusRelay.accept(currentLikeState)
                         errorRelay.accept(error)
                     }
                 }

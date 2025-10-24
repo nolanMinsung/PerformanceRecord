@@ -54,6 +54,7 @@ private extension PerformanceDetailViewController {
     
     func bind() {
         let likeButtonTapped = rootView.likeButton.rx.tap.asObservable()
+            .throttle(.seconds(1), latest: false, scheduler: MainScheduler.instance)
             .withUnretained(rootView.likeButton) { button, _ in button }
             .map(\.isSelected)
             .share()
