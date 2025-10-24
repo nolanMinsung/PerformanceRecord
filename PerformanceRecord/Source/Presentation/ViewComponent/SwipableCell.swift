@@ -274,14 +274,18 @@ class SwipableCell: UICollectionViewCell {
             /*
              셀 너비의 55%이상 끌어왔을 때 시뮬레이터에서 동작하지 않는 경우가 있음.
              */
-            if swipeableView.frame.origin.x >= bounds.width * 0.54 {
+            let horizontalOffset = swipeableView.frame.origin.x
+            let ceilHorizontalOffset = ceil(horizontalOffset)
+            let floorHorizontalOffset = floor(horizontalOffset)
+            
+            if ceilHorizontalOffset >= bounds.width * 0.55 {
                 if !isBlueCircleFilled {
                     fillBlueCircle() {
                         sender.state = .ended
                     }
                 }
                 
-            } else if swipeableView.frame.origin.x < -bounds.width * 0.54 {
+            } else if floorHorizontalOffset < -bounds.width * 0.55 {
                 if !isRedCircleFilled {
                     fillRedCircle() {
                         sender.state = .ended
