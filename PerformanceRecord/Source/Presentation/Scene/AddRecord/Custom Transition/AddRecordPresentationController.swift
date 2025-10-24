@@ -58,7 +58,7 @@ final class AddRecordPresentationController: UIPresentationController {
     }
     
     override func presentationTransitionDidEnd(_ completed: Bool) {
-        blurAnimator.stopAnimation(true)
+        blurAnimator.pauseAnimation()
     }
     
     override func dismissalTransitionWillBegin() {
@@ -66,10 +66,16 @@ final class AddRecordPresentationController: UIPresentationController {
             return
         }
         
+        blurAnimator.isReversed = true
+        let reverseSpringTimingParameter = UICubicTimingParameters(
+            controlPoint1: .init(x: 0.6, y: 0.0),
+            controlPoint2: .init(x: 0.75, y: 0.0)
+        )
+        blurAnimator.continueAnimation(withTimingParameters: reverseSpringTimingParameter, durationFactor: 0.3)
+        
         coordinator.animate { [weak self] context in
             guard let self else { return }
             self.dimmingView.alpha = 0.0
-            self.blurView.effect = nil
         }
     }
     

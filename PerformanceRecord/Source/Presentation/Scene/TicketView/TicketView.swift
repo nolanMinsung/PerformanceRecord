@@ -32,7 +32,7 @@ final class TicketView: UIView {
     }
     
     
-    var gradientColorHot: CGColor = UIColor.white.withAlphaComponent(0.5).cgColor {
+    var gradientColorHot: CGColor = UIColor.white.withAlphaComponent(0.7).cgColor {
         didSet {
             updateGradientColors()
         }
@@ -44,7 +44,7 @@ final class TicketView: UIView {
         }
     }
     
-    var gradientColorCold: CGColor = UIColor.white.withAlphaComponent(0.0).cgColor {
+    var gradientColorCold: CGColor = UIColor.white.withAlphaComponent(0.1).cgColor {
         didSet {
             updateGradientColors()
         }
