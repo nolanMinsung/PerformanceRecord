@@ -23,6 +23,7 @@ class AddRecordView: UIView {
     let memoTextView = UITextView()
     private(set) var imagesCollectionView: UICollectionView!
     let imageAddBox = UIView()
+    let imageStatusLabel = UILabel()
     let imageLoadingIndicator = UIActivityIndicatorView(style: .large)
     let saveButton = BubbleButton()
     let dismissButton = BubbleButton()
@@ -265,11 +266,10 @@ extension AddRecordView: BaseViewSettings {
         let icon = UIImageView(image: UIImage(systemName: "photo"))
         icon.tintColor = .secondaryLabel
         
-        let label = UILabel()
-        label.text = "이미지 추가 (0/5)"
-        label.textColor = .secondaryLabel
+        imageStatusLabel.text = "이미지 추가 (0/5)"
+        imageStatusLabel.textColor = .secondaryLabel
         
-        let stack = UIStackView(arrangedSubviews: [icon, label])
+        let stack = UIStackView(arrangedSubviews: [icon, imageStatusLabel])
         stack.axis = .vertical
         stack.spacing = 8
         stack.alignment = .center
@@ -288,7 +288,7 @@ extension AddRecordView: BaseViewSettings {
 
 extension AddRecordView {
     
-    func updatePhotoSection(imageCount: Int) {
+    func updatePhotoSection(imageCount: Int, isCreatingNewRecord: Bool = true) {
         let hasImages = imageCount > 0
         imagesCollectionView.isHidden = !hasImages
         imageAddBox.isHidden = hasImages
@@ -297,12 +297,13 @@ extension AddRecordView {
         imagesCollectionView.reloadData()
         
         // 이미지 추가 박스의 레이블 업데이트
-        if let label = imageAddBox.subviews
-            .compactMap({ $0 as? UIStackView })
-            .first?.arrangedSubviews
-            .compactMap({ $0 as? UILabel }).first {
-            label.text = "이미지 추가 (\(imageCount)/5)"
+        var imageStatusText: String
+        if isCreatingNewRecord {
+            imageStatusText = "이미지 추가 (\(imageCount)/5)"
+        } else {
+            imageStatusText = "추가했던 이미지가 없어요"
         }
+        imageStatusLabel.text = imageStatusText
     }
     
 }

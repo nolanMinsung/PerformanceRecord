@@ -22,7 +22,7 @@ final class EditRecordViewModel {
     
     struct Output {
         let initialSetting: Observable<Record>
-        let selectedImage: Observable<[UIImage]>
+        let recordImage: Observable<[UIImage]>
         let successEditingRecord: Observable<Void>
         let shouldDismiss: Observable<Void>
         let errorRelay: Observable<any Error>
@@ -48,7 +48,7 @@ final class EditRecordViewModel {
     
     func transform(input: Input) -> Output {
 //        let currentImageData = BehaviorRelay<[ImageDataForSaving]>(value: [])
-        let selectedImages = PublishRelay<[UIImage]>()
+        let recordImages = BehaviorRelay<[UIImage]>(value: [])
         let successCreateRecord = PublishRelay<Void>()
 //        let saveButtonTapped = PublishRelay<Void>()
         let editingButtonTapped = PublishRelay<String>() // record ID 를 같이 전달
@@ -59,44 +59,8 @@ final class EditRecordViewModel {
         
         Task {
             let images = try await self.fetchRecordImagesUseCase.execute(record: record)
-            selectedImages.accept(images)
+            recordImages.accept(images)
         }
-        
-        
-//        let addedImageStream: Observable<[UIImage]> = currentImageData
-//            .flatMap { array -> Observable<[UIImage]> in
-//                return Observable<[UIImage]>.create { observer in
-//                    do {
-//                        let convertedArray = try array.map { dataForSaving in
-//                            guard let image = UIImage(data: dataForSaving.data) else {
-//                                throw AddRecordError.dataConvertingToImageFailed
-//                            }
-//                            return image
-//                        }
-//                        observer.onNext(convertedArray)
-//                        return Disposables.create()
-//                    } catch {
-//                        observer.onError(error)
-//                        return Disposables.create()
-//                    }
-//                }
-//                .catch { error in
-//                    errorRelay.accept(error)
-//                    return Observable<[UIImage]>.never()
-//                }
-//            }
-//            .bind(to: selectedImages)
-//            .disposed(by: disposeBag)
-        
-//        input.deleteImageData
-//            .map(\.item)
-//            .map { deletingIndex in
-//                var currentData = currentImageData.value
-//                currentData.remove(at: deletingIndex)
-//                return currentData
-//            }
-//            .bind(to: currentImageData)
-//            .disposed(by: disposeBag)
         
         let recordDataStream = Observable.combineLatest(
             input.viewedDate,
@@ -104,54 +68,11 @@ final class EditRecordViewModel {
             input.reviewText
         )
         
-        let createdRecordDataStream = recordDataStream
-            .withUnretained(self)
-            .map { owner, data in
-                let (viewedDate, rating, reviewText) = data
-                return Record(
-                    id: UUID().uuidString,
-                    performanceID: owner.performance.id,
-                    createdAt: .now,
-                    viewedAt: viewedDate,
-                    rating: rating,
-                    reviewText: reviewText,
-                    recordImageUUIDs: []
-                )
-            }
-        
         input.saveButtonTapped
             .bind(with: self, onNext: { owner, _ in
                 editingButtonTapped.accept(owner.record.id)
-//                switch owner.editingMode {
-//                case .creatingNew:
-//                    createdButtonTapped.accept(())
-//                case .editing(recordUIModel: let recordUIModel):
-//                }
             })
             .disposed(by: disposeBag)
-        
-        
-//        saveButtonTapped
-//            .withLatestFrom(createdRecordDataStream)
-//            .withLatestFrom(
-//                currentImageData,
-//                resultSelector: { record, imageDataList in
-//                    return (record, imageDataList)
-//                })
-//            .bind(
-//                with: self,
-//                onNext: { owner, data in
-//                    let (record, imageDataList) = data
-//                    Task {
-//                        do {
-//                            try await owner.createRecordUseCase.execute(record: record, imageData: imageDataList)
-//                            successCreateRecord.accept(())
-//                        } catch {
-//                            errorRelay.accept(error)
-//                        }
-//                    }
-//                })
-//            .disposed(by: disposeBag)
         
         editingButtonTapped
             .withLatestFrom(recordDataStream, resultSelector: { ($0, $1) })
@@ -182,7 +103,7 @@ final class EditRecordViewModel {
         
         return .init(
             initialSetting: initialSetting,
-            selectedImage: selectedImages.asObservable(),
+            recordImage: recordImages.asObservable(),
             successEditingRecord: successCreateRecord.asObservable(),
             shouldDismiss: shouldDismissRelay.asObservable(),
             errorRelay: errorRelay.asObservable()

@@ -47,7 +47,6 @@ final class EditRecordViewController: UIViewController {
         super.viewDidLoad()
         
         setupDelegates()
-        setupActions()
         bind()
     }
     
@@ -79,12 +78,12 @@ final class EditRecordViewController: UIViewController {
             })
             .disposed(by: disposeBag)
         
-        output.selectedImage
+        output.recordImage
             .observe(on: MainScheduler.instance)
             .bind(with: self, onNext: { owner, images in
                 owner.currentSelectedImage = images
                 owner.rootView.imagesCollectionView.reloadData()
-                owner.rootView.updatePhotoSection(imageCount: images.count)
+                owner.rootView.updatePhotoSection(imageCount: images.count, isCreatingNewRecord: false)
                 owner.rootView.saveButton.isEnabled = true
             })
             .disposed(by: disposeBag)
@@ -108,21 +107,6 @@ final class EditRecordViewController: UIViewController {
     private func setupDelegates() {
         rootView.imagesCollectionView.dataSource = self
         rootView.imagesCollectionView.delegate = self
-    }
-    
-    private func setupActions() {
-        rootView.imageBoxTapGesture.rx.event
-            .filter { $0.state == .recognized }
-            .bind(
-                with: self,
-                onNext: { owner, gesture in
-                    owner.rootView.saveButton.isEnabled = false
-                    owner.rootView.imageAddBox.isHidden = true
-                    owner.rootView.imageLoadingIndicator.isHidden = false
-                    owner.rootView.imageLoadingIndicator.startAnimating()
-                }
-            )
-            .disposed(by: disposeBag)
     }
     
 }
