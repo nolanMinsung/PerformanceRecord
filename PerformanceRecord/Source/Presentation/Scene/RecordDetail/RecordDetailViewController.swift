@@ -88,12 +88,11 @@ extension RecordDetailViewController {
             // left Swipe 핸들러 설정
             cell.leftSwipeAction = { [weak self] in
                 guard let self else { return }
-                deleteRecord.accept(recordUIModel)
+                self.confirmDeleteRecord(model: recordUIModel)
             }
             
             cell.rightSwipeAction = { [weak self] in
                 guard let self else { return }
-                debugPrint("right swipe aciton detected")
                 self.editRecord.accept(recordUIModel)
             }
         }
@@ -206,6 +205,35 @@ private extension RecordDetailViewController {
         snapshot.reloadSections([.main])
         snapshot.appendItems(records)
         dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func confirmDeleteRecord(model: RecordDetailUIModel) {
+        var recordOverviewText: String? = nil
+        let reviewText = model.record.reviewText
+        if reviewText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            recordOverviewText = nil
+        } else {
+            let prefix = String(reviewText.prefix(6))
+            if prefix.count != reviewText.count {
+                recordOverviewText = "\(prefix)... "
+            } else {
+                recordOverviewText = "\(prefix) "
+            }
+        }
+        let alertCont = UIAlertController(
+            title: "공연 기록 삭제",
+            message: "\(recordOverviewText ?? "")기록을 삭제하시겠어요?",
+            preferredStyle: .alert
+        )
+        
+        let deleteAction = UIAlertAction(title: "삭제", style: .destructive) { [weak self] action in
+            guard let self else { return }
+            self.deleteRecord.accept(model)
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel)
+        alertCont.addAction(deleteAction)
+        alertCont.addAction(cancelAction)
+        present(alertCont, animated: true)
     }
     
 }
