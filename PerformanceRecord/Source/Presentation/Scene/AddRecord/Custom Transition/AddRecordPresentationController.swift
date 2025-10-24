@@ -41,7 +41,7 @@ final class AddRecordPresentationController: UIPresentationController {
         }
         
         blurAnimator = UIViewPropertyAnimator(
-            duration: 0.5 * 2,
+            duration: 0.5 * 4,
             controlPoint1: .init(x: 0.2, y: 0.5),
             controlPoint2: .init(x: 0.7, y: 0.0)
         )
@@ -67,11 +67,17 @@ final class AddRecordPresentationController: UIPresentationController {
         }
         
         blurAnimator.isReversed = true
-        let reverseSpringTimingParameter = UICubicTimingParameters(
-            controlPoint1: .init(x: 0.6, y: 0.0),
-            controlPoint2: .init(x: 0.75, y: 0.0)
-        )
-        blurAnimator.continueAnimation(withTimingParameters: reverseSpringTimingParameter, durationFactor: 0.3)
+        let springTimingParameter = UISpringTimingParameters(dampingRatio: 1)
+        if blurAnimator.state == .active {
+            blurAnimator.continueAnimation(withTimingParameters: springTimingParameter, durationFactor: 0.25)
+        } else {
+            // 앱을 나갔다 들어오거나 화면을 껐다 킨 경우 -> animator의 state가 .active가 아님
+            // (pause해놓은 설정이 풀리며 completionHandler 호출)
+            UIView.springAnimate(withDuration: 0.5) { [weak self] in
+                guard let self else { return }
+                self.blurView.effect = nil
+            }
+        }
         
         coordinator.animate { [weak self] context in
             guard let self else { return }
