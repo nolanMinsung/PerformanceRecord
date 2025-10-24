@@ -21,6 +21,7 @@ final class HomeView: UIView {
     private let top10TitleLabel = UILabel()
     private let trendingPerformanceTitleLabel = UILabel()
     private(set) var homeCollectionView: WispableCollectionView!
+    let blurView = UIVisualEffectView(effect: nil)
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,14 +51,21 @@ extension HomeView: BaseViewSettings {
         
         trendingPerformanceTitleLabel.text = "지금 뜨는 공연"
         trendingPerformanceTitleLabel.font = .systemFont(ofSize: 25, weight: .bold)
+        
+        blurView.isUserInteractionEnabled = false
     }
     
     func setupHierarchy() {
         addSubview(homeCollectionView)
+        addSubview(blurView)
     }
     
     func setupLayoutConstraints() {
         homeCollectionView.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
+        blurView.snp.makeConstraints { make in
             make.edges.equalToSuperview()
         }
     }

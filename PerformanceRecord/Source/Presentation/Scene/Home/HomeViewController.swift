@@ -28,6 +28,7 @@ class HomeViewController: UIViewController {
     private let disposeBag = DisposeBag()
     private let container: DIContainer
     private var viewModel: HomeViewModel
+    private var blurAnimator: UIViewPropertyAnimator? = nil
     
     private var dataSource: DiffableDataSource!
     
@@ -54,6 +55,7 @@ class HomeViewController: UIViewController {
         super.viewDidLoad()
         
         navigationController?.navigationBar.isHidden = true
+        wisp.delegate = self
         setupCollectionView()
         bind()
         
@@ -248,12 +250,67 @@ private extension HomeViewController {
                     layout.initialCornerRadius = 5
                 }
             }
+            startBlurAnimation(duration: 0.5)
             wisp.present(
                 naviCon,
                 collectionView: rootView.homeCollectionView,
                 at: indexPath,
                 configuration: wispConfig
             )
+        }
+    }
+    
+}
+
+
+
+// MARK: - Blur Animation
+private extension HomeViewController {
+    
+    func startBlurAnimation(duration: TimeInterval) {
+        if let blurAnimator {
+            blurAnimator.stopAnimation(true)
+            blurAnimator.finishAnimation(at: .current)
+            self.blurAnimator = nil
+            self.rootView.blurView.effect = nil
+        }
+        let createdBlurAnimator = UIViewPropertyAnimator(
+            duration: duration * 4,
+            controlPoint1: .init(x: 0.2, y: 0.5),
+            controlPoint2: .init(x: 0.7, y: 0.0)
+        )
+        
+        createdBlurAnimator.addAnimations { [weak self] in
+            guard let self else { return }
+            self.rootView.blurView.effect = UIBlurEffect(style: .systemUltraThinMaterial)
+        }
+        self.blurAnimator = createdBlurAnimator
+        createdBlurAnimator.startAnimation()
+        DispatchQueue.main.asyncAfter(deadline: .now() + duration) { [weak self] in
+            guard let self else { return }
+            guard let blurAnimator else { return }
+            guard !blurAnimator.isReversed else { return }
+            blurAnimator.pauseAnimation()
+        }
+    }
+    
+    func startBlurRemoving() {
+        guard let blurAnimator else {
+            self.rootView.blurView.effect = nil
+            return
+        }
+        blurAnimator.pauseAnimation()
+        blurAnimator.isReversed = true
+        let springTimingParameter = UISpringTimingParameters(dampingRatio: 1)
+        if blurAnimator.state == .active {
+            blurAnimator.continueAnimation(withTimingParameters: springTimingParameter, durationFactor: 0.25)
+        } else {
+            // 앱을 나갔다 들어오거나 화면을 껐다 킨 경우 -> animator의 state가 .active가 아님
+            // (pause해놓은 설정이 풀리며 completionHandler 호출)
+            UIView.springAnimate(withDuration: 0.5) { [weak self] in
+                guard let self else { return }
+                self.rootView.blurView.effect = nil
+            }
         }
     }
     
@@ -277,6 +334,20 @@ extension HomeViewController: UICollectionViewDelegate {
             return false
         }
         return true
+    }
+    
+}
+
+
+// MARK: - WispPresenterDelegate
+extension HomeViewController: WispPresenterDelegate {
+    
+    func wispWillRestore() {
+        startBlurRemoving()
+    }
+    
+    func wispDidRestore() {
+        return
     }
     
 }
