@@ -12,11 +12,13 @@ import SnapKit
 class PerformanceHeaderView: UIView {
 
     // MARK: - UI Components
+    private let bubbleBackground = UIImageView(image: .bubble24Black)
+    
     private let posterImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.contentMode = .scaleAspectFill
         imageView.clipsToBounds = true
-        imageView.layer.cornerRadius = 8
+        imageView.layer.cornerRadius = 16
         imageView.backgroundColor = .lightGray
         return imageView
     }()
@@ -63,8 +65,7 @@ class PerformanceHeaderView: UIView {
     // MARK: - Initializer
     override init(frame: CGRect) {
         super.init(frame: frame)
-        backgroundColor = .systemBackground
-        layer.cornerRadius = 12
+        layer.cornerRadius = 24
         setupUI()
         setupLayout()
     }
@@ -82,12 +83,17 @@ class PerformanceHeaderView: UIView {
         mainStackView.addArrangedSubview(posterImageView)
         mainStackView.addArrangedSubview(infoStackView)
         
+        addSubview(bubbleBackground)
         addSubview(mainStackView)
     }
 
     private func setupLayout() {
+        bubbleBackground.snp.makeConstraints { make in
+            make.edges.equalToSuperview()
+        }
+        
         posterImageView.snp.makeConstraints { make in
-            make.width.equalTo(60)
+            make.width.equalTo(80)
             make.height.equalTo(posterImageView.snp.width).multipliedBy(1.4)
         }
         

@@ -12,7 +12,7 @@ import SnapKit
 class StatItemView: UIView {
     
     private let bubbleBackground: UIImageView = {
-        let imageView = UIImageView(image: .bubble32)
+        let imageView = UIImageView(image: .bubble32Black)
         return imageView
     }()
     

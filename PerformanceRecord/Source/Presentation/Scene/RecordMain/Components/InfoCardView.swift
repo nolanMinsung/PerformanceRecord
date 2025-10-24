@@ -12,7 +12,7 @@ import SnapKit
 // MARK: - 정보 카드 뷰 (최근/최다 관람 등)
 class InfoCardView: UIControl, ViewShrinkable {
     private let bubbleBackground: UIImageView = {
-        let imageView = UIImageView(image: .bubble32)
+        let imageView = UIImageView(image: .bubble32Blue)
         return imageView
     }()
     

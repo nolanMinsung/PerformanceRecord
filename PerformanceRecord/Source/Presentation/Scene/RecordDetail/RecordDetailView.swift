@@ -56,7 +56,7 @@ class RecordDetailView: UIView {
     
     private func setupLayout() {
         performanceInfoView.snp.makeConstraints {
-            $0.top.equalTo(self.safeAreaLayoutGuide).inset(30)
+            $0.top.equalTo(self.safeAreaLayoutGuide).inset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         
