@@ -19,6 +19,7 @@ final class EditRecordViewController: UIViewController {
     // 데이터 프로퍼티
     private var currentSelectedImage: [UIImage] = []
     
+    private let viewDateRelay = PublishRelay<Date>()
     private let disposeBag = DisposeBag()
     
     var onRecordDataChanged: (() -> Void)?
@@ -57,10 +58,14 @@ final class EditRecordViewController: UIViewController {
     }
     
     private func bind() {
+        rootView.viewedDatePicker.rx.date
+            .bind(to: viewDateRelay)
+            .disposed(by: disposeBag)
+        
         let input = EditRecordViewModel.Input(
-            viewedDate: rootView.viewedDatePicker.rx.date.asObservable().startWith(.now),
-            ratingInput: rootView.ratingView.rating.asObservable().startWith(5.0),
-            reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable().startWith(""),
+            viewedDate: viewDateRelay.asObservable(),
+            ratingInput: rootView.ratingView.rating.asObservable(),
+            reviewText: rootView.memoTextView.rx.text.orEmpty.asObservable(),
             saveButtonTapped: rootView.saveButton.rx.tap.asObservable(),
             dismissButtonTapped: rootView.dismissButton.rx.tap.asObservable()
         )
@@ -72,6 +77,7 @@ final class EditRecordViewController: UIViewController {
             .compactMap { $0 }
             .bind(with: self, onNext: { owner, record in
                 owner.rootView.viewedDatePicker.date = record.viewedAt
+                owner.viewDateRelay.accept(record.viewedAt)
                 owner.rootView.ratingView.setRating(record.rating)
                 owner.rootView.memoTextView.text = record.reviewText
                 owner.rootView.saveButton.setTitle("기록 업데이트하기", for: .normal)

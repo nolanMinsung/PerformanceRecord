@@ -63,9 +63,9 @@ final class EditRecordViewModel {
         }
         
         let recordDataStream = Observable.combineLatest(
-            input.viewedDate,
-            input.ratingInput,
-            input.reviewText
+            input.viewedDate/*.startWith(record.viewedAt)*/,
+            input.ratingInput/*.startWith(record.rating)*/,
+            input.reviewText/*.startWith(record.reviewText)*/,
         )
         
         input.saveButtonTapped
