@@ -346,8 +346,4 @@ extension HomeViewController: WispPresenterDelegate {
         startBlurRemoving()
     }
     
-    func wispDidRestore() {
-        return
-    }
-    
 }
