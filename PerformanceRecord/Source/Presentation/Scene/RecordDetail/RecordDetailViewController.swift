@@ -136,12 +136,23 @@ private extension RecordDetailViewController {
     
     func bind() {
         let input = RecordDetailViewModel.Input(
+            backButtonTrigger: rootView.backButton.rx.tap.asObservable(),
             addRecordTrigger: rootView.addRecordButton.rx.tap.asObservable(),
             editRecordAction: editRecord.asObservable(),
             recordDeleteAction: deleteRecord.asObservable()
         )
         
         let output = viewModel.transform(input: input)
+        
+        output.pop
+            .observe(on: MainScheduler.instance)
+            .bind(
+                with: self,
+                onNext: { owner, _ in
+                    owner.navigationController?.popViewController(animated: true)
+                }
+            )
+            .disposed(by: disposeBag)
         
         output.performanceUIModel
             .observe(on: MainScheduler.instance)

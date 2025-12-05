@@ -11,8 +11,18 @@ import SnapKit
 
 class RecordDetailView: UIView {
     
+    private let isRunningOnIpad = UIDevice.current.model.contains("iPad")
+    
     // MARK: - UI Components
     private let performanceInfoView = PerformanceHeaderView()
+    
+    let backButton: UIButton  = {
+        var config = UIButton.Configuration.plain()
+        config.baseForegroundColor = .black
+        config.image = UIImage(systemName: "chevron.backward")
+        let button = UIButton(configuration: config)
+        return button
+    }()
     
     let addRecordButton: UIButton = {
         var config = UIButton.Configuration.filled()
@@ -49,14 +59,27 @@ class RecordDetailView: UIView {
     
     // MARK: - Setup
     private func setupUI() {
+        if isRunningOnIpad {
+            addSubview(backButton)
+        }
         addSubview(performanceInfoView)
         addSubview(addRecordButton)
         addSubview(collectionView)
     }
     
     private func setupLayout() {
+        if isRunningOnIpad {
+            backButton.snp.makeConstraints { make in
+                make.top.leading.equalTo(safeAreaLayoutGuide).inset(10)
+            }
+        }
+        
         performanceInfoView.snp.makeConstraints {
-            $0.top.equalTo(self.safeAreaLayoutGuide).inset(16)
+            if isRunningOnIpad {
+                $0.top.equalTo(backButton.snp.bottom).offset(8)
+            } else {
+                $0.top.equalTo(self.safeAreaLayoutGuide).inset(16)
+            }
             $0.leading.trailing.equalToSuperview().inset(16)
         }
         

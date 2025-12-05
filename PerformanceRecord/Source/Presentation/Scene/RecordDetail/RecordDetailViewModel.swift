@@ -13,12 +13,14 @@ import RxCocoa
 final class RecordDetailViewModel {
     
     struct Input {
+        let backButtonTrigger: Observable<Void>
         let addRecordTrigger: Observable<Void>
         let editRecordAction: Observable<RecordDetailUIModel>
         let recordDeleteAction: Observable<RecordDetailUIModel>
     }
     
     struct Output {
+        let pop: Observable<Void>
         let performanceUIModel: Observable<RecordDetailPerformanceUIModel>
         let recordUIModels: Observable<[RecordDetailUIModel]>
         let addNewRecord: Observable<RecordDetailPerformanceUIModel>
@@ -57,6 +59,7 @@ final class RecordDetailViewModel {
     
     
     func transform(input: Input) -> Output {
+        let popRelay = PublishRelay<Void>()
         let performanceUIModelRelay = PublishRelay<RecordDetailPerformanceUIModel>()
         let recordUIModelsRelay = BehaviorRelay<[RecordDetailUIModel]>(value: [])
         let addNewRecordRelay = PublishRelay<RecordDetailPerformanceUIModel>()
@@ -65,6 +68,10 @@ final class RecordDetailViewModel {
         
         DefaultRecordRepository.shared.recordUpdated
             .bind(to: recordsUpdateTrigger)
+            .disposed(by: disposeBag)
+        
+        input.backButtonTrigger
+            .bind(to: popRelay)
             .disposed(by: disposeBag)
         
         recordsUpdateTrigger
@@ -139,6 +146,7 @@ final class RecordDetailViewModel {
         }
         
         return .init(
+            pop: popRelay.asObservable(),
             performanceUIModel: performanceUIModelRelay.asObservable(),
             recordUIModels: recordUIModelsRelay.asObservable(),
             addNewRecord: addNewRecordRelay.asObservable(),
