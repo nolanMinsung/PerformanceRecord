@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Alamofire
 
 struct BoxOfficeRequestParameter: ParameterConvertible {
     /// 발급받은 인증키

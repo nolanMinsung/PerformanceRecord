@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Alamofire
 
 struct FacilityListRequestParameter: ParameterConvertible {
     /// 발급받은 인증키

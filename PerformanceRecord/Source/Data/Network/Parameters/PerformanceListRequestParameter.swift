@@ -6,7 +6,6 @@
 //
 
 import Foundation
-import Alamofire
 
 struct PerformanceListRequestParameter: ParameterConvertible {
     let service = InfoPlist.apiKey
