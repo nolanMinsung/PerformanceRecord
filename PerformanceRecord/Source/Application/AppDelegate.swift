@@ -18,6 +18,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         Kingfisher.ImageCache.default.memoryStorage.config.countLimit = 100
+        Kingfisher.ImageCache.default.diskStorage.config.expiration = .days(3)
         return true
     }
 

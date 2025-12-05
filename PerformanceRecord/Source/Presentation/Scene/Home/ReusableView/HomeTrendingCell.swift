@@ -85,14 +85,19 @@ class HomeTrendingCell: UICollectionViewCell, ViewShrinkable {
     func configure(with uiModel: HomeUIModel) {
         guard case .trending(let boxOfficeItem) = uiModel else { return }
         let targetSize = imageView.bounds.size.applying(.init(scaleX: 0.8, y: 0.8))
+        let longTermGenres: [Constant.BoxOfficeGenre] = [.play, .musical, .openRun]
+        let isCachingLong = longTermGenres.contains(boxOfficeItem.category)
         let processor = DownsamplingImageProcessor(size: targetSize)
         imageView.kf.setImage(
             with: URL(string: boxOfficeItem.posterURL),
-            options: [.processor(processor), .scaleFactor(UIScreen.main.scale),]
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .diskCacheExpiration(.days(isCachingLong ? 7 : 2))
+            ]
         )
         titleLabel.text = boxOfficeItem.name
         placeNameLabel.text = boxOfficeItem.performingPlaceName
-//        performingPeriodLabel.text = boxOfficeItem.performPeriod.replacingOccurrences(of: "~", with: "~\n")
         performingPeriodLabel.text = boxOfficeItem.performPeriod
             .components(separatedBy: "~")
             .map({ $0.dropFirst(2) })
