@@ -223,6 +223,7 @@ private extension DefaultLocalImageDataSource {
         return uiImage.jpegData(compressionQuality: 1.0)
     }
     
+    #if DEBUG
     /// 원본 이미지 데이터를 UIImage로 완전히 로드한 후, `UIGraphicsImageRenderer`를 사용해 썸네일 `Data`를 생성.
     /// `ImageIO` 사용 대비 얼마나 비효율적인지 테스트하기 위한 함수. (실제 사용 X)
     func createThumbnailDataWithoutImageIO(from imageData: Data, maxPixelSize: Int) -> Data? {
@@ -263,5 +264,5 @@ private extension DefaultLocalImageDataSource {
         // (압축 품질을 ImageIO 함수와 동일하게 1.0으로 설정)
         return thumbnailImage.jpegData(compressionQuality: 1.0)
     }
-    
+    #endif
 }
