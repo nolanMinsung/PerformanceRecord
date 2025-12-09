@@ -46,9 +46,6 @@ class FacilityDetailViewController: UIViewController {
     
     
     func createDummyFacility() -> Facility {
-        
-        // --- 테스트용 데이터 ---
-        // 실제 앱에서는 네트워크 요청을 통해 이 데이터를 받아옵니다.
         let concertHall = SubVenue(
             name: "콘서트홀",
             id: "sub1",

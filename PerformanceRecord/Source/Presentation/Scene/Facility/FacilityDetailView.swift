@@ -55,7 +55,6 @@ class FacilityDetailView: UIView {
         
         setupInfoSection()
         setupMapSection()
-//        setupActionButtons()
         mainStackView.addArrangedSubview(amenitySection)
         setupSubVenueSection()
     }
@@ -79,28 +78,6 @@ class FacilityDetailView: UIView {
         mapView.heightAnchor.constraint(equalToConstant: 200).isActive = true
         mapView.layer.cornerRadius = 12
     }
-    
-//    private func setupActionButtons() {
-//        let findRouteButton = UIButton(type: .system)
-//        findRouteButton.setTitle("길찾기", for: .normal)
-//        findRouteButton.backgroundColor = .label
-//        findRouteButton.setTitleColor(.systemBackground, for: .normal)
-//        findRouteButton.layer.cornerRadius = 8
-//        
-//        let shareButton = UIButton(type: .system)
-//        shareButton.setTitle("공유하기", for: .normal)
-//        shareButton.layer.borderColor = UIColor.systemGray3.cgColor
-//        shareButton.layer.borderWidth = 1
-//        shareButton.setTitleColor(.label, for: .normal)
-//        shareButton.layer.cornerRadius = 8
-//
-//        let buttonStack = UIStackView(arrangedSubviews: [findRouteButton, shareButton])
-//        buttonStack.axis = .horizontal
-//        buttonStack.spacing = 12
-//        buttonStack.distribution = .fillEqually
-//        buttonStack.heightAnchor.constraint(equalToConstant: 50).isActive = true
-//        mainStackView.addArrangedSubview(buttonStack)
-//    }
     
     private func setupSubVenueSection() {
         let titleLabel = UILabel()
