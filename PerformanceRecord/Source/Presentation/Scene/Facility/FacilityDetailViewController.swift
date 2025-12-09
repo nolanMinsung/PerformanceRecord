@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import SafariServices
 
 class FacilityDetailViewController: UIViewController {
 
@@ -38,12 +39,19 @@ class FacilityDetailViewController: UIViewController {
         // 네비게이션 바 스타일 설정
         navigationController?.navigationBar.prefersLargeTitles = false
         
+        rootView.linkButton.addTarget(self, action: #selector(onLinkButtonTapped), for: .touchUpInside)
+        
         Task {
             let facility = try await viewModel.fetchFacilityDetailUseCase.execute(facilityID: viewModel.facilityID)
             rootView.configure(with: facility)
         }
     }
     
+    @objc private func onLinkButtonTapped() {
+        guard let relatedURL = rootView.relatedURL else { return }
+        let safariViewController = SFSafariViewController(url: relatedURL)
+        present(safariViewController, animated: true)
+    }
     
     func createDummyFacility() -> Facility {
         let concertHall = SubVenue(

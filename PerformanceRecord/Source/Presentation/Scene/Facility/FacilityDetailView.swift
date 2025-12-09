@@ -10,12 +10,16 @@ import MapKit // 지도 사용
 
 /// FacilityDetailViewController의 root view.
 class FacilityDetailView: UIView {
+    private(set) var relatedURL: URL?
 
     // --- UI Components ---
     private let scrollView = UIScrollView()
     private let mainStackView = UIStackView()
     
     private let nameLabel = UILabel()
+    let linkButton = UIButton(type: .system)
+    private let nameStackView = UIStackView()
+    
     private let totalSeatsLabel = UILabel()
     private let addressLabel = UILabel()
     private let infoSectionStackView = UIStackView()
@@ -62,14 +66,29 @@ class FacilityDetailView: UIView {
     // 각 섹션별 UI 구성 함수들
     private func setupInfoSection() {
         nameLabel.font = .systemFont(ofSize: 24, weight: .bold)
+        nameLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        
+        let linkImage = UIImage(systemName: "link")
+        linkButton.setImage(linkImage, for: .normal)
+        linkButton.tintColor = .systemGray3
+        linkButton.isHidden = true // Initially hidden
+        linkButton.setContentCompressionResistancePriority(.required, for: .horizontal)
+        
+        nameStackView.axis = .horizontal
+        nameStackView.spacing = 8
+        nameStackView.alignment = .center
+        nameStackView.addArrangedSubview(nameLabel)
+        nameStackView.addArrangedSubview(linkButton)
+        
         totalSeatsLabel.font = .systemFont(ofSize: 16)
         totalSeatsLabel.textColor = .secondaryLabel
         addressLabel.font = .systemFont(ofSize: 16)
         
-        infoSectionStackView.addArrangedSubview(nameLabel)
+        infoSectionStackView.addArrangedSubview(nameStackView)
         infoSectionStackView.addArrangedSubview(totalSeatsLabel)
         infoSectionStackView.addArrangedSubview(addressLabel)
         
+        infoSectionStackView.alignment = .leading
         infoSectionStackView.axis = .vertical
         infoSectionStackView.spacing = 8
     }
@@ -97,10 +116,19 @@ class FacilityDetailView: UIView {
     // 데이터 채우기
     public func configure(with facility: Facility) {
         nameLabel.text = facility.name
+        
         guard let detail = facility.detail else {
             mainStackView.addArrangedSubview(infoSectionStackView)
             return
         }
+        
+        if let urlString = detail.relatedURL, let url = URL(string: urlString) {
+            self.relatedURL = url
+            self.linkButton.isHidden = false
+        } else {
+            self.linkButton.isHidden = true
+        }
+        
         totalSeatsLabel.text = "총 \(detail.totalSeatScale)석"
         addressLabel.text = detail.address
         mainStackView.addArrangedSubview(infoSectionStackView)
