@@ -66,7 +66,8 @@ class FacilityDetailView: UIView {
     // 각 섹션별 UI 구성 함수들
     private func setupInfoSection() {
         nameLabel.font = .systemFont(ofSize: 24, weight: .bold)
-        nameLabel.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        nameLabel.numberOfLines = 0
+        nameLabel.setContentHuggingPriority(.defaultLow, for: .horizontal)
         
         let linkImage = UIImage(systemName: "link")
         linkButton.setImage(linkImage, for: .normal)
