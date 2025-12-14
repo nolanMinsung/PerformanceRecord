@@ -123,6 +123,7 @@ final class PerformanceDetailView: UIView {
         config.imagePadding = 4
         config.contentInsets = .zero
         config.titleAlignment = .leading
+        config.cornerStyle = .medium
         config.titleTextAttributesTransformer = .init { incoming in
             var outgoing = incoming
             outgoing.font = .systemFont(ofSize: 16, weight: .semibold)
