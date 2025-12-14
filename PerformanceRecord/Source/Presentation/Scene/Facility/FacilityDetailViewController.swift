@@ -50,7 +50,8 @@ class FacilityDetailViewController: UIViewController {
     @objc private func onLinkButtonTapped() {
         guard let relatedURL = rootView.relatedURL else { return }
         let safariViewController = SFSafariViewController(url: relatedURL)
-        navigationController?.pushViewController(safariViewController, animated: true)
+        safariViewController.modalPresentationStyle = .formSheet
+        present(safariViewController, animated: true)
     }
     
     func createDummyFacility() -> Facility {
