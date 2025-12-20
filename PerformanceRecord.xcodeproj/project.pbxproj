@@ -62,7 +62,12 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				"Source/Global/Supporting FIles/InfoPlist/Info.plist",
+				Source/Test/PerformanceRecordTests/Mock/MockError.swift,
+				Source/Test/PerformanceRecordTests/Mock/MockFetchRemotePerformanceDetailUseCase.swift,
+				Source/Test/PerformanceRecordTests/Mock/MockFetchRemotePerformanceListUseCase.swift,
+				Source/Test/PerformanceRecordTests/Mock/MockTogglePerformanceLikeUseCase.swift,
 				Source/Test/PerformanceRecordTests/PerformanceRecordTests.swift,
+				Source/Test/PerformanceRecordTests/SearchViewModelTests.swift,
 				Source/Test/PerformanceRecordUITests/PerformanceRecordUITests.swift,
 				Source/Test/PerformanceRecordUITests/PerformanceRecordUITestsLaunchTests.swift,
 			);
@@ -71,7 +76,12 @@
 		4E1256912E979DB80097B4F0 /* Exceptions for "PerformanceRecord" folder in "PerformanceRecordTests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Source/Test/PerformanceRecordTests/Mock/MockError.swift,
+				Source/Test/PerformanceRecordTests/Mock/MockFetchRemotePerformanceDetailUseCase.swift,
+				Source/Test/PerformanceRecordTests/Mock/MockFetchRemotePerformanceListUseCase.swift,
+				Source/Test/PerformanceRecordTests/Mock/MockTogglePerformanceLikeUseCase.swift,
 				Source/Test/PerformanceRecordTests/PerformanceRecordTests.swift,
+				Source/Test/PerformanceRecordTests/SearchViewModelTests.swift,
 			);
 			target = 4E52FA9F2E890BF100EB3EBB /* PerformanceRecordTests */;
 		};
