@@ -1,6 +1,6 @@
 //
-//  MuyeonTests.swift
-//  MuyeonTests
+//  PerformanceRecordTests.swift
+//  PerformanceRecordTests
 //
 //  Created by 김민성 on 9/28/25.
 //
