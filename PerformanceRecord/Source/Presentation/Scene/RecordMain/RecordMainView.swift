@@ -39,7 +39,7 @@ class RecordMainView: UIView {
     private func setupLayout() {
         addSubview(collectionView)
         collectionView.snp.makeConstraints { make in
-            make.edges.equalTo(self.safeAreaLayoutGuide)
+            make.edges.equalToSuperview()
         }
     }
     
