@@ -242,7 +242,11 @@ private extension HomeViewController {
         case .wisp(let indexPath):
             let wispConfig = WispConfiguration { config in
                 config.setGesture { gesture in
-                    gesture.allowedDirections = [.right, .down]
+                    if #available(iOS 26.0, *) {
+                        gesture.allowedDirections = [.down]                        
+                    } else {
+                        gesture.allowedDirections = [.right, .down]                        
+                    }
                 }
                 config.setLayout { layout in
                     let topInset = self.view.safeAreaInsets.top
