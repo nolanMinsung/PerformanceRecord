@@ -124,38 +124,36 @@ private extension HomeView {
         let section = NSCollectionLayoutSection(group: group)
         section.orthogonalScrollingBehavior = .groupPagingCentered
         section.contentInsets = NSDirectionalEdgeInsets(top: 20, leading: 0, bottom: 20, trailing: 0)
-//        section.visibleItemsInvalidationHandler = {
-//            visibleItems,
-//            scrollOffset,
-//            layoutEnvironment in
-//            print(scrollOffset)
-//            // 컬렉션뷰의 centerX 좌표 계산
-//            let collectionViewCenterX = scrollOffset.x + layoutEnvironment.container.contentSize.width / 2
-//            
-//            let scalingFactor: CGFloat = 0.0007
-//            let maxScale: CGFloat = 1.0
-//            let minScale: CGFloat = 0.8
-//            
-//            for item in visibleItems {
-//                // 헤더는 제외
-//                guard (item.representedElementCategory == .cell) else { continue }
-//                // 아이템의 centerX 좌표
-//                let itemCenterX = item.center.x
-//                
-//                // 중앙으로부터의 거리
-//                let distance = itemCenterX - collectionViewCenterX
-//                
-//                // 거리에 비례하여 scale 계산 및 적용
-//                let normalizedDistance = abs(distance) * scalingFactor
-//                let scale = max(minScale, maxScale - normalizedDistance)
-//                let xPositionDiff = -distance * 0.1
-//                
-//                let scaleTransform = CGAffineTransform(scaleX: scale, y: scale)
-//                let positionTransform = CGAffineTransform(translationX: xPositionDiff, y: 0)
-//                item.transform = positionTransform.concatenating(scaleTransform)
-//                item.zIndex = Int(scale * 10)
-//            }
-//        }
+        section.visibleItemsInvalidationHandler = {
+            visibleItems,
+            scrollOffset,
+            layoutEnvironment in
+            // 컬렉션뷰의 centerX 좌표 계산
+            let collectionViewCenterX = scrollOffset.x + layoutEnvironment.container.contentSize.width / 2
+            
+            let scalingFactor: CGFloat = 0.0007
+            let maxScale: CGFloat = 1.0
+            let minScale: CGFloat = 0.8
+            
+            for item in visibleItems {
+                // 헤더는 제외
+                guard (item.representedElementCategory == .cell) else { continue }
+                // 아이템의 centerX 좌표
+                let itemCenterX = item.center.x
+                
+                // 중앙으로부터의 거리
+                let distance = itemCenterX - collectionViewCenterX
+                
+                // 거리에 비례하여 scale 계산 및 적용
+                let normalizedDistance = abs(distance) * scalingFactor
+                let scale = max(minScale, maxScale - normalizedDistance)
+                let xPositionDiff = -distance * 0.1
+                let positionDiff = CGPoint(x: xPositionDiff, y: 0)
+                
+                self.setCarouselCellScaleAndPosition( at: item.indexPath, scale: scale, position: positionDiff)
+                item.zIndex = Int(scale * 10)
+            }
+        }
         
         let headerSize = NSCollectionLayoutSize(
             widthDimension: .fractionalWidth(1.0),
@@ -232,6 +230,17 @@ private extension HomeView {
         section.interGroupSpacing = spacing
         
         return section
+    }
+    
+    private func setCarouselCellScaleAndPosition(
+        at indexPath: IndexPath,
+        scale: CGFloat,
+        position: CGPoint
+    ) {
+        guard let cell = homeCollectionView.cellForItem(at: indexPath) else { return }
+        let sizeTransform = CGAffineTransform(scaleX: scale, y: scale)
+        let positionTransform = CGAffineTransform(translationX: position.x, y: position.y)
+        cell.transform = sizeTransform.concatenating(positionTransform)
     }
     
 }
