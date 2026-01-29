@@ -54,7 +54,7 @@ class HomeViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationController?.navigationBar.isHidden = true
+        navigationController?.isNavigationBarHidden = true
         wisp.delegate = self
         setupCollectionView()
         bind()
@@ -242,11 +242,7 @@ private extension HomeViewController {
         case .wisp(let indexPath):
             let wispConfig = WispConfiguration { config in
                 config.setGesture { gesture in
-                    if #available(iOS 26.0, *) {
-                        gesture.allowedDirections = [.down]                        
-                    } else {
-                        gesture.allowedDirections = [.right, .down]                        
-                    }
+                    gesture.allowedDirections = [.down]
                 }
                 config.setLayout { layout in
                     let topInset = self.view.safeAreaInsets.top
