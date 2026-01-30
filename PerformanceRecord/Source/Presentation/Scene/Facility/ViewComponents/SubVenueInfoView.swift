@@ -174,19 +174,27 @@ class SubVenueInfoView: UIView {
         var stageTags: [UIView] = []
         
         if venue.hasOrchestraPit {
-            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "music.note"), text: "오케스트라피트", color: .systemGreen)
+            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "music.note"),
+                                          text: "오케스트라피트",
+                                          color: .Main.primary)
             stageTags.append(tag)
         }
         if venue.hasPracticeRoom {
-            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "person.2.fill"), text: "연습실", color: .systemGreen)
+            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "person.2.fill"),
+                                          text: "연습실",
+                                          color: .Main.primary)
             stageTags.append(tag)
         }
         if venue.hasDressingRoom {
-            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "paintpalette.fill"), text: "분장실", color: .systemGreen)
+            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "paintpalette.fill"),
+                                          text: "분장실",
+                                          color: .Main.primary)
             stageTags.append(tag)
         }
         if venue.hasOutdoorStage {
-            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "bell.fill"), text: "야외공연장", color: .systemGreen)
+            let tag = SubVenueInfoTagView(icon: UIImage(systemName: "bell.fill"),
+                                          text: "야외공연장",
+                                          color: .Main.primary)
             stageTags.append(tag)
         }
         

@@ -78,8 +78,8 @@ class AmenityIconView: UIView, BaseViewSettings {
         label.text = text
 
         if isAvailable {
-            iconBackgroundView.backgroundColor = UIColor(red: 0.82, green: 0.97, blue: 0.85, alpha: 1.00) // light green
-            iconImageView.tintColor = .systemGreen
+            iconBackgroundView.backgroundColor = .Main.primary.withAlphaComponent(0.1)
+            iconImageView.tintColor = .Main.primary
             slashImageView.isHidden = true
             label.textColor = .label
         } else {
